@@ -18,7 +18,9 @@ app.get('/', function(req, res){
 
 
 app.get('/messages', function(req, res){
-    res.send('tetst');
+    res.send(
+        
+    );
 });
 
 
