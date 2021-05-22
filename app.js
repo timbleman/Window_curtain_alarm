@@ -34,9 +34,10 @@ app.get('/',express.static(path.join(__dirname, 'index')));
 //       res.send('Your Text:' +myText); 
 //   });
 
-  app.post('/submit-form', (req, res) => {
-    const username = req.body.username
-    res.send('test')
+  app.post('/https://192.168.178.24:4000', (req, res) => {
+    var username = req.body.username
+    console.log(username)
+    res.send(username)
   })
 // app.post('/messages', function(req, res){
 //   var txt_folder_name = req.body.order;
@@ -47,10 +48,12 @@ app.get('/',express.static(path.join(__dirname, 'index')));
 // app.use('/',express.static(path.join(__dirname, '/')));
 
 const timeElapsed = Date.now();
-const today = new Date(timeElapsed).getHours(); 
+const today = new Date(timeElapsed)
 
 // Console.log area
-console.log('Time: '.yellow, today);
-console.log("Client Server started at http://localhost: ".green + port.toString()+ '');
+console.log(
+"\nClient Server started at ".green + "http://localhost:".cyan + port.toString()+ '' +
+"\tTime: ".yellow, today.getHours() + ':'+ today.getMinutes()
+);
 
 app.listen(port)
