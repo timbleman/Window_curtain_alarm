@@ -14,6 +14,9 @@ PORT = 4000
 # Tried many encoders like ascii, utf-8, utf-16, utf-32, latin-1, ISO...
 # 
 # TODO find right encoder
+#
+# think this is the solution
+# -> \x16\x03 should be turned to 16 03‚
 
 def main():
     # Setup hardware
