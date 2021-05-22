@@ -1,6 +1,7 @@
 import socket
 import time
 import codecs
+import sys
 
 import InputParser
 import MotorHandler
@@ -11,7 +12,7 @@ from typedefs import coms, COMMAND_TYPE, DAT_PRSD
 PORT = 4000
 
 
-# Tried many encoders like ascii, utf-8, utf-16, utf-32, latin-1, ISO...
+# Tried many encoders like ascii, utf-8, utf-16, utf-32, latin-1, ISO..., cp437
 # 
 # TODO find right encoder
 #
@@ -21,7 +22,8 @@ PORT = 4000
 def main():
     # Setup hardware
     # Setup socket
-    sckt = socket.socket()
+    sckt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sckt.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sckt.bind(('', PORT))
     print("\nSocket bound to", PORT)
     sckt.listen(0)
@@ -35,7 +37,7 @@ def main():
 
     # byte = [97, 98, 99]
   
-    # s = ''.join(map(chr, byte))
+    # s = ''.join(format(x, '02x')for x in byte)
     # print(s)
 
     while True:
@@ -45,8 +47,15 @@ def main():
             print(addr, "connected!")
             #conn.setblocking(False)
             user_input = conn.recv(1024)
-            print("user_input", type(user_input))
+            #u = unicode(user_input, "utf-8")
+            print("\nuser_input", type(user_input))
             print("Received data: ", user_input)
+
+            # Converts Bytes to 
+            user_input = ''.join(["{:02x}".format(x) for x in user_input])
+            print("Step 1: ", user_input)
+            user_input = str(user_input, 'UTF-8')
+            print("Step 2: ",user_input)
             deltime = 1000
         except:
             deltime = 1
@@ -94,7 +103,6 @@ def main():
 
         #if parsed_in[COMMAND_TYPE] != coms.NOTHING:
         time.sleep(deltime)
-        conn.close()
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':

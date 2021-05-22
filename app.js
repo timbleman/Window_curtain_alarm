@@ -34,7 +34,7 @@ app.get('/',express.static(path.join(__dirname, 'index')));
 //       res.send('Your Text:' +myText); 
 //   });
 
-  app.post('/https://192.168.178.24:4000', (req, res) => {
+  app.post('/https://172.20.10.2:4000', (req, res) => {
     var username = req.body.username
     console.log(username)
     res.send(username)
