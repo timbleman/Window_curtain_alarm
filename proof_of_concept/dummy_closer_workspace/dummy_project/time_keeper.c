@@ -6,7 +6,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <stdint.h>
-#include "command_parser.h"
+//#include "command_parser.h"
 
 
 /********************************* Constants *********************************/
@@ -64,6 +64,7 @@ int main_1()
     return 0;
 }
 
+/*
 int set_wake(uint32_t days, int h, int m, int s)
 {
     return 0;
@@ -75,12 +76,14 @@ int set_times_multiple_days(one_tm_per_wd *time_strct,
 {
     
 }
+*/
 
 /*
  * Returns the first day in tm struct representation found in multiple days.
  * 
  * 
  */
+ /*
 int get_tm_day_from_day_type(enum DAY_TYPE dayt)
 {
     switch (dayt)
@@ -95,6 +98,7 @@ int get_tm_day_from_day_type(enum DAY_TYPE dayt)
     SUN_T = 0x0040
     }
 }
+*/
 
 /*
  * This function calculates the difference in seconds between two weekdays.
