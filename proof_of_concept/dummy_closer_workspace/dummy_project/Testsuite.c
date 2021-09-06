@@ -162,6 +162,9 @@ static void Test_get_action()
 }
 #endif // TESTABLE_PARSER_CODE
 
+#ifdef TESTABLE_TK_CODE
+#endif // TESTABLE_TK_CODE
+
 int get_bit_of_error(uint32_t err_code)
 {
     int i;
@@ -308,11 +311,14 @@ static void Test_CheckTracepointsDemo(void)
 
 void Testsuite_RunTests(void)
 {
-    #ifdef TESTABLE_PARSER_CODE
+#ifdef TESTABLE_PARSER_CODE
     Test_parse_hour();
     Test_parse_command();
     Test_get_action();
-    #endif // TESTABLE_PARSER_CODE
+#endif // TESTABLE_PARSER_CODE
+    
+#ifdef TESTABLE_TK_CODE
+#endif // TESTABLE_TK_CODE
 
     UCUNIT_WriteSummary();
 }

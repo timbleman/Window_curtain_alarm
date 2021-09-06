@@ -32,9 +32,9 @@
 *.app
 
 # Folders and files to ignore
-proof_of_concept/dummy_closer_workspace/.codelite
-proof_of_concept/dummy_closer_workspace/dummy_closer_workspace.workspace
-proof_of_concept/dummy_closer_workspace/Makefile
+#proof_of_concept/dummy_closer_workspace/.codelite
+#proof_of_concept/dummy_closer_workspace/dummy_closer_workspace.workspace
+#proof_of_concept/dummy_closer_workspace/Makefile
 proof_of_concept/dummy_closer_workspace/tags
 proof_of_concept/dummy_closer_workspace/dummy_project/Debug
 proof_of_concept/dummy_closer_workspace/dummy_project/compile_flags.txt

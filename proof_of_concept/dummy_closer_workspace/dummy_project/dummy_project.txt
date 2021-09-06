@@ -1,1 +1,1 @@
-Debug/main.c.o Debug/command_parser.c.o Debug/motor_controller.c.o Debug/System.c.o Debug/time_keeper.c.o Debug/Testsuite.c.o   
+Debug/Testsuite.c.o Debug/System.c.o Debug/command_parser.c.o Debug/main.c.o Debug/time_keeper.c.o Debug/motor_controller.c.o   

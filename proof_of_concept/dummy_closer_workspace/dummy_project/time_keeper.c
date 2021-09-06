@@ -3,16 +3,19 @@
 
 /********************************** Includes **********************************/
 #include <stdio.h>
-#include <time.h>
 #include <unistd.h>
 #include <stdint.h>
-//#include "command_parser.h"
+#include "command_parser.h"
+#ifndef TESTABLE_TK_CODE
+#include <time.h>
+#endif // TESTABLE_TK_CODE
 
 
 /********************************* Constants *********************************/
 
 
 /***************************** Struct definitions *****************************/
+#ifndef TESTABLE_TK_CODE
 typedef struct {
     struct tm tm_mon;
     struct tm tm_tue;
@@ -22,6 +25,7 @@ typedef struct {
     struct tm tm_sat;
     struct tm tm_sun;
 } one_tm_per_wd;
+#endif // TESTABLE_TK_CODE
 
 
 /**************************** Prototype functions ****************************/
@@ -30,11 +34,16 @@ long only_time_diff(struct tm *tm1, struct tm *tm2);
 int set_tm_per_wd(one_tm_per_wd *tmpwd, int wd, int h, int m, int s);
 struct tm *get_wdtm(one_tm_per_wd *tmpwd, int wd);
 long secs_until_tm_today(one_tm_per_wd *tmpwd);
+int get_tm_day_from_day_type(uint32_t dayt);
+int set_tm_multiple_days(one_tm_per_wd *time_strct,
+                            uint32_t days, int h, int m, int s);
 
 
 /**************************** Variable definitions ****************************/
+#ifndef TESTABLE_TK_CODE
 one_tm_per_wd wake_times;
 one_tm_per_wd sleep_times;
+#endif // TESTABLE_TK_CODE
 
 
 /**************************** Function definitions ****************************/
@@ -64,41 +73,90 @@ int main_1()
     return 0;
 }
 
-/*
 int set_wake(uint32_t days, int h, int m, int s)
 {
-    return 0;
+    return set_tm_multiple_days(&wake_times,
+                            days, h, m, s);
 }
 
-int set_times_multiple_days(one_tm_per_wd *time_strct,
+int set_sleep(uint32_t days, int h, int m, int s)
+{
+    return set_tm_multiple_days(&sleep_times,
+                            days, h, m, s);
+}
+
+int set_tm_multiple_days(one_tm_per_wd *time_strct,
                             uint32_t days,
                             int h, int m, int s)
 {
-    
+    int status = 0;
+    for (int i = 0; i < 7; i++)
+    {
+        int day_to_set = 1 << i;
+        status |= set_tm_per_wd(time_strct, day_to_set, h, m, s);
+    }
+    return status;
 }
-*/
 
 /*
+int set_time_single_day(one_tm_per_wd *week_strct,
+                            uint32_t day_t_day,
+                            int h, int m, int s)
+{
+    int status = 0;
+    int tm_day = get_tm_day_from_day_type(day_t_day); 
+   
+    switch (tm_day)
+    {
+        case 0: status = set_tm_per_wd(&week_strct->tm_mon, tm_day, h, m, s);
+                break;
+        case 1: status = set_tm_per_wd(&week_strct->tm_tue, tm_day, h, m, s);
+                break;
+        case 2: status = set_tm_per_wd(&week_strct->tm_wed, tm_day, h, m, s);
+                break;
+        case 3: status = set_tm_per_wd(&week_strct->tm_thu, tm_day, h, m, s);
+                break;
+        case 4: status = set_tm_per_wd(&week_strct->tm_fri, tm_day, h, m, s);
+                break;
+        case 5: status = set_tm_per_wd(&week_strct->tm_sat, tm_day, h, m, s);
+                break;
+        case 6: status = set_tm_per_wd(&week_strct->tm_sun, tm_day, h, m, s);
+                break;
+    }
+    
+    return status;
+}
+*/
+  
+/*
  * Returns the first day in tm struct representation found in multiple days.
+ * TODO Check for onehot encoding!
  * 
- * 
+ * @param dayt: A single week day in enum DAY_TYPE representation.
+ * @return: The week day in tm struct representation.
  */
- /*
-int get_tm_day_from_day_type(enum DAY_TYPE dayt)
+int get_tm_day_from_day_type(uint32_t dayt)
 {
     switch (dayt)
     {
         case MON_T: return 1;
                     break;
-    TUE_T = 0x0002,
-    WED_T = 0x0004,
-    THU_T = 0x0008,
-    FRI_T = 0x0010,
-    SAT_T = 0x0020,
-    SUN_T = 0x0040
+        case TUE_T: return 2;
+                    break;
+        case WED_T: return 3;
+                    break;
+        case THU_T: return 4;
+                    break;
+        case FRI_T: return 5;
+                    break;
+        case SAT_T: return 6;
+                    break;
+        case SUN_T: return 0;
+                    break;
+        default:    return INVALID_DAY_ERR;
+                    break;
     }
 }
-*/
 
 /*
  * This function calculates the difference in seconds between two weekdays.
