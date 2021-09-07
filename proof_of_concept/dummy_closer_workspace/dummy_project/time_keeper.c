@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdint.h>
+#include <limits.h>
 #include "command_parser.h"
 #ifndef TESTABLE_TK_CODE
 #include <time.h>
@@ -73,6 +74,25 @@ int main_1()
     return 0;
 }
 
+int setup_time_keeper()
+{
+    int status = 0;
+    
+    // Set default time for weekdays
+    for (int i = 1; i < 6; i++)
+    {
+        status |= set_tm_per_wd(&wake_times, i, DEFAULT_WEEK_WAKE, 0, 0);
+        status |= set_tm_per_wd(&sleep_times, i, DEFAULT_SLEEP, 0, 0);
+    }
+    // Set default time for the weekend
+    status |= set_tm_per_wd(&wake_times, 6, DEFAULT_WEEKEND_WAKE, 0, 0);
+    status |= set_tm_per_wd(&sleep_times, 6, DEFAULT_SLEEP, 0, 0);
+    status |= set_tm_per_wd(&wake_times, 0, DEFAULT_WEEKEND_WAKE, 0, 0);
+    status |= set_tm_per_wd(&sleep_times, 0, DEFAULT_SLEEP, 0, 0);
+
+    return status;
+}
+
 int set_wake(uint32_t days, int h, int m, int s)
 {
     return set_tm_multiple_days(&wake_times,
@@ -90,10 +110,23 @@ int set_tm_multiple_days(one_tm_per_wd *time_strct,
                             int h, int m, int s)
 {
     int status = 0;
+    
+    // Perform validity checks
+    if ((days == 0) || ((days & 0xFFFFFF80) > 0))
+        status |= 1;
+        
+    // Set times for selected days
     for (int i = 0; i < 7; i++)
     {
-        int day_to_set = 1 << i;
-        status |= set_tm_per_wd(time_strct, day_to_set, h, m, s);
+        // Check if a weekday has been set
+        int single_weekday = 1 << i;
+        if ((days & single_weekday) != 0)
+        {
+            int day_to_set = get_tm_day_from_day_type(single_weekday);
+            if (day_to_set == INVALID_DAY_ERR)
+                return 1;
+            status |= set_tm_per_wd(time_strct, day_to_set, h, m, s);
+        }
     }
     return status;
 }
@@ -158,6 +191,16 @@ int get_tm_day_from_day_type(uint32_t dayt)
     }
 }
 
+long time_until_wake()
+{
+    return secs_until_tm_today(&wake_times);
+}
+
+long time_until_sleep()
+{
+    return secs_until_tm_today(&sleep_times);
+}
+
 /*
  * This function calculates the difference in seconds between two weekdays.
  * The year, month, etc are not considered.
@@ -211,6 +254,8 @@ long secs_until_tm_today(one_tm_per_wd *tmpwd)
     currenttime = *gmtime(&rawtime);
     
     struct tm *tm_to_comp = get_wdtm(tmpwd, currenttime.tm_wday); 
+    if (tm_to_comp == NULL)
+        return LONG_MAX;
     
     printf("currenttime: hour %i, min %i, sec %i \n", 
             currenttime.tm_hour, currenttime.tm_min, currenttime.tm_sec);
@@ -235,17 +280,17 @@ int set_tm_per_wd(one_tm_per_wd *tmpwd, int wd, int h, int m, int s)
     // Some validity checks
     if (wd < 0 || wd > 6)
         return 1;
-    if (wd < 0 || h > 23)
+    if (h < 0 || h > 23)
         return 1;
-    if (wd < 0 || wd > 59)
+    if (m < 0 || m > 59)
         return 1;
-    if (wd < 0 || wd > 59)
+    if (s < 0 || s > 59)
         return 1;
             
     // Set the time of the selected weekday
     struct tm *tm_to_set = get_wdtm(tmpwd, wd);
     // TODO May uncomment.
-    //tm_to_set->tm_wday = wd;
+    tm_to_set->tm_wday = wd;
     tm_to_set->tm_hour = h;
     tm_to_set->tm_min = m;
     tm_to_set->tm_sec = s;
@@ -256,6 +301,8 @@ int set_tm_per_wd(one_tm_per_wd *tmpwd, int wd, int h, int m, int s)
 
 /*
  * Get a selected weekday from a one_tm_per_wd entity.
+ * Returning NULL in case of an invalid wd is a design decission, resulting
+ * in more necessary checks to avoid memory segmentation errors.
  * 
  * @param tmpwd: one_tm_per_wd struct that saves a time for each weekday.
  * @param wd: The weekday in the one_tm_per_wd to select.
@@ -279,7 +326,71 @@ struct tm *get_wdtm(one_tm_per_wd *tmpwd, int wd)
                 break;
         case 6: return &tmpwd->tm_sat;
                 break;
-        default: return &tmpwd->tm_sun;
+        default: return NULL;
                 break;
     }
+}
+
+/*
+ * To check the current system time.
+ * Copy by value is performed, should not be called all the time.
+ * 
+ * @return: The current day.
+ */
+int get_current_d_tm()
+{
+    time_t rawtime;
+    struct tm currenttime;
+    time(&rawtime);
+    // Copy by value to not be affected by delays
+    currenttime = *gmtime(&rawtime);
+    return currenttime.tm_wday;
+}
+
+/*
+ * To check the current system time.
+ * Copy by value is performed, should not be called all the time.
+ * 
+ * @return: The current hour.
+ */
+int get_current_h()
+{
+    time_t rawtime;
+    struct tm currenttime;
+    time(&rawtime);
+    // Copy by value to not be affected by delays
+    currenttime = *gmtime(&rawtime);
+    return currenttime.tm_hour;
+}
+
+/*
+ * To check the current system time.
+ * Copy by value is performed, should not be called all the time.
+ * 
+ * @return: The current minute.
+ */
+int get_current_m()
+{
+    time_t rawtime;
+    struct tm currenttime;
+    time(&rawtime);
+    // Copy by value to not be affected by delays
+    currenttime = *gmtime(&rawtime);
+    return currenttime.tm_min;
+}
+
+/*
+ * To check the current system time.
+ * Copy by value is performed, should not be called all the time.
+ * 
+ * @return: The current second.
+ */
+int get_current_s()
+{
+    time_t rawtime;
+    struct tm currenttime;
+    time(&rawtime);
+    // Copy by value to not be affected by delays
+    currenttime = *gmtime(&rawtime);
+    return currenttime.tm_sec;
 }

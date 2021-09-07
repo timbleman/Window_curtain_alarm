@@ -11,6 +11,11 @@
 
 
 /********************************* Constants *********************************/
+#define DEFAULT_WEEKEND_WAKE 9
+#define DEFAULT_WEEK_WAKE 8
+#define DEFAULT_SLEEP 23
+
+
 /***************************** Struct definitions *****************************/
 #ifdef TESTABLE_TK_CODE
 typedef struct {
@@ -32,6 +37,8 @@ one_tm_per_wd sleep_times;
 #endif // TESTABLE_TK_CODE
 
 /**************************** Prototype functions ****************************/
+int setup_time_keeper();
+
 int set_wake(uint32_t days, int h, int m, int s);
 
 int set_sleep(uint32_t days, int h, int m, int s);
@@ -40,12 +47,13 @@ long time_until_wake();
 
 long time_until_sleep();
 
+int get_current_d_tm();
+
 int get_current_h();
 
 int get_current_m();
 
 int get_current_s();
-
 
 
 #endif // _TIME_KEEPER_H_

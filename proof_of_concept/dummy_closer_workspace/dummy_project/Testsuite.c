@@ -36,10 +36,12 @@
 
 #include <string.h>
 #include <stdio.h>  // printf()
+#include <stdbool.h>
 #include "System.h"
 #include "uCUnit-v1.0.h"
 #include "Testsuite.h"
 #include "command_parser.h"
+#include "time_keeper.h"
 #include "configuration.h"
 
 int get_bit_of_error(uint32_t err_code);
@@ -47,6 +49,8 @@ int get_bit_of_error(uint32_t err_code);
 #ifdef TESTABLE_PARSER_CODE
 static void Test_parse_hour(void)
 {
+    UCUNIT_TestcaseBegin("DEMO: Checking parsing of hours from user input.");
+
     int argc = 0;
     const int ARGV_LEN = 20;
     char *argv[20] = {0};
@@ -95,6 +99,8 @@ static void Test_parse_hour(void)
 
 static void Test_parse_command(void)
 {
+    UCUNIT_TestcaseBegin("DEMO: Checking parsing user input.");
+
     int argc = 0;
     const int ARGV_LEN = 20;
     char *argv[20] = {0};
@@ -128,6 +134,8 @@ static void Test_parse_command(void)
 
 static void Test_get_action()
 {
+    UCUNIT_TestcaseBegin("DEMO: Checking basic action generation for set_sleep.");
+
     user_action_t new_act;
     
     // Open
@@ -163,9 +171,210 @@ static void Test_get_action()
 #endif // TESTABLE_PARSER_CODE
 
 #ifdef TESTABLE_TK_CODE
-static void Test_set_single_day()
+static void Test_set_wake_single_day()
 {
+    UCUNIT_TestcaseBegin("DEMO: Checking set_wake() for single days.");
+    /*
+     * Check the basic setup
+     */
+    setup_time_keeper();
     
+    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_wday, 1);
+    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_min, 0);
+    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_sec, 0);
+    UCUNIT_CheckIsEqual( wake_times.tm_sat.tm_wday, 6);
+    UCUNIT_CheckIsEqual( wake_times.tm_sat.tm_hour, DEFAULT_WEEKEND_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_sat.tm_min, 0);
+    UCUNIT_CheckIsEqual( wake_times.tm_sat.tm_sec, 0);
+    UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_wday, 0);
+    UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_hour, DEFAULT_WEEKEND_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_min, 0);
+    UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_sec, 0);
+    
+    
+    /*
+     * Try setting single days
+     */
+    set_wake(MON_T, 1, 2, 3);
+    set_wake(TUE_T, 4, 5, 6);
+    set_wake(WED_T, 7, 8, 9);
+    set_wake(THU_T, 10, 11, 12);
+    set_wake(FRI_T, 13, 14, 15);
+    set_wake(SAT_T, 16, 17, 18);
+    set_wake(SUN_T, 23, 59, 59);
+    
+    // Check whether times are set correctly
+    // Mon
+    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_wday, 1);
+    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_hour, 1);
+    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_min, 2);
+    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_sec, 3);
+    printf("mon wd h m s: %i %i %i %i \n", wake_times.tm_mon.tm_wday, 
+            wake_times.tm_mon.tm_hour, wake_times.tm_mon.tm_min, 
+            wake_times.tm_mon.tm_sec);
+    // Tue
+    UCUNIT_CheckIsEqual( wake_times.tm_tue.tm_wday, 2);
+    UCUNIT_CheckIsEqual( wake_times.tm_tue.tm_hour, 4);
+    UCUNIT_CheckIsEqual( wake_times.tm_tue.tm_min, 5);
+    UCUNIT_CheckIsEqual( wake_times.tm_tue.tm_sec, 6);   
+    // Wed
+    UCUNIT_CheckIsEqual( wake_times.tm_wed.tm_wday, 3);
+    UCUNIT_CheckIsEqual( wake_times.tm_wed.tm_hour, 7);
+    UCUNIT_CheckIsEqual( wake_times.tm_wed.tm_min, 8);
+    UCUNIT_CheckIsEqual( wake_times.tm_wed.tm_sec, 9);    
+    // Thu
+    UCUNIT_CheckIsEqual( wake_times.tm_thu.tm_wday, 4);
+    UCUNIT_CheckIsEqual( wake_times.tm_thu.tm_hour, 10);
+    UCUNIT_CheckIsEqual( wake_times.tm_thu.tm_min, 11);
+    UCUNIT_CheckIsEqual( wake_times.tm_thu.tm_sec, 12);     
+    // Fri
+    UCUNIT_CheckIsEqual( wake_times.tm_fri.tm_wday, 5);
+    UCUNIT_CheckIsEqual( wake_times.tm_fri.tm_hour, 13);
+    UCUNIT_CheckIsEqual( wake_times.tm_fri.tm_min, 14);
+    UCUNIT_CheckIsEqual( wake_times.tm_fri.tm_sec, 15);     
+    // Sat
+    UCUNIT_CheckIsEqual( wake_times.tm_sat.tm_wday, 6);
+    UCUNIT_CheckIsEqual( wake_times.tm_sat.tm_hour, 16);
+    UCUNIT_CheckIsEqual( wake_times.tm_sat.tm_min, 17);
+    UCUNIT_CheckIsEqual( wake_times.tm_sat.tm_sec, 18);     
+    // Sun
+    // Also check upper bounds
+    UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_wday, 0);
+    UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_hour, 23);
+    UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_min, 59);
+    UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_sec, 59);
+
+    // Reset
+    setup_time_keeper();   
+}
+
+static void Test_set_wake_invalid()
+{
+    UCUNIT_TestcaseBegin("DEMO: Checking set_wake() for invalid inputs.");
+    // Setup
+    setup_time_keeper();
+    
+    // Invalid day
+    UCUNIT_CheckIsInRange( set_wake(0, 1, 2, 3), 1, UINT32_MAX);
+    UCUNIT_CheckIsInRange( set_wake(0x0080, 1, 2, 3), 1, UINT32_MAX);
+    
+    // Invalid hour
+    UCUNIT_CheckIsInRange( set_wake(MON_T, 24, 2, 3), 1, UINT32_MAX);
+    UCUNIT_CheckIsInRange( set_wake(MON_T, -1, 2, 3), 1, UINT32_MAX);
+    
+    // Invalid minute
+    UCUNIT_CheckIsInRange( set_wake(MON_T, 1, 60, 3), 1, UINT32_MAX);
+    UCUNIT_CheckIsInRange( set_wake(MON_T, 1, -1, 3), 1, UINT32_MAX);
+    
+    // Invalid second
+    UCUNIT_CheckIsInRange( set_wake(MON_T, 1, 2, 60), 1, UINT32_MAX);
+    UCUNIT_CheckIsInRange( set_wake(MON_T, 1, 2, -1), 1, UINT32_MAX);
+    
+    // Check that monday times have not been changed due to invalid input.
+    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_wday, 1);
+    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_min, 0);
+    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_sec, 0);
+    
+    // Reset
+    setup_time_keeper();     
+}
+
+static void Test_set_wake_multiple_days()
+{
+    UCUNIT_TestcaseBegin("DEMO: Checking set_wake() for multiple days at once.");
+    // Setup
+    setup_time_keeper();
+    
+    set_wake(MON_T | TUE_T | SAT_T, 11, 2, 3);
+    
+    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_hour, 11);
+    UCUNIT_CheckIsEqual( wake_times.tm_tue.tm_hour, 11);
+    UCUNIT_CheckIsEqual( wake_times.tm_wed.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_thu.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_fri.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_sat.tm_hour, 11);
+    UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_hour, DEFAULT_WEEKEND_WAKE);
+    
+    // Reset
+    setup_time_keeper();    
+}
+
+static void Test_set_sleep_single_day()
+{
+    UCUNIT_TestcaseBegin("DEMO: Checking set_sleep().");
+    /*
+     * Check the basic setup
+     */
+    setup_time_keeper();
+    
+    UCUNIT_CheckIsEqual( sleep_times.tm_mon.tm_wday, 1);
+    UCUNIT_CheckIsEqual( sleep_times.tm_mon.tm_hour, DEFAULT_SLEEP);
+    UCUNIT_CheckIsEqual( sleep_times.tm_mon.tm_min, 0);
+    UCUNIT_CheckIsEqual( sleep_times.tm_mon.tm_sec, 0);
+    UCUNIT_CheckIsEqual( sleep_times.tm_sat.tm_wday, 6);
+    UCUNIT_CheckIsEqual( sleep_times.tm_sat.tm_hour, DEFAULT_SLEEP);
+    UCUNIT_CheckIsEqual( sleep_times.tm_sat.tm_min, 0);
+    UCUNIT_CheckIsEqual( sleep_times.tm_sat.tm_sec, 0);
+    UCUNIT_CheckIsEqual( sleep_times.tm_sun.tm_wday, 0);
+    UCUNIT_CheckIsEqual( sleep_times.tm_sun.tm_hour, DEFAULT_SLEEP);
+    UCUNIT_CheckIsEqual( sleep_times.tm_sun.tm_min, 0);
+    UCUNIT_CheckIsEqual( sleep_times.tm_sun.tm_sec, 0);
+    
+    
+    /*
+     * Try setting single days
+     */
+    set_sleep(MON_T, 11, 22, 33);
+    
+    // Check whether times are set correctly
+    // Mon
+    UCUNIT_CheckIsEqual( sleep_times.tm_mon.tm_wday, 1);
+    UCUNIT_CheckIsEqual( sleep_times.tm_mon.tm_hour, 11);
+    UCUNIT_CheckIsEqual( sleep_times.tm_mon.tm_min, 22);
+    UCUNIT_CheckIsEqual( sleep_times.tm_mon.tm_sec, 33);
+    
+    // Reset
+    setup_time_keeper();
+}
+
+static void Test_time_until_wake_today()
+{
+    UCUNIT_TestcaseBegin("Checking time_until_wake() for current time.");
+    // Setup
+    setup_time_keeper();
+    
+    bool min_prev = get_current_m() > 30;
+    
+    const uint32_t ALL_DAYS = MON_T | TUE_T | WED_T | THU_T | FRI_T 
+                                | SAT_T | SUN_T;
+    const int MIN_OFFSET = 25;
+    const int TARGET_DIFF_SECS = MIN_OFFSET * 60;
+    
+    // Set a wake_time not far from now and check whether the seconds match.
+    int NEW_MIN = 0;
+    if (min_prev)
+    {
+        NEW_MIN = get_current_m() - MIN_OFFSET;
+        set_wake(ALL_DAYS,  get_current_h(),
+                            NEW_MIN,
+                            get_current_s());
+        UCUNIT_CheckIsInRange( time_until_wake(), TARGET_DIFF_SECS - 1, 
+                                                TARGET_DIFF_SECS + 1);
+    }
+    else
+    {
+        NEW_MIN = get_current_m() + MIN_OFFSET;
+        set_wake(ALL_DAYS,  get_current_h(),
+                            NEW_MIN,
+                            get_current_s());
+        UCUNIT_CheckIsInRange( time_until_wake(), TARGET_DIFF_SECS - 1, 
+                                                TARGET_DIFF_SECS + 1);     
+    }
+    
+    // Reset
+    setup_time_keeper();
 }
 #endif // TESTABLE_TK_CODE
 
@@ -322,6 +531,11 @@ void Testsuite_RunTests(void)
 #endif // TESTABLE_PARSER_CODE
     
 #ifdef TESTABLE_TK_CODE
+    Test_set_wake_single_day();
+    Test_set_wake_multiple_days();
+    Test_set_wake_invalid();
+    Test_set_sleep_single_day();
+    Test_time_until_wake_today();
 #endif // TESTABLE_TK_CODE
 
     UCUNIT_WriteSummary();
