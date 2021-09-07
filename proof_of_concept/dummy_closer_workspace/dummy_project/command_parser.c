@@ -253,6 +253,7 @@ char *parse_arbitrary_arg(char **split_command, int command_num, char option)
  */
 int parse_days(char **split_command, int command_num)
 {
+    // TODO Replace by calloc and free, make size variable.
     char *dvalue = "                                                     ";
     //int errors = 0;
     
@@ -278,7 +279,7 @@ int parse_days(char **split_command, int command_num)
     if (strstr(dvalue, "sun") != NULL)
         days = days | SUN_T;
         
-    // TODO find writing errors!
+    // TODO Find writing errors!
         
     return days;
 }

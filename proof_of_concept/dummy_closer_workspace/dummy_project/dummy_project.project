@@ -93,6 +93,7 @@
     </Configuration>
   </Settings>
   <VirtualDirectory Name="src">
+    <File Name="README.md"/>
     <File Name="uCUnit-v1.0.h"/>
     <File Name="time_keeper.h"/>
     <File Name="time_keeper.c"/>

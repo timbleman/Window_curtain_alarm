@@ -163,6 +163,10 @@ static void Test_get_action()
 #endif // TESTABLE_PARSER_CODE
 
 #ifdef TESTABLE_TK_CODE
+static void Test_set_single_day()
+{
+    
+}
 #endif // TESTABLE_TK_CODE
 
 int get_bit_of_error(uint32_t err_code)
