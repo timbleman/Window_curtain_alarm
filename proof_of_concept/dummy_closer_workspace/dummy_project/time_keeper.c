@@ -48,32 +48,11 @@ one_tm_per_wd sleep_times;
 
 
 /**************************** Function definitions ****************************/
-int main_1()
-{
-    time_t rawtime;
-    struct tm timeinfo1;
-    struct tm timeinfo2;
-    
-    set_tm_per_wd(&wake_times, 3, 21, 12, 0);
-    printf("mon: hour %i, min %i, sec %i \n", wake_times.tm_mon.tm_hour, 
-            wake_times.tm_mon.tm_min, wake_times.tm_mon.tm_sec);
-    
-    time(&rawtime);
-    timeinfo1 = *gmtime(&rawtime);
-    printf("1: hour %i, min %i, sec %i \n", timeinfo1.tm_hour, timeinfo1.tm_min, timeinfo1.tm_sec);
-    
-    time(&rawtime);
-    timeinfo2 = *gmtime(&rawtime);
-    printf("1: hour %i, min %i, sec %i \n", timeinfo1.tm_hour, timeinfo1.tm_min, timeinfo1.tm_sec);
-    printf("2: hour %i, min %i, sec %i \n", timeinfo2.tm_hour, timeinfo2.tm_min, timeinfo2.tm_sec);
-    
-    printf("Own diff: %ld\n", only_time_wd_diff(&timeinfo1, &timeinfo2));
-    
-    printf("Current wake diff: %ld\n", secs_until_tm_today(&wake_times));
-
-    return 0;
-}
-
+/*
+ * Default wake and sleep times are set for each weekday.
+ * 
+ * @return: 0 if successful.
+ */
 int setup_time_keeper()
 {
     int status = 0;
@@ -93,18 +72,47 @@ int setup_time_keeper()
     return status;
 }
 
+/*
+ * Set the time to wake up for multiple days.
+ * Days are onehot encoded as in the DAY_TYPE defined in command_parser.
+ * 
+ * @param days: The weekdays to set.
+ * @param h: The hour to open the curtain.
+ * @param m: The minute to open the curtain.
+ * @param s: The second to open the curtain.
+ * @return: 0 if successful.
+ */
 int set_wake(uint32_t days, int h, int m, int s)
 {
     return set_tm_multiple_days(&wake_times,
                             days, h, m, s);
 }
 
+/*
+ * Set the time to sleep for multiple days.
+ * Days are onehot encoded as in the DAY_TYPE defined in command_parser.
+ * 
+ * @param days: The weekdays to set.
+ * @param h: The hour to close the curtain.
+ * @param m: The minute to close the curtain.
+ * @param s: The second to close the curtain.
+ * @return: 0 if successful.
+ */
 int set_sleep(uint32_t days, int h, int m, int s)
 {
     return set_tm_multiple_days(&sleep_times,
                             days, h, m, s);
 }
 
+/*
+ * Set the times for multiple days.
+ * 
+ * @param time_struct: one_tm_per_wd instance that saves a time for each weekday.
+ * @param h: The hour to close the curtain.
+ * @param m: The minute to close the curtain.
+ * @param s: The second to close the curtain.
+ * @return: 0 if successful.
+ */
 int set_tm_multiple_days(one_tm_per_wd *time_strct,
                             uint32_t days,
                             int h, int m, int s)
@@ -130,36 +138,6 @@ int set_tm_multiple_days(one_tm_per_wd *time_strct,
     }
     return status;
 }
-
-/*
-int set_time_single_day(one_tm_per_wd *week_strct,
-                            uint32_t day_t_day,
-                            int h, int m, int s)
-{
-    int status = 0;
-    int tm_day = get_tm_day_from_day_type(day_t_day); 
-   
-    switch (tm_day)
-    {
-        case 0: status = set_tm_per_wd(&week_strct->tm_mon, tm_day, h, m, s);
-                break;
-        case 1: status = set_tm_per_wd(&week_strct->tm_tue, tm_day, h, m, s);
-                break;
-        case 2: status = set_tm_per_wd(&week_strct->tm_wed, tm_day, h, m, s);
-                break;
-        case 3: status = set_tm_per_wd(&week_strct->tm_thu, tm_day, h, m, s);
-                break;
-        case 4: status = set_tm_per_wd(&week_strct->tm_fri, tm_day, h, m, s);
-                break;
-        case 5: status = set_tm_per_wd(&week_strct->tm_sat, tm_day, h, m, s);
-                break;
-        case 6: status = set_tm_per_wd(&week_strct->tm_sun, tm_day, h, m, s);
-                break;
-    }
-    
-    return status;
-}
-*/
   
 /*
  * Returns the first day in tm struct representation found in multiple days.
@@ -191,11 +169,23 @@ int get_tm_day_from_day_type(uint32_t dayt)
     }
 }
 
+/*
+ * The time difference from now until the wake time of the current weekday.
+ * Positive if one_tm_per_wd entry is in the future, negative if in the past.
+ * 
+ * @return: Difference in seconds.
+ */
 long time_until_wake()
 {
     return secs_until_tm_today(&wake_times);
 }
 
+/*
+ * The time difference from now until the sleep time of the current weekday.
+ * Positive if one_tm_per_wd entry is in the future, negative if in the past.
+ * 
+ * @return: Difference in seconds.
+ */
 long time_until_sleep()
 {
     return secs_until_tm_today(&sleep_times);
@@ -242,7 +232,7 @@ long only_time_diff(struct tm *tm1, struct tm *tm2)
  * The time difference from now until the one_tm_per_wd selected by weekday.
  * Positive if one_tm_per_wd entry is in the future, negative if in the past.
  * 
- * @param tmpwd: one_tm_per_wd struct that saves a time for each weekday.
+ * @param tmpwd: one_tm_per_wd instance that saves a time for each weekday.
  * @return: Difference in seconds.
  */
 long secs_until_tm_today(one_tm_per_wd *tmpwd)
@@ -335,7 +325,7 @@ struct tm *get_wdtm(one_tm_per_wd *tmpwd, int wd)
  * To check the current system time.
  * Copy by value is performed, should not be called all the time.
  * 
- * @return: The current day.
+ * @return: The current day in the C tm struct format.
  */
 int get_current_d_tm()
 {

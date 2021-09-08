@@ -354,14 +354,16 @@ static void Test_time_until_wake_today()
     
     // Set a wake_time not far from now and check whether the seconds match.
     int NEW_MIN = 0;
+    long time_till_wake = 0;
     if (min_prev)
     {
         NEW_MIN = get_current_m() - MIN_OFFSET;
         set_wake(ALL_DAYS,  get_current_h(),
                             NEW_MIN,
                             get_current_s());
-        UCUNIT_CheckIsInRange( time_until_wake(), TARGET_DIFF_SECS - 1, 
-                                                TARGET_DIFF_SECS + 1);
+        time_till_wake = time_until_wake();
+        UCUNIT_CheckIsInRange( time_till_wake, -TARGET_DIFF_SECS - 1, 
+                                                -TARGET_DIFF_SECS + 1);
     }
     else
     {
@@ -369,9 +371,12 @@ static void Test_time_until_wake_today()
         set_wake(ALL_DAYS,  get_current_h(),
                             NEW_MIN,
                             get_current_s());
-        UCUNIT_CheckIsInRange( time_until_wake(), TARGET_DIFF_SECS - 1, 
+        time_till_wake = time_until_wake();
+        UCUNIT_CheckIsInRange( time_till_wake, TARGET_DIFF_SECS - 1, 
                                                 TARGET_DIFF_SECS + 1);     
     }
+    
+    //printf("time_till_wake %ld target_diff %i \n", time_till_wake, TARGET_DIFF_SECS);
     
     // Reset
     setup_time_keeper();

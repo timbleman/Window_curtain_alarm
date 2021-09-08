@@ -37,22 +37,83 @@ one_tm_per_wd sleep_times;
 #endif // TESTABLE_TK_CODE
 
 /**************************** Prototype functions ****************************/
+/*
+ * Default wake and sleep times are set for each weekday.
+ * 
+ * @return: 0 if successful.
+ */
 int setup_time_keeper();
 
+/*
+ * Set the time to wake up for multiple days.
+ * Days are onehot encoded as in the DAY_TYPE defined in command_parser.
+ * 
+ * @param days: The weekdays to set.
+ * @param h: The hour to open the curtain.
+ * @param m: The minute to open the curtain.
+ * @param s: The second to open the curtain.
+ * @return: 0 if successful.
+ */
 int set_wake(uint32_t days, int h, int m, int s);
 
+/*
+ * Set the time to sleep for multiple days.
+ * Days are onehot encoded as in the DAY_TYPE defined in command_parser.
+ * 
+ * @param days: The weekdays to set.
+ * @param h: The hour to close the curtain.
+ * @param m: The minute to close the curtain.
+ * @param s: The second to close the curtain.
+ * @return: 0 if successful.
+ */
 int set_sleep(uint32_t days, int h, int m, int s);
 
+/*
+ * The time difference from now until the wake time of the current weekday.
+ * Positive if one_tm_per_wd entry is in the future, negative if in the past.
+ * 
+ * @return: Difference in seconds.
+ */
 long time_until_wake();
 
+/*
+ * The time difference from now until the sleep time of the current weekday.
+ * Positive if one_tm_per_wd entry is in the future, negative if in the past.
+ * 
+ * @return: Difference in seconds.
+ */
 long time_until_sleep();
 
+/*
+ * To check the current system time.
+ * Copy by value is performed, should not be called all the time.
+ * 
+ * @return: The current day in the C tm struct format.
+ */
 int get_current_d_tm();
 
+/*
+ * To check the current system time.
+ * Copy by value is performed, should not be called all the time.
+ * 
+ * @return: The current hour.
+ */
 int get_current_h();
 
+/*
+ * To check the current system time.
+ * Copy by value is performed, should not be called all the time.
+ * 
+ * @return: The current minute.
+ */
 int get_current_m();
 
+/*
+ * To check the current system time.
+ * Copy by value is performed, should not be called all the time.
+ * 
+ * @return: The current second.
+ */
 int get_current_s();
 
 

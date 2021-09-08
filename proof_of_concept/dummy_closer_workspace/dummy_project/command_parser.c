@@ -23,6 +23,7 @@ int getopt_example (int argc, char **argv);
 enum CURTAIN_CONTROL_ACT_T parse_open_close(char *user_str);
 user_action_t get_time_action(char **split_command, int command_num);
 int parse_days(char **split_command, int command_num);
+uint32_t check_mins_secs_validity(int m_s_int, char *m_s_str);
 //static void print_buffer(char *buffer, int size);
 //static void print_argc_argv(int argc, char *argv[]);
 #ifndef TESTABLE_PARSER_CODE
@@ -40,34 +41,6 @@ int tokenise_to_argc_argv(
 
 
 /**************************** Function definitions ****************************/
-int main_2(void)
-{ /* This shows various string examples */
-    printf("# `tokenise_to_argc_argv()` Examples\n");
-    char  buffer[] = "set_sleep -a -c foo,poo,shoe -h 22";
-
-    int   argc     = 0;
-    char *argv[10] = {0};
-
-    //printf("* **Initial State**\n");
-    //print_buffer(buffer, sizeof(buffer));
-
-    /* Tokenise Command Buffer */
-    tokenise_to_argc_argv(buffer, &argc, argv, sizeof(argv));
-
-    /*
-    printf("* **After Tokenizing**\n");
-    print_buffer(buffer, sizeof(buffer));
-    print_argc_argv(argc, argv);
-    printf("\n\n");
-    */
-    //getopt_example (argc, argv);
-    
-    //parse_action(argv, argc);
-    parse_hour(argv, argc);
-    
-    return 0;
-}
-
 /*
  * A user_action_t is created from user input as string.
  * Currently wake set, sleep set and curtain actions are parsed.
@@ -89,7 +62,7 @@ user_action_t get_action(char *user_str)
     for (size_t i = 0; i < strlen(user_str); ++i) {
         str_lower[i] = tolower((unsigned char) user_str[i]);
     }
-    printf("\nstr_lower to lower: %s \n", str_lower);
+    //printf("\nstr_lower to lower: %s \n", str_lower);
     tokenise_to_argc_argv(str_lower, &argc, argv, MAX_USER_INPUT_LEN);
 #else
     // Regular parsing
@@ -140,7 +113,9 @@ user_action_t get_time_action(char **split_command, int command_num)
                     | (s & ALL_ERRS);
     if (all_errors != 0)
     {
-        printf("Errors have occured! %X \n", all_errors);
+#ifdef BASIC_DEBUG_PRINTS
+        printf("Errors have been detected! %X \n", all_errors);
+#endif // BASIC_DEBUG_PRINTS
         days = days | all_errors;
     }
     
@@ -182,13 +157,26 @@ int tokenise_to_argc_argv(
   return i; // Argument Count
 }
 
+/*
+ * Extracts the command value of an option (e.g.: -d, -h, -m, -s).
+ * Should have used optarg, but because of some problems an own implementation
+ * has been used.
+ * 
+ * @param split_command: Array pointing tokenized user input.
+ * @param command_num: Number of substrings.
+ * @param option: The char for the option to extract.
+ * @return: The value belonging to the option.
+ */
 char *parse_arbitrary_arg(char **split_command, int command_num, char option)
 {
     //char **split_command = *split_com;
     char matching_str[3] = "-\n";
     matching_str[1] = option;
+#ifdef BASIC_DEBUG_PRINTS
     printf("matching_str %s \n", matching_str);   
-    
+#endif // BASIC_DEBUG_PRINTS    
+
+    // Search the option
     int str_i = 0;
     while (str_i < command_num)
     {
@@ -200,10 +188,20 @@ char *parse_arbitrary_arg(char **split_command, int command_num, char option)
         }
         str_i++;
     }
+    
+    // Return value belonging to the option or NULL.
     if (str_i != command_num)
     {
         //printf("split_command[str_i] %p \n", &split_command[str_i]);
-        return split_command[str_i];
+        // Check that the next string is not another option.
+        if (split_command[str_i][0] == '-')
+        {
+            return NULL;
+        }
+        else
+        {
+            return split_command[str_i];
+        }
     } 
     else
     {
@@ -260,7 +258,10 @@ int parse_days(char **split_command, int command_num)
     dvalue = parse_arbitrary_arg(split_command, command_num, 'd');
     if (dvalue == NULL)
         dvalue = "";
+        
+#ifdef PARSE_TIME_DEBUG_PRINTS
     printf("dvalue %s \n", dvalue);
+#endif // PARSE_TIME_DEBUG_PRINTS
     
     uint32_t days = 0;
     
@@ -350,26 +351,31 @@ int parse_hour(char **split_command, int command_num)
     }
     */
     
-    printf("hour value as str: %s \n", hvalue);
-    
     uint32_t parsed_hour = atoi(hvalue);
     
+#ifdef PARSE_TIME_DEBUG_PRINTS
+    printf("hour value as str: %s \n", hvalue);
     printf("parsed hour value: %i \n", parsed_hour);
     
     
     printf("(strcmp(hvalue, 0) != 0) %i \n", (strcmp(hvalue, "0") != 0));
     printf("(strcmp(hvalue, 00) != 0) %i \n", (strcmp(hvalue, "00") != 0));
+#endif // PARSE_TIME_DEBUG_PRINTS
     // TODO Check if string is parsed correctly
     if ((parsed_hour == 0) && 
             ((strcmp(hvalue, "0") != 0) && (strcmp(hvalue, "00") != 0)))
     {
+#ifdef PARSE_TIME_DEBUG_PRINTS
         printf("Invalid, lol \n");
+#endif // PARSE_TIME_DEBUG_PRINTS
         errors |= INVALID_TIME_ERR;
     }
     
     if ((parsed_hour < 0) || (parsed_hour > 23))
     {
+#ifdef PARSE_TIME_DEBUG_PRINTS
         printf("Out of range, lol \n");
+#endif // PARSE_TIME_DEBUG_PRINTS
         errors |= INVALID_TIME_ERR;
     }
 
@@ -399,19 +405,7 @@ int parse_min(char **split_command, int command_num)
         
     uint32_t parsed_min = atoi(mvalue);
     
-    // TODO Check if string is parsed correctly
-    if ((parsed_min == 0) && 
-            ((strcmp(mvalue, "0") != 0) && (strcmp(mvalue, "00") != 0)))
-    {
-        printf("Invalid, lol \n");
-        errors |= INVALID_TIME_ERR;
-    }
-    
-    if ((parsed_min < 0) || (parsed_min > 59))
-    {
-        printf("Out of range, lol \n");
-        errors |= INVALID_TIME_ERR;
-    }
+    errors |= check_mins_secs_validity(parsed_min, mvalue);
 
     if (errors != 0)
         return errors;
@@ -439,19 +433,7 @@ int parse_sec(char **split_command, int command_num)
         
     uint32_t parsed_sec = atoi(svalue);
     
-    // TODO Check if string is parsed correctly
-    if ((parsed_sec == 0) && 
-            ((strcmp(svalue, "0") != 0) && (strcmp(svalue, "00") != 0)))
-    {
-        printf("Invalid, lol \n");
-        errors |= INVALID_TIME_ERR;
-    }
-    
-    if ((parsed_sec < 0) || (parsed_sec > 59))
-    {
-        printf("Out of range, lol \n");
-        errors |= INVALID_TIME_ERR;
-    }
+    errors |= check_mins_secs_validity(parsed_sec, svalue);
 
     if (errors != 0)
         return errors;
@@ -459,6 +441,46 @@ int parse_sec(char **split_command, int command_num)
     return parsed_sec;
 }
 
+/*
+ * Checks whether a minutes or seconds value has been parsed correctly from 
+ * a string. This is necessary as "0", "00" or arbitrary strings are parsed
+ * to the integer 0.
+ * 
+ * @param m_s_int: Parsed minutes or seconds integer.
+ * @param m_s_str: String containing a number to be parsed.
+ * @param: 0 if valid, INVALID_TIME_ERR otherwise.
+ */
+uint32_t check_mins_secs_validity(int m_s_int, char *m_s_str)
+{
+    int errors = 0;
+    // TODO Check if string is parsed correctly
+    if ((m_s_int == 0) && 
+            ((strcmp(m_s_str, "0") != 0) && (strcmp(m_s_str, "00") != 0)))
+    {
+#ifdef PARSE_TIME_DEBUG_PRINTS
+        printf("Invalid, lol \n");
+#endif // PARSE_TIME_DEBUG_PRINTS
+        errors |= INVALID_TIME_ERR;
+    }
+    
+    if ((m_s_int < 0) || (m_s_int > 59))
+    {
+#ifdef PARSE_TIME_DEBUG_PRINTS
+        printf("Out of range, lol \n");
+#endif // PARSE_TIME_DEBUG_PRINTS
+        errors |= INVALID_TIME_ERR;
+    }
+    
+    return errors;
+}
+
+/*
+ * Parses action type from user input. NONE_T if nothing found.
+ * 
+ * @param split_command: Array pointing tokenized user input.
+ * @param command_num: Number of substrings.
+ * @return: The parsed ACTION_TYPE.
+ */
 enum ACTION_TYPE parse_action(char **split_command, int command_num)
 {
     if (command_num == 0)
@@ -468,38 +490,58 @@ enum ACTION_TYPE parse_action(char **split_command, int command_num)
 
     if (strcmp(split_command[0], "set_wake") == 0)
     {
+#ifdef PARSE_ACTION_DEBUG_PRINTS
         printf("WAKE_SET_T found command\n");
+#endif // PARSE_ACTION_DEBUG_PRINTS
         return WAKE_SET_T;
     }
     else if (strcmp(split_command[0], "set_sleep") == 0)
     {
+#ifdef PARSE_ACTION_DEBUG_PRINTS
         printf("SLEEP_SET_T found command\n");
+#endif // PARSE_ACTION_DEBUG_PRINTS
         return SLEEP_SET_T;
     }
     else if ((strcmp(split_command[0], "open") == 0)
                 || (strcmp(split_command[0], "close") == 0)) 
     {
+#ifdef PARSE_ACTION_DEBUG_PRINTS
         printf("CURTAIN_CONTROL_T found command\n");
+#endif // PARSE_ACTION_DEBUG_PRINTS
         return CURTAIN_CONTROL_T;    
     }
     else
     {
+#ifdef PARSE_ACTION_DEBUG_PRINTS
         printf("No valid command found!\n");
+#endif // PARSE_ACTION_DEBUG_PRINTS
         return NONE_T;
     }
     
 }
 
+/*
+ * Parses whether a user input contains open or close commands.
+ * 
+ * @param user_str: The user string to parse.
+ * @return: CURTAIN_CONTROL_ACT_T
+ */
 enum CURTAIN_CONTROL_ACT_T parse_open_close(char *user_str)
 {
     if (strstr(user_str, "open") != NULL)
     {
+#ifdef PARSE_ACTION_DEBUG_PRINTS
         printf("open type \n");
+#endif // PARSE_ACTION_DEBUG_PRINTS
         return OPEN_T;
     }
     else if (strstr(user_str, "close") != NULL)
     {
+#ifdef PARSE_ACTION_DEBUG_PRINTS
         printf("close type \n");
+#endif // PARSE_ACTION_DEBUG_PRINTS
+        return CLOSE_T;
+        return CLOSE_T;
         return CLOSE_T;
     }
     else
