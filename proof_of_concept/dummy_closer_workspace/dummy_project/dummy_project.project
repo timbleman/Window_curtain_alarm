@@ -8,6 +8,8 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="alarm_checker.c"/>
+    <File Name="alarm_checker.h"/>
     <File Name="action_executer.h"/>
     <File Name="action_executer.c"/>
     <File Name="README.md"/>

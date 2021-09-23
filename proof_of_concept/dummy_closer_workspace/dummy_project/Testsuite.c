@@ -44,6 +44,7 @@
 #include "time_keeper.h"
 #include "motor_controller.h"
 #include "action_executer.h"
+#include "alarm_checker.h"
 #include "configuration.h"
 
 
@@ -553,6 +554,37 @@ static void Test_basic_sleep_actions()
 #endif // TESTABLE_ACTION_EXEC
 
 
+#ifdef TESTABLE_ALARMCHECKER_CODE
+static void Test_new_state_ttw_tts_today()
+{
+    UCUNIT_TestcaseBegin("Checking new state based on today's tuw and tus.");
+    
+    /*
+     * TODO
+     * Jooo check if this makes sense.
+     * 
+     * now is the current time, |wake| today's wake_time,
+     * |sleep| today's sleep_time.
+     * Only the current day is considered.
+     */
+    
+    // now |wake| ... |sleep| ...
+    UCUNIT_CheckIsEqual( CURTAIN_UNDEFINED_T, new_state_ttw_tts_today(5, 10));
+    // ... |wake| now |sleep| ...
+    UCUNIT_CheckIsEqual( CURTAIN_OPEN_T, new_state_ttw_tts_today(-5, 5));
+    // ... |wake| ... |sleep| now
+    UCUNIT_CheckIsEqual( CURTAIN_CLOSED_T, new_state_ttw_tts_today(-10, -5));
+    
+    // now |sleep| ... |wake| ...
+    UCUNIT_CheckIsEqual( CURTAIN_UNDEFINED_T, new_state_ttw_tts_today(10, 5));
+    // ... |sleep| now |wake| ...
+    UCUNIT_CheckIsEqual( CURTAIN_CLOSED_T, new_state_ttw_tts_today(5, -5));
+    // ... |sleep| ... |wake| now
+    UCUNIT_CheckIsEqual( CURTAIN_OPEN_T, new_state_ttw_tts_today(-5, -10));
+}
+#endif // TESTABLE_ALARMCHECKER_CODE
+
+
 int get_bit_of_error(uint32_t err_code)
 {
     int i;
@@ -715,6 +747,7 @@ void Testsuite_RunTests(void)
 
 #ifdef TESTABLE_MOTOR_CODE
     Test_basic_open_close();
+    Test_current_state();
 #endif // TESTABLE_MOTOR_CODE
 
 #ifdef TESTABLE_ACTION_EXEC
@@ -722,6 +755,10 @@ void Testsuite_RunTests(void)
     Test_basic_wake_actions();
     Test_basic_sleep_actions();
 #endif // TESTABLE_ACTION_EXEC
+
+#ifdef TESTABLE_ALARMCHECKER_CODE
+    Test_new_state_ttw_tts_today();
+#endif // TESTABLE_ALARMCHECKER_CODE
 
     UCUNIT_WriteSummary();
 }

@@ -62,7 +62,7 @@ AS       := C:/MinGW/bin/as.exe
 ## User defined environment variables
 ##
 CodeLiteDir:=C:\Program Files\CodeLite
-Objects0=$(IntermediateDirectory)/command_parser.c$(ObjectSuffix) $(IntermediateDirectory)/System.c$(ObjectSuffix) $(IntermediateDirectory)/Testsuite.c$(ObjectSuffix) $(IntermediateDirectory)/action_executer.c$(ObjectSuffix) $(IntermediateDirectory)/main.c$(ObjectSuffix) $(IntermediateDirectory)/motor_controller.c$(ObjectSuffix) $(IntermediateDirectory)/time_keeper.c$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/time_keeper.c$(ObjectSuffix) $(IntermediateDirectory)/motor_controller.c$(ObjectSuffix) $(IntermediateDirectory)/main.c$(ObjectSuffix) $(IntermediateDirectory)/action_executer.c$(ObjectSuffix) $(IntermediateDirectory)/Testsuite.c$(ObjectSuffix) $(IntermediateDirectory)/System.c$(ObjectSuffix) $(IntermediateDirectory)/alarm_checker.c$(ObjectSuffix) $(IntermediateDirectory)/command_parser.c$(ObjectSuffix) 
 
 
 
@@ -93,35 +93,11 @@ PreBuild:
 ##
 ## Objects
 ##
-$(IntermediateDirectory)/command_parser.c$(ObjectSuffix): command_parser.c
-	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/command_parser.c$(ObjectSuffix) -MF$(IntermediateDirectory)/command_parser.c$(DependSuffix) -MM command_parser.c
-	$(CC) $(SourceSwitch) "C:/Users/fraun/Documents/3D_druck/Sonstige_Moebel/curtain_closer/code/Window_curtain_alarm/proof_of_concept/dummy_closer_workspace/dummy_project/command_parser.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/command_parser.c$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/command_parser.c$(PreprocessSuffix): command_parser.c
-	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/command_parser.c$(PreprocessSuffix) command_parser.c
-
-$(IntermediateDirectory)/System.c$(ObjectSuffix): System.c
-	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/System.c$(ObjectSuffix) -MF$(IntermediateDirectory)/System.c$(DependSuffix) -MM System.c
-	$(CC) $(SourceSwitch) "C:/Users/fraun/Documents/3D_druck/Sonstige_Moebel/curtain_closer/code/Window_curtain_alarm/proof_of_concept/dummy_closer_workspace/dummy_project/System.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/System.c$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/System.c$(PreprocessSuffix): System.c
-	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/System.c$(PreprocessSuffix) System.c
-
-$(IntermediateDirectory)/Testsuite.c$(ObjectSuffix): Testsuite.c
-	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/Testsuite.c$(ObjectSuffix) -MF$(IntermediateDirectory)/Testsuite.c$(DependSuffix) -MM Testsuite.c
-	$(CC) $(SourceSwitch) "C:/Users/fraun/Documents/3D_druck/Sonstige_Moebel/curtain_closer/code/Window_curtain_alarm/proof_of_concept/dummy_closer_workspace/dummy_project/Testsuite.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/Testsuite.c$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/Testsuite.c$(PreprocessSuffix): Testsuite.c
-	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/Testsuite.c$(PreprocessSuffix) Testsuite.c
-
-$(IntermediateDirectory)/action_executer.c$(ObjectSuffix): action_executer.c
-	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/action_executer.c$(ObjectSuffix) -MF$(IntermediateDirectory)/action_executer.c$(DependSuffix) -MM action_executer.c
-	$(CC) $(SourceSwitch) "C:/Users/fraun/Documents/3D_druck/Sonstige_Moebel/curtain_closer/code/Window_curtain_alarm/proof_of_concept/dummy_closer_workspace/dummy_project/action_executer.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/action_executer.c$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/action_executer.c$(PreprocessSuffix): action_executer.c
-	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/action_executer.c$(PreprocessSuffix) action_executer.c
-
-$(IntermediateDirectory)/main.c$(ObjectSuffix): main.c
-	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/main.c$(ObjectSuffix) -MF$(IntermediateDirectory)/main.c$(DependSuffix) -MM main.c
-	$(CC) $(SourceSwitch) "C:/Users/fraun/Documents/3D_druck/Sonstige_Moebel/curtain_closer/code/Window_curtain_alarm/proof_of_concept/dummy_closer_workspace/dummy_project/main.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/main.c$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/main.c$(PreprocessSuffix): main.c
-	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/main.c$(PreprocessSuffix) main.c
+$(IntermediateDirectory)/time_keeper.c$(ObjectSuffix): time_keeper.c
+	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/time_keeper.c$(ObjectSuffix) -MF$(IntermediateDirectory)/time_keeper.c$(DependSuffix) -MM time_keeper.c
+	$(CC) $(SourceSwitch) "C:/Users/fraun/Documents/3D_druck/Sonstige_Moebel/curtain_closer/code/Window_curtain_alarm/proof_of_concept/dummy_closer_workspace/dummy_project/time_keeper.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/time_keeper.c$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/time_keeper.c$(PreprocessSuffix): time_keeper.c
+	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/time_keeper.c$(PreprocessSuffix) time_keeper.c
 
 $(IntermediateDirectory)/motor_controller.c$(ObjectSuffix): motor_controller.c
 	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/motor_controller.c$(ObjectSuffix) -MF$(IntermediateDirectory)/motor_controller.c$(DependSuffix) -MM motor_controller.c
@@ -129,11 +105,41 @@ $(IntermediateDirectory)/motor_controller.c$(ObjectSuffix): motor_controller.c
 $(IntermediateDirectory)/motor_controller.c$(PreprocessSuffix): motor_controller.c
 	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/motor_controller.c$(PreprocessSuffix) motor_controller.c
 
-$(IntermediateDirectory)/time_keeper.c$(ObjectSuffix): time_keeper.c
-	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/time_keeper.c$(ObjectSuffix) -MF$(IntermediateDirectory)/time_keeper.c$(DependSuffix) -MM time_keeper.c
-	$(CC) $(SourceSwitch) "C:/Users/fraun/Documents/3D_druck/Sonstige_Moebel/curtain_closer/code/Window_curtain_alarm/proof_of_concept/dummy_closer_workspace/dummy_project/time_keeper.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/time_keeper.c$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/time_keeper.c$(PreprocessSuffix): time_keeper.c
-	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/time_keeper.c$(PreprocessSuffix) time_keeper.c
+$(IntermediateDirectory)/main.c$(ObjectSuffix): main.c
+	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/main.c$(ObjectSuffix) -MF$(IntermediateDirectory)/main.c$(DependSuffix) -MM main.c
+	$(CC) $(SourceSwitch) "C:/Users/fraun/Documents/3D_druck/Sonstige_Moebel/curtain_closer/code/Window_curtain_alarm/proof_of_concept/dummy_closer_workspace/dummy_project/main.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/main.c$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/main.c$(PreprocessSuffix): main.c
+	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/main.c$(PreprocessSuffix) main.c
+
+$(IntermediateDirectory)/action_executer.c$(ObjectSuffix): action_executer.c
+	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/action_executer.c$(ObjectSuffix) -MF$(IntermediateDirectory)/action_executer.c$(DependSuffix) -MM action_executer.c
+	$(CC) $(SourceSwitch) "C:/Users/fraun/Documents/3D_druck/Sonstige_Moebel/curtain_closer/code/Window_curtain_alarm/proof_of_concept/dummy_closer_workspace/dummy_project/action_executer.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/action_executer.c$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/action_executer.c$(PreprocessSuffix): action_executer.c
+	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/action_executer.c$(PreprocessSuffix) action_executer.c
+
+$(IntermediateDirectory)/Testsuite.c$(ObjectSuffix): Testsuite.c
+	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/Testsuite.c$(ObjectSuffix) -MF$(IntermediateDirectory)/Testsuite.c$(DependSuffix) -MM Testsuite.c
+	$(CC) $(SourceSwitch) "C:/Users/fraun/Documents/3D_druck/Sonstige_Moebel/curtain_closer/code/Window_curtain_alarm/proof_of_concept/dummy_closer_workspace/dummy_project/Testsuite.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/Testsuite.c$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/Testsuite.c$(PreprocessSuffix): Testsuite.c
+	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/Testsuite.c$(PreprocessSuffix) Testsuite.c
+
+$(IntermediateDirectory)/System.c$(ObjectSuffix): System.c
+	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/System.c$(ObjectSuffix) -MF$(IntermediateDirectory)/System.c$(DependSuffix) -MM System.c
+	$(CC) $(SourceSwitch) "C:/Users/fraun/Documents/3D_druck/Sonstige_Moebel/curtain_closer/code/Window_curtain_alarm/proof_of_concept/dummy_closer_workspace/dummy_project/System.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/System.c$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/System.c$(PreprocessSuffix): System.c
+	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/System.c$(PreprocessSuffix) System.c
+
+$(IntermediateDirectory)/alarm_checker.c$(ObjectSuffix): alarm_checker.c
+	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/alarm_checker.c$(ObjectSuffix) -MF$(IntermediateDirectory)/alarm_checker.c$(DependSuffix) -MM alarm_checker.c
+	$(CC) $(SourceSwitch) "C:/Users/fraun/Documents/3D_druck/Sonstige_Moebel/curtain_closer/code/Window_curtain_alarm/proof_of_concept/dummy_closer_workspace/dummy_project/alarm_checker.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/alarm_checker.c$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/alarm_checker.c$(PreprocessSuffix): alarm_checker.c
+	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/alarm_checker.c$(PreprocessSuffix) alarm_checker.c
+
+$(IntermediateDirectory)/command_parser.c$(ObjectSuffix): command_parser.c
+	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/command_parser.c$(ObjectSuffix) -MF$(IntermediateDirectory)/command_parser.c$(DependSuffix) -MM command_parser.c
+	$(CC) $(SourceSwitch) "C:/Users/fraun/Documents/3D_druck/Sonstige_Moebel/curtain_closer/code/Window_curtain_alarm/proof_of_concept/dummy_closer_workspace/dummy_project/command_parser.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/command_parser.c$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/command_parser.c$(PreprocessSuffix): command_parser.c
+	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/command_parser.c$(PreprocessSuffix) command_parser.c
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)
