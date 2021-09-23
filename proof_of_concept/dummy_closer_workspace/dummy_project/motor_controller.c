@@ -84,3 +84,20 @@ int calibrate_nonblocking()
     current_steps--;
     return 1;
 }
+
+/*
+ * Returns the current state of the curtain.
+ * Can be open, closed or undefined.
+ * TODO Maybe add some sort of range?
+ * 
+ * @return: enum CURTAIN_STATE open, closed or undefined.
+ */
+enum CURTAIN_STATE get_curtain_state()
+{
+    if (current_steps == target_steps)
+        return CURTAIN_OPEN_T;
+    else if (current_steps == 0)
+        return CURTAIN_CLOSED_T;
+    else
+        return CURTAIN_UNDEFINED_T;
+}

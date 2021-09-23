@@ -411,8 +411,28 @@ static void Test_basic_open_close()
     
     while(open_nonblocking());
     UCUNIT_CheckIsEqual( target_steps, current_steps );
+    UCUNIT_CheckIsEqual( CURTAIN_OPEN_T, get_curtain_state() );
     while(close_nonblocking());
     UCUNIT_CheckIsEqual( 0, current_steps );
+    UCUNIT_CheckIsEqual( CURTAIN_CLOSED_T, get_curtain_state() );
+}
+
+static void Test_current_state()
+{
+    current_steps = 0;
+    target_steps = 10;
+    
+    UCUNIT_CheckIsEqual( CURTAIN_CLOSED_T, get_curtain_state() );
+    
+    current_steps = 10;
+    UCUNIT_CheckIsEqual( CURTAIN_OPEN_T, get_curtain_state() );
+    
+    current_steps = 5;
+    UCUNIT_CheckIsEqual( CURTAIN_UNDEFINED_T, get_curtain_state() );
+    current_steps = -5;
+    UCUNIT_CheckIsEqual( CURTAIN_UNDEFINED_T, get_curtain_state() );
+    current_steps = 15;
+    UCUNIT_CheckIsEqual( CURTAIN_UNDEFINED_T, get_curtain_state() );
 }
 
 // TODO Should the calibrate also be tested? requires hardware...
