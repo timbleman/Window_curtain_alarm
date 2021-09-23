@@ -3,17 +3,21 @@
 /********************************** Includes **********************************/
 #include <stdio.h>  // printf()
 
-
 /********************************* Constants *********************************/
 /***************************** Struct definitions *****************************/
 /**************************** Prototype functions ****************************/
 /**************************** Variable definitions ****************************/
+#ifndef TESTABLE_MOTOR_CODE
 int current_steps = 0;
 int target_steps = 40;
+#endif // TESTABLE_MOTOR_CODE
+
 
 /**************************** Function definitions ****************************/
 int setup_motor_control()
 {
+    current_steps = 0;
+    target_steps = 40;
     return 0;
 }
 
@@ -26,11 +30,15 @@ int setup_motor_control()
 int open_nonblocking()
 {
     printf("Opening...\n");
-    current_steps++;
     if (current_steps >= target_steps)
-        return 1;
-    else
+    {
         return 0;
+    }
+    else
+    {
+        current_steps++;
+        return 1;
+    }
 }
 
 /*
@@ -43,25 +51,36 @@ int open_nonblocking()
 int close_nonblocking()
 {
     printf("Closing...\n");
-    current_steps--;
     if (current_steps <= 0)
-        return 1;
-    else
+    {
         return 0;
+    }
+    else
+    {
+        current_steps--;
+        return 1;
+    }
 }
 
 /*
  * This function is mostly equivalent to close(), the main difference being
  * that the internal step target for fully opening is set.
+ * TODO Make endstop work.
  * 
  * @return: 0 if not yet closed, 1 if fully closed.
  */
 int calibrate_nonblocking()
 {
     printf("Closing and calibrating...\n");
-    current_steps--;
-    if (current_steps <= 0)
-        return 1;
-    else
+    
+    // TODO Make this work
+    int end_stop = 0;
+    if (end_stop)
+    {
+        current_steps = 0;
         return 0;
+    }
+    
+    current_steps--;
+    return 1;
 }

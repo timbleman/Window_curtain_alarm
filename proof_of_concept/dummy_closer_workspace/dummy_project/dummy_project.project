@@ -1,7 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Project Name="dummy_project" Version="11000" InternalType="Console">
+  <Plugins>
+    <Plugin Name="qmake">
+      <![CDATA[00010001N0005Debug000000000000]]>
+    </Plugin>
+  </Plugins>
   <Description/>
   <Dependencies/>
+  <VirtualDirectory Name="src">
+    <File Name="action_executer.h"/>
+    <File Name="action_executer.c"/>
+    <File Name="README.md"/>
+    <File Name="uCUnit-v1.0.h"/>
+    <File Name="time_keeper.h"/>
+    <File Name="time_keeper.c"/>
+    <File Name="Testsuite.h"/>
+    <File Name="Testsuite.c"/>
+    <File Name="System.h"/>
+    <File Name="System.c"/>
+    <File Name="motor_controller.h"/>
+    <File Name="motor_controller.c"/>
+    <File Name="configuration.h"/>
+    <File Name="command_parser.h"/>
+    <File Name="command_parser.c"/>
+    <File Name="main.c"/>
+  </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="" C_Options="" Assembler="">
@@ -12,7 +35,7 @@
       </Linker>
       <ResourceCompiler Options=""/>
     </GlobalSettings>
-    <Configuration Name="Debug" CompilerType="MinGW ( C:\MinGW\bin\ )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+    <Configuration Name="Debug" CompilerType="MinGW ( MinGW )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-g;-O0;-Wall" C_Options="-g;-O0;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
       </Compiler>
@@ -92,20 +115,4 @@
       </Completion>
     </Configuration>
   </Settings>
-  <VirtualDirectory Name="src">
-    <File Name="README.md"/>
-    <File Name="uCUnit-v1.0.h"/>
-    <File Name="time_keeper.h"/>
-    <File Name="time_keeper.c"/>
-    <File Name="Testsuite.h"/>
-    <File Name="Testsuite.c"/>
-    <File Name="System.h"/>
-    <File Name="System.c"/>
-    <File Name="motor_controller.h"/>
-    <File Name="motor_controller.c"/>
-    <File Name="configuration.h"/>
-    <File Name="command_parser.h"/>
-    <File Name="command_parser.c"/>
-    <File Name="main.c"/>
-  </VirtualDirectory>
 </CodeLite_Project>

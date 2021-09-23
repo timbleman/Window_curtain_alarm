@@ -46,7 +46,8 @@ enum CURTAIN_CONTROL_ACT_T
 {
     OPEN_T = 1,
     CLOSE_T = 2,
-    CURTAIN_ERROR_T = 4
+    CALIBRATE_T = 4,
+    CURTAIN_ERROR_T = 8
 };
 
 /***************************** Struct definitions *****************************/

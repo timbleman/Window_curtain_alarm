@@ -8,6 +8,13 @@
 /********************************* Constants *********************************/
 /***************************** Struct definitions *****************************/
 /**************************** Variable definitions ****************************/
+#ifdef TESTABLE_MOTOR_CODE
+// For test case compilation these have to be initialized first.
+int current_steps;
+int target_steps;
+#endif // TESTABLE_MOTOR_CODE
+
+
 /**************************** Prototype functions ****************************/
 
 int setup_motor_control();

@@ -42,9 +42,16 @@
 #include "Testsuite.h"
 #include "command_parser.h"
 #include "time_keeper.h"
+#include "motor_controller.h"
+#include "action_executer.h"
 #include "configuration.h"
 
+
+#define MESSAGE_LEN 128
+
+
 int get_bit_of_error(uint32_t err_code);
+
 
 #ifdef TESTABLE_PARSER_CODE
 static void Test_parse_hour(void)
@@ -383,6 +390,149 @@ static void Test_time_until_wake_today()
 }
 #endif // TESTABLE_TK_CODE
 
+
+#ifdef TESTABLE_MOTOR_CODE
+static void Test_basic_open_close()
+{
+    UCUNIT_TestcaseBegin("Checking basic open and close.");
+    // Ensure this number is low enough to not cause any troubles.
+    
+    const int STEPS_TO_MAKE = 4;
+    
+    int status = 0;
+    
+    status |= setup_motor_control();
+    // Set custom step limit.
+    current_steps = 0;
+    target_steps = STEPS_TO_MAKE;
+    
+    // Check for successful init
+    UCUNIT_CheckIsEqual( 0, status );
+    
+    while(open_nonblocking());
+    UCUNIT_CheckIsEqual( target_steps, current_steps );
+    while(close_nonblocking());
+    UCUNIT_CheckIsEqual( 0, current_steps );
+}
+
+// TODO Should the calibrate also be tested? requires hardware...
+#endif // TESTABLE_MOTOR_CODE
+
+
+#ifdef TESTABLE_ACTION_EXEC
+static void Test_basic_curtain_control_actions()
+{
+    UCUNIT_TestcaseBegin("Checking basic open and close by action.");
+    
+    user_action_t open_act = {0};
+    open_act.act_type = CURTAIN_CONTROL_T;
+    open_act.data[0] = OPEN_T;
+    
+    user_action_t close_act = {0};
+    close_act.act_type = CURTAIN_CONTROL_T;
+    close_act.data[0] = CLOSE_T;
+    
+    char message[MESSAGE_LEN] = {0};
+    
+    // Ensure this number is low enough to not cause any troubles.
+    const int STEPS_TO_MAKE = 4;
+    
+    int status = 0;
+    
+    status |= setup_motor_control();
+    // Set custom step limit.
+    current_steps = 0;
+    target_steps = STEPS_TO_MAKE;
+    
+    // Check for successful init
+    UCUNIT_CheckIsEqual( 0, status );
+    printf("Actual current %i \n", current_steps);
+    
+    while(execute_action_non_blocking(&open_act,
+                                        message,
+                                        MESSAGE_LEN));
+    UCUNIT_CheckIsEqual( target_steps, current_steps );
+    printf("Actual current %i \n", current_steps);
+    while(execute_action_non_blocking(&close_act,
+                                        message,
+                                        MESSAGE_LEN));
+    UCUNIT_CheckIsEqual( 0, current_steps );
+    printf("Actual current %i \n", current_steps);
+}
+
+static void Test_basic_wake_actions()
+{
+    UCUNIT_TestcaseBegin("Setting wake for multiple days using an action.");
+    // Setup
+    setup_time_keeper();
+    
+    // Create the action
+    user_action_t wake_set_act = {0};
+    wake_set_act.act_type = WAKE_SET_T;
+    wake_set_act.data[0] = (MON_T | TUE_T | SAT_T);
+    wake_set_act.data[1] = 11;
+    wake_set_act.data[2] = 2;
+    wake_set_act.data[3] = 3;
+    
+    char message[MESSAGE_LEN] = {0};
+    
+    // Execute the action
+    while(execute_action_non_blocking(&wake_set_act,
+                                message,
+                                MESSAGE_LEN));
+                                
+    printf("Message %s \n", message);
+    
+    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_hour, 11);
+    UCUNIT_CheckIsEqual( wake_times.tm_tue.tm_hour, 11);
+    UCUNIT_CheckIsEqual( wake_times.tm_wed.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_thu.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_fri.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_sat.tm_hour, 11);
+    UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_hour, DEFAULT_WEEKEND_WAKE);
+    
+    // Reset
+    setup_time_keeper();
+}
+
+// TODO Maybe vary these checks a litte, make them harder.
+static void Test_basic_sleep_actions()
+{
+    UCUNIT_TestcaseBegin("Setting sleep for multiple days using an action.");
+    // Setup
+    setup_time_keeper();
+    
+    // Create the action
+    user_action_t sleep_set_act = {0};
+    sleep_set_act.act_type = SLEEP_SET_T;
+    sleep_set_act.data[0] = (WED_T | THU_T | FRI_T | SUN_T);
+    sleep_set_act.data[1] = 18;
+    sleep_set_act.data[2] = 2;
+    sleep_set_act.data[3] = 3;
+    
+    char message[MESSAGE_LEN] = {0};
+    
+    // Execute the action
+    while(execute_action_non_blocking(&sleep_set_act,
+                                message,
+                                MESSAGE_LEN));
+                                
+    printf("Message %s \n", message);
+    
+    UCUNIT_CheckIsEqual( sleep_times.tm_mon.tm_hour, DEFAULT_SLEEP);
+    UCUNIT_CheckIsEqual( sleep_times.tm_tue.tm_hour, DEFAULT_SLEEP);
+    UCUNIT_CheckIsEqual( sleep_times.tm_wed.tm_hour, 18);
+    UCUNIT_CheckIsEqual( sleep_times.tm_thu.tm_hour, 18);
+    UCUNIT_CheckIsEqual( sleep_times.tm_fri.tm_hour, 18);
+    UCUNIT_CheckIsEqual( sleep_times.tm_sat.tm_hour, DEFAULT_SLEEP);
+    UCUNIT_CheckIsEqual( sleep_times.tm_sun.tm_hour, 18);
+    
+    // Reset
+    setup_time_keeper();
+}
+#endif // TESTABLE_ACTION_EXEC
+
+
 int get_bit_of_error(uint32_t err_code)
 {
     int i;
@@ -542,6 +692,16 @@ void Testsuite_RunTests(void)
     Test_set_sleep_single_day();
     Test_time_until_wake_today();
 #endif // TESTABLE_TK_CODE
+
+#ifdef TESTABLE_MOTOR_CODE
+    Test_basic_open_close();
+#endif // TESTABLE_MOTOR_CODE
+
+#ifdef TESTABLE_ACTION_EXEC
+    Test_basic_curtain_control_actions();
+    Test_basic_wake_actions();
+    Test_basic_sleep_actions();
+#endif // TESTABLE_ACTION_EXEC
 
     UCUNIT_WriteSummary();
 }

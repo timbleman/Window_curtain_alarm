@@ -1,8 +1,114 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Session Name="C:\Users\fraun\Documents\3D_druck\Sonstige_Moebel\curtain_closer\code\Window_curtain_alarm\proof_of_concept\dummy_closer_workspace\dummy_closer_workspace.workspace">
-  <int Value="0" Name="m_selectedTab"/>
+  <int Value="6" Name="m_selectedTab"/>
   <wxString Value="C:\Users\fraun\Documents\3D_druck\Sonstige_Moebel\curtain_closer\code\Window_curtain_alarm\proof_of_concept\dummy_closer_workspace\dummy_closer_workspace.workspace" Name="m_workspaceName"/>
-  <TabInfoArray Name="TabInfoArray"/>
+  <TabInfoArray Name="TabInfoArray">
+    <TabInfo>
+      <wxString Value="C:\Users\fraun\Documents\3D_druck\Sonstige_Moebel\curtain_closer\code\Window_curtain_alarm\proof_of_concept\dummy_closer_workspace\dummy_project\main.c" Name="FileName"/>
+      <int Value="0" Name="FirstVisibleLine"/>
+      <int Value="12" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\fraun\Documents\3D_druck\Sonstige_Moebel\curtain_closer\code\Window_curtain_alarm\proof_of_concept\dummy_closer_workspace\dummy_project\time_keeper.c" Name="FileName"/>
+      <int Value="49" Name="FirstVisibleLine"/>
+      <int Value="50" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\fraun\Documents\3D_druck\Sonstige_Moebel\curtain_closer\code\Window_curtain_alarm\proof_of_concept\dummy_closer_workspace\dummy_project\command_parser.h" Name="FileName"/>
+      <int Value="68" Name="FirstVisibleLine"/>
+      <int Value="69" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\fraun\Documents\3D_druck\Sonstige_Moebel\curtain_closer\code\Window_curtain_alarm\proof_of_concept\dummy_closer_workspace\dummy_project\command_parser.c" Name="FileName"/>
+      <int Value="195" Name="FirstVisibleLine"/>
+      <int Value="196" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\fraun\Documents\3D_druck\Sonstige_Moebel\curtain_closer\code\Window_curtain_alarm\proof_of_concept\dummy_closer_workspace\dummy_project\configuration.h" Name="FileName"/>
+      <int Value="0" Name="FirstVisibleLine"/>
+      <int Value="5" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\fraun\Documents\3D_druck\Sonstige_Moebel\curtain_closer\code\Window_curtain_alarm\proof_of_concept\dummy_closer_workspace\dummy_project\time_keeper.h" Name="FileName"/>
+      <int Value="38" Name="FirstVisibleLine"/>
+      <int Value="39" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\fraun\Documents\3D_druck\Sonstige_Moebel\curtain_closer\code\Window_curtain_alarm\proof_of_concept\dummy_closer_workspace\dummy_project\Testsuite.c" Name="FileName"/>
+      <int Value="33" Name="FirstVisibleLine"/>
+      <int Value="45" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\fraun\Documents\3D_druck\Sonstige_Moebel\curtain_closer\code\Window_curtain_alarm\proof_of_concept\dummy_closer_workspace\dummy_project\uCUnit-v1.0.h" Name="FileName"/>
+      <int Value="35" Name="FirstVisibleLine"/>
+      <int Value="36" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\fraun\Documents\3D_druck\Sonstige_Moebel\curtain_closer\code\Window_curtain_alarm\proof_of_concept\dummy_closer_workspace\dummy_project\README.md" Name="FileName"/>
+      <int Value="17" Name="FirstVisibleLine"/>
+      <int Value="18" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\fraun\Documents\3D_druck\Sonstige_Moebel\curtain_closer\code\Window_curtain_alarm\proof_of_concept\dummy_closer_workspace\dummy_project\System.c" Name="FileName"/>
+      <int Value="36" Name="FirstVisibleLine"/>
+      <int Value="37" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\fraun\Documents\3D_druck\Sonstige_Moebel\curtain_closer\code\Window_curtain_alarm\proof_of_concept\dummy_closer_workspace\dummy_project\Testsuite.h" Name="FileName"/>
+      <int Value="34" Name="FirstVisibleLine"/>
+      <int Value="35" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\fraun\Documents\3D_druck\Sonstige_Moebel\curtain_closer\code\Window_curtain_alarm\proof_of_concept\dummy_closer_workspace\dummy_project\action_executer.c" Name="FileName"/>
+      <int Value="0" Name="FirstVisibleLine"/>
+      <int Value="9" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\fraun\Documents\3D_druck\Sonstige_Moebel\curtain_closer\code\Window_curtain_alarm\proof_of_concept\dummy_closer_workspace\dummy_project\action_executer.h" Name="FileName"/>
+      <int Value="2" Name="FirstVisibleLine"/>
+      <int Value="3" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\fraun\Documents\3D_druck\Sonstige_Moebel\curtain_closer\code\Window_curtain_alarm\proof_of_concept\dummy_closer_workspace\dummy_project\motor_controller.c" Name="FileName"/>
+      <int Value="20" Name="FirstVisibleLine"/>
+      <int Value="3" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\fraun\Documents\3D_druck\Sonstige_Moebel\curtain_closer\code\Window_curtain_alarm\proof_of_concept\dummy_closer_workspace\dummy_project\motor_controller.h" Name="FileName"/>
+      <int Value="21" Name="FirstVisibleLine"/>
+      <int Value="26" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+  </TabInfoArray>
   <SerializedObject Name="m_breakpoints">
     <long Value="0" Name="Count"/>
   </SerializedObject>
