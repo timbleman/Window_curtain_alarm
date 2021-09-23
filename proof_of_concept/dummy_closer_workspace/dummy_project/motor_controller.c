@@ -3,9 +3,12 @@
 /********************************** Includes **********************************/
 #include <stdio.h>  // printf()
 
-/********************************* Constants *********************************/
+/********************************* Constants **********************************/
 /***************************** Struct definitions *****************************/
-/**************************** Prototype functions ****************************/
+/**************************** Prototype functions *****************************/
+void make_step(int dir);
+
+
 /**************************** Variable definitions ****************************/
 #ifndef TESTABLE_MOTOR_CODE
 int current_steps = 0;
@@ -36,6 +39,7 @@ int open_nonblocking()
     }
     else
     {
+        make_step(0);
         current_steps++;
         return 1;
     }
@@ -57,6 +61,7 @@ int close_nonblocking()
     }
     else
     {
+        make_step(1);
         current_steps--;
         return 1;
     }
@@ -81,6 +86,7 @@ int calibrate_nonblocking()
         return 0;
     }
     
+    make_step(1);
     current_steps--;
     return 1;
 }
@@ -100,4 +106,26 @@ enum CURTAIN_STATE get_curtain_state()
         return CURTAIN_CLOSED_T;
     else
         return CURTAIN_UNDEFINED_T;
+}
+
+/*
+ * Make a step. Controls the stepper driver.
+ * In the first iteration this should be GPIO based.
+ * Later on a UART based approach may be chosen.
+ * 
+ * @param dir: The direction. 1 closes, 0 opens.
+ * @return: None.
+ */
+void make_step(int close)
+{
+    if (close)
+    {
+        // Close
+        return;
+    }
+    else
+    {
+        // Open
+        return;
+    }
 }
