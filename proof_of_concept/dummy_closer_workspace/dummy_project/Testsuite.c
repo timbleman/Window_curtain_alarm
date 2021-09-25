@@ -172,6 +172,14 @@ static void Test_get_action()
     UCUNIT_CheckIsEqual( 22, new_act.data[1]);
     UCUNIT_CheckIsEqual( 30, new_act.data[2]);
     UCUNIT_CheckIsEqual( 10, new_act.data[3]);
+    
+    // Times with zeros
+    strcpy(test_str, "set_sleep -d mon,tue -h 02 -m 05 -s 00 \n");
+    new_act = get_action(test_str);
+    UCUNIT_CheckIsEqual( MON_T | TUE_T, new_act.data[0]);
+    UCUNIT_CheckIsEqual( 2, new_act.data[1]);
+    UCUNIT_CheckIsEqual( 5, new_act.data[2]);
+    UCUNIT_CheckIsEqual( 0, new_act.data[3]);
 
     // Invalid time stuff
     int invalid_t_err_pos = get_bit_of_error(INVALID_TIME_ERR);
