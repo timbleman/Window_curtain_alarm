@@ -510,6 +510,21 @@ enum ACTION_TYPE parse_action(char **split_command, int command_num)
 #endif // PARSE_ACTION_DEBUG_PRINTS
         return CURTAIN_CONTROL_T;    
     }
+    else if ((strcmp(split_command[0], "help") == 0)
+                || (strcmp(split_command[0], "--help") == 0)) 
+    {
+#ifdef PARSE_ACTION_DEBUG_PRINTS
+        printf("HELP_T found command\n");
+#endif // PARSE_ACTION_DEBUG_PRINTS
+        return HELP_T;    
+    }
+    else if (strcmp(split_command[0], "curtime") == 0) 
+    {
+#ifdef PARSE_ACTION_DEBUG_PRINTS
+        printf("CURTIME_T found command\n");
+#endif // PARSE_ACTION_DEBUG_PRINTS
+        return CURTIME_T;    
+    }
     else
     {
 #ifdef PARSE_ACTION_DEBUG_PRINTS

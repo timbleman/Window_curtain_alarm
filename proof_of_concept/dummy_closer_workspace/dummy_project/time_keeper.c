@@ -241,7 +241,7 @@ long secs_until_tm_today(one_tm_per_wd *tmpwd)
     struct tm currenttime;
     time(&rawtime);
     // Copy by value to not be affected by delays
-    currenttime = *gmtime(&rawtime);
+    currenttime = *localtime(&rawtime);
     
     struct tm *tm_to_comp = get_wdtm(tmpwd, currenttime.tm_wday); 
     if (tm_to_comp == NULL)
@@ -333,7 +333,7 @@ int get_current_d_tm()
     struct tm currenttime;
     time(&rawtime);
     // Copy by value to not be affected by delays
-    currenttime = *gmtime(&rawtime);
+    currenttime = *localtime(&rawtime);
     return currenttime.tm_wday;
 }
 
@@ -349,7 +349,7 @@ int get_current_h()
     struct tm currenttime;
     time(&rawtime);
     // Copy by value to not be affected by delays
-    currenttime = *gmtime(&rawtime);
+    currenttime = *localtime(&rawtime);
     return currenttime.tm_hour;
 }
 
@@ -365,7 +365,7 @@ int get_current_m()
     struct tm currenttime;
     time(&rawtime);
     // Copy by value to not be affected by delays
-    currenttime = *gmtime(&rawtime);
+    currenttime = *localtime(&rawtime);
     return currenttime.tm_min;
 }
 
@@ -381,6 +381,6 @@ int get_current_s()
     struct tm currenttime;
     time(&rawtime);
     // Copy by value to not be affected by delays
-    currenttime = *gmtime(&rawtime);
+    currenttime = *localtime(&rawtime);
     return currenttime.tm_sec;
 }

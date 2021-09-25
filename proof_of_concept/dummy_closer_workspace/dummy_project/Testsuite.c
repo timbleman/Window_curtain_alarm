@@ -135,6 +135,14 @@ static void Test_parse_command(void)
     tokenise_to_argc_argv(test_str, &argc, argv, ARGV_LEN);
     UCUNIT_CheckIsEqual( CURTAIN_CONTROL_T, parse_action(argv, argc));
     
+    strcpy(test_str, "help \n");
+    tokenise_to_argc_argv(test_str, &argc, argv, ARGV_LEN);
+    UCUNIT_CheckIsEqual( HELP_T, parse_action(argv, argc));
+    
+    strcpy(test_str, "curtime \n");
+    tokenise_to_argc_argv(test_str, &argc, argv, ARGV_LEN);
+    UCUNIT_CheckIsEqual( CURTIME_T, parse_action(argv, argc));
+    
     strcpy(test_str, "");
     tokenise_to_argc_argv(test_str, &argc, argv, ARGV_LEN);
     UCUNIT_CheckIsEqual( NONE_T, parse_action(argv, argc));
@@ -551,13 +559,50 @@ static void Test_basic_sleep_actions()
     // Reset
     setup_time_keeper();
 }
+
+static void Test_other_actions()
+{
+    UCUNIT_TestcaseBegin("Checking other actions.");
+    // Setup
+    setup_time_keeper();
+    
+    // Help string
+    // Create the action
+    user_action_t help_act = {0};
+    help_act.act_type = HELP_T;
+    
+    char message[MESSAGE_LEN] = {0};
+
+    // Execute the action
+    while(execute_action_non_blocking(&help_act,
+                                message,
+                                MESSAGE_LEN));
+                                
+    printf("Help string: \n%s\n", message);
+    
+    
+    // Current time
+    // Create the action
+    user_action_t curtime_act = {0};
+    curtime_act.act_type = CURTIME_T;
+    
+    memset(message, 0, MESSAGE_LEN);
+
+    // Execute the action
+    while(execute_action_non_blocking(&curtime_act,
+                                message,
+                                MESSAGE_LEN));
+                                
+    printf("Curtime string: \n%s", message);
+    
+}
 #endif // TESTABLE_ACTION_EXEC
 
 
 #ifdef TESTABLE_ALARMCHECKER_CODE
 static void Test_new_state_ttw_tts_today()
 {
-    UCUNIT_TestcaseBegin("Checking new state based on today's tuw and tus.");
+    UCUNIT_TestcaseBegin("Checking new state based on today's ttw and tts.");
     
     /*
      * TODO
@@ -754,6 +799,7 @@ void Testsuite_RunTests(void)
     Test_basic_curtain_control_actions();
     Test_basic_wake_actions();
     Test_basic_sleep_actions();
+    Test_other_actions();
 #endif // TESTABLE_ACTION_EXEC
 
 #ifdef TESTABLE_ALARMCHECKER_CODE

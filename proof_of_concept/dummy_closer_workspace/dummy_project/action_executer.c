@@ -77,6 +77,15 @@ int execute_action_non_blocking(user_action_t *act,
         case CURTAIN_CONTROL_T:     status = curtain_control_from_act(act, message, 
                                                         message_max_len);
                                     break;
+        case CURTIME_T: sprintf(message, "Current internal time: %i:%i:%i\n",
+                            get_current_h(), get_current_m(), get_current_s());
+                        break;
+        case HELP_T:    sprintf(message, "Example commands:\n"
+                                            "set_wake -h 7 -m 22 -s 0\n"
+                                            "curtime\n"
+                                            "open\n"
+                                            "close\n");
+                        break;
         case ERROR_T:   strcpy(message, "ERROR_T action\n");
                         break;
         default:    strcpy(message, "Invalid action_type\n");
