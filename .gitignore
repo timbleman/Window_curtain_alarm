@@ -43,3 +43,12 @@ proof_of_concept/dummy_closer_workspace/dummy_project/tags
 #proof_of_concept/dummy_closer_workspace/dummy_project/dummy_project.project
 proof_of_concept/dummy_closer_workspace/dummy_project/dummy_project.mk
 proof_of_concept/dummy_closer_workspace/dummy_project/dummy_project.txt
+
+# test stuff
+# socket_test stuff
+esp8266_code/test_stuff/socket_test/.pio
+esp8266_code/test_stuff/socket_test/.vscode/.browse.c_cpp.db*
+esp8266_code/test_stuff/socket_test/.vscode/c_cpp_properties.json
+esp8266_code/test_stuff/socket_test/.vscode/launch.json
+esp8266_code/test_stuff/socket_test/.vscode/ipch
+
