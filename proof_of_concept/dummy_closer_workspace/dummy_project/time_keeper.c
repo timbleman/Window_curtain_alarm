@@ -38,6 +38,8 @@ long secs_until_tm_today(one_tm_per_wd *tmpwd);
 int get_tm_day_from_day_type(uint32_t dayt);
 int set_tm_multiple_days(one_tm_per_wd *time_strct,
                             uint32_t days, int h, int m, int s);
+int save_times();
+int load_times();
 
 
 /**************************** Variable definitions ****************************/
@@ -57,18 +59,22 @@ int setup_time_keeper()
 {
     int status = 0;
     
-    // Set default time for weekdays
-    for (int i = 1; i < 6; i++)
+    // If load times from the memory is unsuccessful set defaults.
+    if (load_times())
     {
-        status |= set_tm_per_wd(&wake_times, i, DEFAULT_WEEK_WAKE, 0, 0);
-        status |= set_tm_per_wd(&sleep_times, i, DEFAULT_SLEEP, 0, 0);
+        // Set default time for weekdays
+        for (int i = 1; i < 6; i++)
+        {
+            status |= set_tm_per_wd(&wake_times, i, DEFAULT_WEEK_WAKE, 0, 0);
+            status |= set_tm_per_wd(&sleep_times, i, DEFAULT_SLEEP, 0, 0);
+        }
+        // Set default time for the weekend
+        status |= set_tm_per_wd(&wake_times, 6, DEFAULT_WEEKEND_WAKE, 0, 0);
+        status |= set_tm_per_wd(&sleep_times, 6, DEFAULT_SLEEP, 0, 0);
+        status |= set_tm_per_wd(&wake_times, 0, DEFAULT_WEEKEND_WAKE, 0, 0);
+        status |= set_tm_per_wd(&sleep_times, 0, DEFAULT_SLEEP, 0, 0);
     }
-    // Set default time for the weekend
-    status |= set_tm_per_wd(&wake_times, 6, DEFAULT_WEEKEND_WAKE, 0, 0);
-    status |= set_tm_per_wd(&sleep_times, 6, DEFAULT_SLEEP, 0, 0);
-    status |= set_tm_per_wd(&wake_times, 0, DEFAULT_WEEKEND_WAKE, 0, 0);
-    status |= set_tm_per_wd(&sleep_times, 0, DEFAULT_SLEEP, 0, 0);
-
+    
     return status;
 }
 
@@ -383,4 +389,25 @@ int get_current_s()
     // Copy by value to not be affected by delays
     currenttime = *localtime(&rawtime);
     return currenttime.tm_sec;
+}
+
+/*
+ * Saves the currently set times into non-volatile memory.
+ * For ESP8266: Store in flash. For linux based systems: Some file.
+ * 
+ * @return: Success status.
+ */
+int save_times()
+{
+    return 1;
+}
+
+/*
+ * Loads wake and sleep times from the memory.
+ * 
+ * @return: Success status.
+ */
+int load_times()
+{
+    return 1;
 }

@@ -1,18 +1,28 @@
+/********************************** Includes **********************************/
 #include <Arduino.h>
 #include <stdint.h>
 #include "ESP8266WiFi.h"
+#include "user_communication.h"
 
+
+/********************************* Constants **********************************/
 const char* ssid = "FRITZ!Box 7430 FC";
 const char* password =  "94044782303556147675";
+
  
-WiFiServer wifiServer(23);
-WiFiClient client;
+/***************************** Struct definitions *****************************/
+/**************************** Prototype functions *****************************/
+/**************************** Variable definitions ****************************/
+WiFiServer wifiServer1(23);
+WiFiClient client1;
+
+bool connected1 = false;
 
 char buf[128] = {0};
 size_t max_size = 16;
 
-bool connected = false;
 
+/**************************** Function definitions ****************************/
 void setup() {
   Serial.begin(9600);
  
@@ -28,54 +38,18 @@ void setup() {
   Serial.print("Connected to WiFi. IP:");
   Serial.println(WiFi.localIP());
 
-  wifiServer.begin();
+  //wifiServer1.begin();
+
+  setup_user_comm();
 }
 
 void loop() {
-  client = wifiServer.available();
-
-  if (client) {
-    if(client.connected() && !connected)
-    {
-      //client.setDefaultNoDelay(true);
-      Serial.println("Client Connected");
-      connected = true;
-    }
-    
-    while(client.connected()){      
-      while(client.available()>0){
-        // read data from the connected client
-        //char c = client.read();
-        //Serial.write(c); 
-        //client.read(buf, max_size);
-        //client.write(client.read());
-        
-        // This seems to block until the number or break character is hit.
-        // Additionally, exceeding the max_size number seems to break printf() 
-        if (client.readBytesUntil('\n', &buf[0], max_size) > 0)
-        {
-          Serial.print("Received buf: ");
-          //delay(50);
-          Serial.println(buf);
-        }
-        
-        //client.write(c);
-      }
-      //Serial.print("Received buf: ");
-      //Send Data to connected client
-      /*
-      while(Serial.available()>0)
-      {
-        client.write(Serial.read());
-      }
-      */
-    }
-
-    if (!client.connected())
-    {
-      Serial.println("Client disconnected");
-      client.stop();
-      connected = false;
-    }    
+  int new_user_in_success = get_user_in(buf, max_size);
+  if (new_user_in_success == 0)
+  {
+    printf("User in in main: %s\n", buf);
+    //printf("%s\n", buf);
+    respond_to_user(buf, max_size);
+    memset(buf, 0, max_size);
   }
 }
