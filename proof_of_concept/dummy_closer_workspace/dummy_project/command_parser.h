@@ -4,6 +4,7 @@
 /********************************** Includes **********************************/
 #include <stdint.h>
 #include "configuration.h"
+#include "types_and_enums.h"
 
 /********************************* Constants *********************************/
 #define MAX_USER_INPUT_LEN 64
@@ -13,54 +14,9 @@
 #undef PARSE_TIME_DEBUG_PRINTS
 #undef PARSE_ACTION_DEBUG_PRINTS
 
-enum PARSER_ERRORS
-{
-    INVALID_DAY_ERR = 0x1000,
-    INVALID_TIME_ERR = 0x2000,
-    INVALID_COMMAND_ERR = 0x4000,
-    ALL_ERRS = (INVALID_DAY_ERR | INVALID_TIME_ERR | INVALID_COMMAND_ERR)
-};
-
-enum ACTION_TYPE
-{
-    NONE_T = 0x0000,
-    WAKE_SET_T = 0x0001,
-    SLEEP_SET_T = 0x0002,
-    CURTAIN_CONTROL_T = 0x0004,
-    CURTIME_T = 0x0008,
-    HELP_T = 0x0010,
-    ERROR_T = 0x0020
-};
-
-// These should be able to be combined
-enum DAY_TYPE
-{
-    MON_T = 0x0001,
-    TUE_T = 0x0002,
-    WED_T = 0x0004,
-    THU_T = 0x0008,
-    FRI_T = 0x0010,
-    SAT_T = 0x0020,
-    SUN_T = 0x0040
-};
-
-enum CURTAIN_CONTROL_ACT_T
-{
-    OPEN_T = 1,
-    CLOSE_T = 2,
-    CALIBRATE_T = 4,
-    CURTAIN_ERROR_T = 8
-};
-
 /***************************** Struct definitions *****************************/
-typedef struct 
-{
-    enum ACTION_TYPE act_type;
-    uint32_t data[5];
-} user_action_t;
-
 /**************************** Variable definitions ****************************/
-/**************************** Prototype functions ****************************/
+/**************************** Prototype functions *****************************/
 
 /*
  * This function returns a user_action_t. 
@@ -77,11 +33,11 @@ user_action_t get_action(char *str);
  * Error codes have to be passed (one-hot, those can be XORed together).
  * 
  * @param errs: (Multiple) error code(s).
- * @param str: Preallocated string buffer to write message into.
+ * @param buf: Preallocated string buffer to write message into.
  * @param str_max_len: The maximum length of the string.
- * @return: None.
+ * @return: 0 if successful.
  */
-void get_message_from_errors(enum PARSER_ERRORS errs, char *str, int str_max_len);
+int get_message_from_errors(enum TIME_ERRORS errs, char *buf, int str_max_len);
 
 
 #ifdef TESTABLE_PARSER_CODE

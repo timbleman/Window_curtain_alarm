@@ -192,6 +192,35 @@ static void Test_get_action()
     //printf("\n new act data get_time_action %u %u %u %u \n", new_act.data[0], new_act.data[1], new_act.data[2], new_act.data[3]);
     UCUNIT_CheckIsBitSet( new_act.data[0], invalid_t_err_pos);
 }
+
+static void Test_get_message_from_errors()
+{
+    UCUNIT_TestcaseBegin("Checking getting message from error codes.");
+    
+    const int BUF_LEN = 32;
+    char buf[32] = {0};
+    
+    get_message_from_errors(INVALID_DAY_ERR, buf, BUF_LEN);
+    UCUNIT_CheckIsEqual( strcmp(buf, "DAY_ERR"), 0);
+    
+    memset(buf, 0, BUF_LEN);
+    get_message_from_errors(INVALID_TIME_ERR, buf, BUF_LEN);
+    UCUNIT_CheckIsEqual( strcmp(buf, "TIME_ERR"), 0);
+    
+    memset(buf, 0, BUF_LEN);
+    get_message_from_errors(INVALID_COMMAND_ERR, buf, BUF_LEN);
+    UCUNIT_CheckIsEqual( strcmp(buf, "COMMAND_ERR"), 0);
+    
+    memset(buf, 0, BUF_LEN);
+    get_message_from_errors(ALL_ERRS, buf, BUF_LEN);
+    printf("all_errs buf %s\n", buf);
+    UCUNIT_CheckIsEqual( strcmp(buf, "DAY_ERR, TIME_ERR, COMMAND_ERR"), 0);
+    
+    // Too small buffer
+    memset(buf, 0, BUF_LEN);
+    UCUNIT_CheckIsEqual( get_message_from_errors(ALL_ERRS, buf, 5), 1);
+    UCUNIT_CheckIsEqual( strcmp(buf, "SLEN"), 0);
+}
 #endif // TESTABLE_PARSER_CODE
 
 #ifdef TESTABLE_TK_CODE
@@ -599,6 +628,116 @@ static void Test_basic_wake_actions()
     setup_time_keeper();
 }
 
+static void Test_invalid_time_in_wake_actions()
+{
+    UCUNIT_TestcaseBegin("Trying to set wake for multiple days using an invalid"
+                            " action.\nThe time is not valid.");
+    // Setup
+    setup_time_keeper();
+    
+    // Create the action
+    user_action_t wake_set_act = {0};
+    wake_set_act.act_type = WAKE_SET_T;
+    wake_set_act.data[0] = (MON_T | TUE_T | SAT_T);
+    wake_set_act.data[1] = 110;
+    wake_set_act.data[2] = 2;
+    wake_set_act.data[3] = 3;
+    
+    char message[MESSAGE_LEN] = {0};
+    
+    // Execute the action
+    while(execute_action_non_blocking(&wake_set_act,
+                                message,
+                                MESSAGE_LEN));
+                                
+    printf("Message invalid wake: \n%s \n", message);
+    
+    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_tue.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_wed.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_thu.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_fri.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_sat.tm_hour, DEFAULT_WEEKEND_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_hour, DEFAULT_WEEKEND_WAKE);
+    
+    // Reset
+    setup_time_keeper();
+}
+
+static void Test_invalid_command_in_wake_actions()
+{
+    UCUNIT_TestcaseBegin("Trying to set wake for multiple days using an invalid"
+                            " action.\nThe command is invalid.");
+    // Setup
+    setup_time_keeper();
+    
+    // Create the action
+    user_action_t wake_set_act = {0};
+    // Invalid action type:
+    wake_set_act.act_type = 123;
+    wake_set_act.data[0] = (MON_T | TUE_T | SAT_T);
+    wake_set_act.data[1] = 11;
+    wake_set_act.data[2] = 2;
+    wake_set_act.data[3] = 3;
+    
+    char message[MESSAGE_LEN] = {0};
+    
+    // Execute the action
+    while(execute_action_non_blocking(&wake_set_act,
+                                message,
+                                MESSAGE_LEN));
+                                
+    printf("Message invalid wake: \n%s \n", message);
+    
+    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_tue.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_wed.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_thu.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_fri.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_sat.tm_hour, DEFAULT_WEEKEND_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_hour, DEFAULT_WEEKEND_WAKE);
+    
+    // Reset
+    setup_time_keeper();
+}
+
+static void Test_parser_errors_in_wake_actions()
+{
+    UCUNIT_TestcaseBegin("Trying to set wake for multiple days using an invalid"
+                            "action.\nThe parser appended errors.");
+    // Setup
+    setup_time_keeper();
+    
+    // Create the action
+    user_action_t wake_set_act = {0};
+    wake_set_act.act_type = WAKE_SET_T;
+    wake_set_act.data[0] = (MON_T | TUE_T | SAT_T) 
+                                | (INVALID_TIME_ERR | INVALID_COMMAND_ERR);
+    wake_set_act.data[1] = 11;
+    wake_set_act.data[2] = 2;
+    wake_set_act.data[3] = 3;
+    
+    char message[MESSAGE_LEN] = {0};
+    
+    // Execute the action
+    while(execute_action_non_blocking(&wake_set_act,
+                                message,
+                                MESSAGE_LEN));
+                                
+    printf("Message invalid wake: \n%s \n", message);
+    
+    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_tue.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_wed.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_thu.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_fri.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_sat.tm_hour, DEFAULT_WEEKEND_WAKE);
+    UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_hour, DEFAULT_WEEKEND_WAKE);
+    
+    // Reset
+    setup_time_keeper();
+}
+
 // TODO Maybe vary these checks a litte, make them harder.
 static void Test_basic_sleep_actions()
 {
@@ -855,6 +994,7 @@ void Testsuite_RunTests(void)
     Test_parse_hour();
     Test_parse_command();
     Test_get_action();
+    Test_get_message_from_errors();
 #endif // TESTABLE_PARSER_CODE
     
 #ifdef TESTABLE_TK_CODE
@@ -874,6 +1014,9 @@ void Testsuite_RunTests(void)
 #ifdef TESTABLE_ACTION_EXEC
     Test_basic_curtain_control_actions();
     Test_basic_wake_actions();
+    Test_invalid_time_in_wake_actions();
+    Test_invalid_command_in_wake_actions();
+    Test_parser_errors_in_wake_actions();
     Test_basic_sleep_actions();
     Test_other_actions();
 #endif // TESTABLE_ACTION_EXEC

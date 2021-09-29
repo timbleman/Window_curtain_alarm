@@ -41,6 +41,18 @@
 /****** Customizing area ******/
 /*****************************************************************************/
 
+/*
+ * TODO Added by timbleman.
+ * As I only use one testsuite, I do not want to see the full path for each
+ * test.
+ */
+#define NO_NOT_SHOW_PATH
+#ifdef NO_NOT_SHOW_PATH
+#define PATH_TO_SHOW "Testsuite"
+#else
+#define PATH_TO_SHOW __FILE__
+#endif // NO_NOT_SHOW_PATH
+
 /**
  * @Macro:       UCUNIT_WriteString(msg)
  *
@@ -250,7 +262,7 @@ static int ucunit_index = 0; /* Tracepoint index */
 #define UCUNIT_WritePassedMsg(msg, args)                        \
     do                                                          \
     {                                                           \
-        UCUNIT_WriteString(__FILE__);                           \
+        UCUNIT_WriteString(PATH_TO_SHOW);                       \
         UCUNIT_WriteString(":");                                \
         UCUNIT_WriteString(UCUNIT_DefineToString(__LINE__));    \
         UCUNIT_WriteString(": passed:");                        \
@@ -283,7 +295,7 @@ static int ucunit_index = 0; /* Tracepoint index */
 #define UCUNIT_WriteFailedMsg(msg, args)                        \
     do                                                          \
     {                                                           \
-        UCUNIT_WriteString(__FILE__);                           \
+        UCUNIT_WriteString(PATH_TO_SHOW);                       \
         UCUNIT_WriteString(":");                                \
         UCUNIT_WriteString(UCUNIT_DefineToString(__LINE__));    \
         UCUNIT_WriteString(": failed:");                        \

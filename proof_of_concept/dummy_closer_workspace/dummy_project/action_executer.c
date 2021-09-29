@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "action_executer.h"
+#include "command_parser.h"
 #include "motor_controller.h"
 #include "time_keeper.h"
 
@@ -29,7 +30,8 @@ int execute_action_non_blocking(user_action_t *act,
                                 int message_max_len)
 {
     // Perform message size check. Make sure message fits.
-    if (message_max_len < 128)
+    const int REQUIRED_LEN = 128;
+    if (message_max_len < REQUIRED_LEN)
         return 0;
         
     int status = 0;
@@ -40,14 +42,31 @@ int execute_action_non_blocking(user_action_t *act,
     {
         case NONE_T:    strcpy(message, "NONE_T action\n");
                         break;
-        case WAKE_SET_T:    internal_status = set_wake(act->data[0], 
-                                            act->data[1], act->data[2], 
-                                            act->data[3]);
-                            if (internal_status & ALL_ERRS)
+        case WAKE_SET_T:    // Check if the parser appended errors to the first data field.
+                            if ((act->data[0] & ALL_ERRS) == 0)
                             {
-                                sprintf(message, 
-                                        "Setting wake caused errors: %X\n",
-                                        (internal_status & ALL_ERRS));
+                                internal_status = set_wake(act->data[0], 
+                                                act->data[1], act->data[2], 
+                                                act->data[3]);
+                            }
+                            else
+                            {
+                                internal_status |= (act->data[0] & ALL_ERRS);
+                            }
+                            // Message differs if error occured or not.
+                            if ((internal_status & ALL_ERRS) != 0)
+                            {
+                                const char wake_err_str[] = 
+                                        "Setting wake caused errors: ";
+                                strcpy(message, wake_err_str);
+                                /*
+                                 * Write errors to end of message.
+                                 * Overwrite the current '\0'.
+                                 * Pass the space left in the buffer.
+                                 */
+                                get_message_from_errors(internal_status, 
+                                        &message[strlen(wake_err_str)], 
+                                        (message_max_len - strlen(message)));
                             }
                             else
                             {
@@ -57,14 +76,27 @@ int execute_action_non_blocking(user_action_t *act,
                                             act->data[3]);
                             }
                             break;
-        case SLEEP_SET_T:   internal_status = set_sleep(act->data[0], 
-                                            act->data[1], act->data[2], 
-                                            act->data[3]);
-                            if (internal_status & ALL_ERRS)
+        case SLEEP_SET_T:   // Check if the parser appended errors to the first data field.
+                            if ((act->data[0] & ALL_ERRS) == 0)
                             {
-                                sprintf(message, 
-                                        "Setting sleep caused errors: %X\n",
-                                        (internal_status & ALL_ERRS));
+                                internal_status = set_sleep(act->data[0], 
+                                                act->data[1], act->data[2], 
+                                                act->data[3]);
+                            }
+                            else
+                            {
+                                internal_status |= (act->data[0] & ALL_ERRS);
+                            }
+                            // Message differs if error occured or not.
+                            if ((internal_status & ALL_ERRS) != 0)
+                            {
+                                const char wake_err_str[] = 
+                                        "Setting sleep caused errors: ";
+                                strcpy(message, wake_err_str);
+                                // See WAKE_SET_T case
+                                get_message_from_errors(internal_status, 
+                                        &message[strlen(wake_err_str)], 
+                                        (message_max_len - strlen(message)));
                             }
                             else
                             {

@@ -3,7 +3,7 @@
 
 /********************************** Includes **********************************/
 #include <stdint.h>
-#include "command_parser.h"
+#include "types_and_enums.h"
 #include "configuration.h"
 
 /********************************* Constants **********************************/

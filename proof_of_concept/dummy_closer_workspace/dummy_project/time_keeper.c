@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <string.h> // strlen
 #include <limits.h> // Max int
-#include "command_parser.h"
+#include "types_and_enums.h"
 #ifndef TESTABLE_TK_CODE
 #include <time.h>
 #endif // TESTABLE_TK_CODE
@@ -141,7 +141,7 @@ int set_tm_multiple_days(one_tm_per_wd *time_strct,
         {
             int day_to_set = get_tm_day_from_day_type(single_weekday);
             if (day_to_set == INVALID_DAY_ERR)
-                return 1;
+                return INVALID_DAY_ERR;
             status |= set_tm_per_wd(time_strct, day_to_set, h, m, s);
         }
     }
@@ -276,15 +276,18 @@ long secs_until_tm_today(one_tm_per_wd *tmpwd)
  */
 int set_tm_per_wd(one_tm_per_wd *tmpwd, int wd, int h, int m, int s)
 {
+    int errs = 0;
     // Some validity checks
     if (wd < 0 || wd > 6)
-        return 1;
+        errs |= INVALID_DAY_ERR;
     if (h < 0 || h > 23)
-        return 1;
+        errs |= INVALID_TIME_ERR;
     if (m < 0 || m > 59)
-        return 1;
+        errs |= INVALID_TIME_ERR;
     if (s < 0 || s > 59)
-        return 1;
+        errs |= INVALID_TIME_ERR;
+    if (errs != 0)
+        return errs;
             
     // Set the time of the selected weekday
     struct tm *tm_to_set = get_wdtm(tmpwd, wd);

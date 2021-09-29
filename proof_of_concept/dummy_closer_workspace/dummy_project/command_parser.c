@@ -566,6 +566,70 @@ enum CURTAIN_CONTROL_ACT_T parse_open_close(char *user_str)
 }
 
 /*
+ * This function writes an error message in a predefined buffer.
+ * Error codes have to be passed (one-hot, those can be XORed together).
+ * Keep in mind "DAY_ERR, TIME_ERR, COMMAND_ERR" needs almost 32 bytes.
+ * 
+ * @param errs: (Multiple) error code(s).
+ * @param buf: Preallocated string buffer to write message into.
+ * @param str_max_len: The maximum length of the string.
+ * @return: 0 if successful.
+ */
+int get_message_from_errors(enum TIME_ERRORS errs, char *buf, int str_max_len)
+{
+    // These errors will be written
+    const char d_err[] = "DAY_ERR";
+    const char t_err[] = "TIME_ERR";
+    const char com_err[] = "COMMAND_ERR"; 
+    
+    // 6 to leave some room
+    if (str_max_len < (strlen(d_err) + strlen(t_err) + strlen(com_err) + 6))
+    {
+        if (str_max_len >= 5)
+            strcpy(buf, "SLEN");
+        return 1;
+    }
+    
+    /*
+     * Write error strings to buffer. 
+     */
+    int index = 0;
+    
+    if (errs & INVALID_DAY_ERR)
+    {
+        strcpy(&buf[index], d_err);
+        index += strlen(d_err);
+    }
+
+    if (errs & INVALID_TIME_ERR)
+    {
+        if (index != 0)
+        {
+            buf[index] = ',';
+            buf[index + 1] = ' ';
+            index += 2;
+        }
+        strcpy(&buf[index], t_err);
+        index += strlen(t_err);
+    }
+
+    if (errs & INVALID_COMMAND_ERR)
+    {
+        if (index != 0)
+        {
+            buf[index] = ',';
+            buf[index + 1] = ' ';
+            index += 2;
+        }
+        strcpy(&buf[index], com_err);
+        index += strlen(com_err);
+    }    
+        
+    //INVALID_DAY_ERR | INVALID_TIME_ERR | INVALID_COMMAND_ERR
+    return 0;
+}
+
+/*
 static void demonstrate_tokenise_to_argc_argv(char buffer[], int buffer_size)
 { // This demonstrates usage of tokenise_to_argc_argv 
   int   argc     = 0;

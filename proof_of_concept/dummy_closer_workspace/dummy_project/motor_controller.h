@@ -23,7 +23,7 @@ int target_steps;
 #endif // TESTABLE_MOTOR_CODE
 
 
-/**************************** Prototype functions ****************************/
+/**************************** Prototype functions *****************************/
 
 int setup_motor_control();
 
