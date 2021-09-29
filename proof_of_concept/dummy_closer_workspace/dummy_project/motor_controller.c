@@ -1,12 +1,15 @@
+/********************************** Includes **********************************/
 #include "motor_controller.h"
 
-/********************************** Includes **********************************/
 #include <stdio.h>  // printf()
+
 
 /********************************* Constants **********************************/
 /***************************** Struct definitions *****************************/
 /**************************** Prototype functions *****************************/
 void make_step(int dir);
+void enable_stepper();
+void disable_stepper();
 
 
 /**************************** Variable definitions ****************************/
@@ -17,6 +20,11 @@ int target_steps = 40;
 
 
 /**************************** Function definitions ****************************/
+/*
+ * Sets up variables of this file. Configures inputs and outputs.
+ * 
+ * @return: 0 if successful.
+ */
 int setup_motor_control()
 {
     current_steps = 0;
@@ -35,12 +43,15 @@ int open_nonblocking()
     printf("Opening...\n");
     if (current_steps >= target_steps)
     {
+        // TODO Here the passive break mode could be used instead of disabling.
+        disable_stepper();
         return 0;
     }
     else
     {
+        // TODO A check if already enabled could be employed.
+        enable_stepper();
         make_step(0);
-        current_steps++;
         return 1;
     }
 }
@@ -62,7 +73,6 @@ int close_nonblocking()
     else
     {
         make_step(1);
-        current_steps--;
         return 1;
     }
 }
@@ -79,6 +89,7 @@ int calibrate_nonblocking()
     printf("Closing and calibrating...\n");
     
     // TODO Make this work
+    // Interrupt or polling? Polling should be fine for now...
     int end_stop = 0;
     if (end_stop)
     {
@@ -87,7 +98,6 @@ int calibrate_nonblocking()
     }
     
     make_step(1);
-    current_steps--;
     return 1;
 }
 
@@ -121,11 +131,39 @@ void make_step(int close)
     if (close)
     {
         // Close
+        current_steps--;
         return;
     }
     else
     {
         // Open
+        current_steps++;
         return;
     }
+}
+
+/*
+ * Enables the stepper driver.
+ * 
+ * @return: None.
+ */
+void enable_stepper()
+{
+    // TODO check if already active.
+    // Some GPIO stuff that disables the stepper driver.
+    return;
+}
+
+/*
+ * Reduces power draw or noise of the stepper during a standstill.
+ * This could be acchieved by either completely disabling the driver
+ * or by enabling the passive breakmode.
+ * 
+ * @retun: Mone.
+ */
+void disable_stepper()
+{
+    // Some GPIO stuff that disables the stepper driver.
+    // Could also enable passive breakmode of the TMC2209.
+    return;
 }

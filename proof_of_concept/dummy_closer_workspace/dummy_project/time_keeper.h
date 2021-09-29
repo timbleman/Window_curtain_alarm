@@ -116,5 +116,26 @@ int get_current_m();
  */
 int get_current_s();
 
+/*
+ * Get all the wake times in a user readable format.
+ * 
+ * @param buf: String buffer to write into.
+ * @param max_len: The maximum length of the string.
+ * @return: Success if 0.
+ */
+int write_wake_times_message(char *buf, int max_len);
+
+/*
+ * Get all the sleep times in a user readable format.
+ * 
+ * @param buf: String buffer to write into.
+ * @param max_len: The maximum length of the string.
+ * @return: Success if 0.
+ */
+int write_sleep_times_message(char *buf, int max_len);
+
+#ifdef TESTABLE_TK_CODE
+int format_time_to_str(char *str, int max_len, int h, int m, int s);
+#endif // TESTABLE_TK_CODE
 
 #endif // _TIME_KEEPER_H_

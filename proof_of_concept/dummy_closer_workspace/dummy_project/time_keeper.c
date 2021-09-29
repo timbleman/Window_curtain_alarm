@@ -5,7 +5,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdint.h>
-#include <limits.h>
+#include <string.h> // strlen
+#include <limits.h> // Max int
 #include "command_parser.h"
 #ifndef TESTABLE_TK_CODE
 #include <time.h>
@@ -38,6 +39,8 @@ long secs_until_tm_today(one_tm_per_wd *tmpwd);
 int get_tm_day_from_day_type(uint32_t dayt);
 int set_tm_multiple_days(one_tm_per_wd *time_strct,
                             uint32_t days, int h, int m, int s);
+int write_week_times_message(char *str, int max_len, one_tm_per_wd *week_tms);
+int format_tm_time_to_str(char *str, int max_len, struct tm *tmstrct);
 int save_times();
 int load_times();
 
@@ -389,6 +392,151 @@ int get_current_s()
     // Copy by value to not be affected by delays
     currenttime = *localtime(&rawtime);
     return currenttime.tm_sec;
+}
+
+/*
+ * Get all the wake times in a user readable format.
+ * 
+ * @param buf: String buffer to write into.
+ * @param max_len: The maximum length of the string.
+ * @return: Success if 0.
+ */
+int write_wake_times_message(char *buf, int max_len)
+{
+    int status = write_week_times_message(buf, max_len, &wake_times);
+    memcpy(buf, "wake times:", 11);
+    return status;
+}
+
+/*
+ * Get all the sleep times in a user readable format.
+ * 
+ * @param buf: String buffer to write into.
+ * @param max_len: The maximum length of the string.
+ * @return: Success if 0.
+ */
+int write_sleep_times_message(char *buf, int max_len)
+{
+    int status = write_week_times_message(buf, max_len, &sleep_times);
+    memcpy(buf, "sleep times:", 12);
+    return status;
+}
+
+/*
+ * Writes times of a one_tm_per_wd struct into a user readable message.
+ * Not easily adjustable code, heavily dependent on the message format.
+ * 
+ * @param str: The buffer to write into.
+ * @param max_len: The maximum depth of the supplied buffer.
+ * @param week_tms: one_tm_per_wd containg times for a whole week.
+ * @return: 0 if successful.
+ */
+int write_week_times_message(char *str, int max_len, one_tm_per_wd *week_tms)
+{
+    char msg[128] = "             \n"
+                "mon: xx:xx:xx\n"
+                "tue: xx:xx:xx\n"
+                "wed: xx:xx:xx\n"
+                "thu: xx:xx:xx\n"
+                "fri: xx:xx:xx\n"
+                "sat: xx:xx:xx\n"
+                "sun: xx:xx:xx\n";
+                
+    // Abort if the buffer is too small
+    if (max_len < strlen(msg))
+        return 1;
+
+    /*
+     * Pulling these magic number out of nowhere is not good practice.
+     * Instead of this approach some sprintf() could be used, however,
+     * the function may not be as predicatable (memory) as this approach.
+     */
+    const int line_offset = 14;
+    const int time_offset = 5;
+    const int str_term_off = time_offset + 8;
+    const int mon_offset =  time_offset + line_offset * 1;
+    const int tue_offset =  time_offset + line_offset * 2;
+    const int wed_offset =  time_offset + line_offset * 3;
+    const int thu_offset =  time_offset + line_offset * 4;
+    const int fri_offset =  time_offset + line_offset * 5;
+    const int sat_offset =  time_offset + line_offset * 6;
+    const int sun_offset =  time_offset + line_offset * 7;
+    
+    /*
+     * Write times into string.
+     * Remember, each of the written strings has terminating '\0', which needs
+     * to be removed.
+     */
+    int status = 0;
+    status |= format_tm_time_to_str(&msg[mon_offset], 9, &(week_tms->tm_mon));
+    status |= format_tm_time_to_str(&msg[tue_offset], 9, &(week_tms->tm_tue));
+    status |= format_tm_time_to_str(&msg[wed_offset], 9, &(week_tms->tm_wed));
+    status |= format_tm_time_to_str(&msg[thu_offset], 9, &(week_tms->tm_thu));
+    status |= format_tm_time_to_str(&msg[fri_offset], 9, &(week_tms->tm_fri));
+    status |= format_tm_time_to_str(&msg[sat_offset], 9, &(week_tms->tm_sat));
+    status |= format_tm_time_to_str(&msg[sun_offset], 9, &(week_tms->tm_sun));
+    //status |= format_time_to_str(msg, 10, 1, 1, 1);
+    
+    /*
+     * Replace every '\0' by '\n', except the last one.
+     * This is not portable, heavily tied to message format.
+     */
+    for (int i = 0; i < 7; ++i)
+    {
+        int offs = str_term_off + line_offset * i;
+        msg[offs] = '\n';
+    }
+    
+    // Copy message into buffer.
+    memcpy(str, msg, strlen(msg));
+    //printf("msg %s\n", msg);
+    //printf("str %s\n", str);
+    return status;
+}
+
+/*
+ * Formats a c time struct tm into a string of the format "hh:mm:ss".
+ * Modified in place.
+ * 
+ * @param str: Buffer to write into.
+ * @param max_len: The maximum depth of the supplied buffer.
+ * @param tmstrct: C struct tm containg h, m and s.
+ * @return: 0 if successful.
+ */
+int format_tm_time_to_str(char *str, int max_len, struct tm *tmstrct)
+{
+    return format_time_to_str(str, max_len, tmstrct->tm_hour, 
+                                            tmstrct->tm_min,
+                                            tmstrct->tm_sec);
+}
+
+/*
+ * Formats a hour, min and second into a string of the format "hh:mm:ss".
+ * Modified in place.
+ * 
+ * @param str: Buffer to write into.
+ * @param max_len: The maximum depth of the supplied buffer.
+ * @param h: Hour.
+ * @param m: Minute.
+ * @param s: Second.
+ * @return: 0 if successful.
+ */
+int format_time_to_str(char *str, int max_len, int h, int m, int s)
+{
+    // "12:12:12\n" --> 9 chars
+    if (max_len < 9)
+        return 1;
+        
+    if (h > 99 || m > 99 || s > 99
+        || h < 0 || m < 0 || s < 0)
+    {
+        strcpy(str, "-1:-1:-1");
+        return 1;
+    }
+    
+    // This may not work on an embedded platform, if so adjust test lel.
+    sprintf(str, "%02d:%02d:%02d", h, m, s);
+    return 0;
 }
 
 /*

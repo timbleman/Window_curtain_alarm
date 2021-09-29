@@ -269,6 +269,11 @@ static void Test_set_wake_single_day()
     UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_min, 59);
     UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_sec, 59);
 
+    // For easier checking
+    //char formatted_times[128] = {0};
+    //UCUNIT_CheckIsEqual( write_wake_times_message(formatted_times, 128), 0 );
+    //printf("Wake times print:\n%s \n", formatted_times);
+    
     // Reset
     setup_time_keeper();   
 }
@@ -401,6 +406,68 @@ static void Test_time_until_wake_today()
     }
     
     //printf("time_till_wake %ld target_diff %i \n", time_till_wake, TARGET_DIFF_SECS);
+    
+    // Reset
+    setup_time_keeper();
+}
+
+static void Test_write_times_message()
+{
+    UCUNIT_TestcaseBegin("Checking time_until_wake() for current time.");
+    // Setup
+    setup_time_keeper();
+    
+    char message[10] = {0};
+    
+    int status = format_time_to_str(message, 10, 1, 2, 3);
+    UCUNIT_CheckIsEqual( status, 0);
+    UCUNIT_CheckIsEqual( strcmp(message, "01:02:03"), 0);
+    
+    memset(message, 0, 10);
+    status = format_time_to_str(message, 10, 11, 22, 33);
+    UCUNIT_CheckIsEqual( status, 0);
+    UCUNIT_CheckIsEqual( strcmp(message, "11:22:33"), 0);
+    
+    // Invalid stuff
+    memset(message, 0, 10);
+    status = format_time_to_str(message, 10, 110, 22, 33);
+    UCUNIT_CheckIsEqual( status, 1);
+    UCUNIT_CheckIsEqual( strcmp(message, "-1:-1:-1"), 0);
+    memset(message, 0, 10);
+    status = format_time_to_str(message, 10, 11, 220, 33);
+    UCUNIT_CheckIsEqual( status, 1);
+    UCUNIT_CheckIsEqual( strcmp(message, "-1:-1:-1"), 0);
+    memset(message, 0, 10);
+    status = format_time_to_str(message, 10, 11, 22, 330);
+    UCUNIT_CheckIsEqual( status, 1);
+    UCUNIT_CheckIsEqual( strcmp(message, "-1:-1:-1"), 0);
+    memset(message, 0, 10);
+    status = format_time_to_str(message, 10, -1, 22, 33);
+    UCUNIT_CheckIsEqual( status, 1);
+    UCUNIT_CheckIsEqual( strcmp(message, "-1:-1:-1"), 0);
+    memset(message, 0, 10);
+    status = format_time_to_str(message, 10, 11, -1, 33);
+    UCUNIT_CheckIsEqual( status, 1);
+    UCUNIT_CheckIsEqual( strcmp(message, "-1:-1:-1"), 0);
+    memset(message, 0, 10);
+    status = format_time_to_str(message, 10, 11, 22, -1);
+    UCUNIT_CheckIsEqual( status, 1);
+    UCUNIT_CheckIsEqual( strcmp(message, "-1:-1:-1"), 0);
+    // No space
+    memset(message, 0, 10);
+    status = format_time_to_str(message, 3, 110, 22, 33);
+    UCUNIT_CheckIsEqual( status, 1);
+    UCUNIT_CheckIsEqual( strcmp(message, ""), 0);
+    
+    
+    // Just visualize the actual formatted message in the console.
+    // Check for success.
+    char formatted_times[128] = {0};
+    UCUNIT_CheckIsEqual( write_wake_times_message(formatted_times, 128), 0 );
+    printf("Wake times print:\n%s \n", formatted_times);
+    memset(formatted_times, 0, 128);
+    UCUNIT_CheckIsEqual( write_sleep_times_message(formatted_times, 128), 0);
+    printf("Sleep times print:\n%s \n", formatted_times);
     
     // Reset
     setup_time_keeper();
@@ -796,6 +863,7 @@ void Testsuite_RunTests(void)
     Test_set_wake_invalid();
     Test_set_sleep_single_day();
     Test_time_until_wake_today();
+    Test_write_times_message();
 #endif // TESTABLE_TK_CODE
 
 #ifdef TESTABLE_MOTOR_CODE
