@@ -8,6 +8,8 @@
 #define PERFORM_STEP_PIN D5
 #define END_STOP_PIN D6
 
+#define CHECK_MICROS_OVERFLOW
+
 
 /***************************** Struct definitions *****************************/
 /**************************** Prototype functions *****************************/
@@ -293,7 +295,13 @@ void make_step_no_del(int close)
             
             high_step = false;
         }
+#ifdef CHECK_MICROS_OVERFLOW
+        // Leave approximately 1ms buffer in case of an overflow
+        next_step_micros = (micros() < 0xFFFFFFFFFFFFFFD0) ? 
+                            (micros() + DEL_TIME) : 0;
+#else
         next_step_micros = micros() + DEL_TIME;
+#endif // CHECK_MICROS_OVERFLOW
     }
 }
 
