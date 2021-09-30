@@ -47,6 +47,7 @@ int setup_time_keeper();
 /*
  * Set the time to wake up for multiple days.
  * Days are onehot encoded as in the DAY_TYPE defined in command_parser.
+ * Unsets ignore of a single wake.
  * 
  * @param days: The weekdays to set.
  * @param h: The hour to open the curtain.
@@ -59,6 +60,7 @@ int set_wake(uint32_t days, int h, int m, int s);
 /*
  * Set the time to sleep for multiple days.
  * Days are onehot encoded as in the DAY_TYPE defined in command_parser.
+ * Unsets ignore of a single wake.
  * 
  * @param days: The weekdays to set.
  * @param h: The hour to close the curtain.
@@ -115,6 +117,11 @@ int get_current_m();
  * @return: The current second.
  */
 int get_current_s();
+
+int get_ignore();
+void set_ignore();
+void unset_ignore();
+void update_ignore();
 
 /*
  * Get all the wake times in a user readable format.

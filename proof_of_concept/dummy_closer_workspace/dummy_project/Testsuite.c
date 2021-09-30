@@ -34,6 +34,7 @@
  * author.
  */
 
+#include <unistd.h> // sleep()
 #include <string.h>
 #include <stdio.h>  // printf()
 #include <stdbool.h>
@@ -52,6 +53,7 @@
 
 
 int get_bit_of_error(uint32_t err_code);
+int time_plus_secs(int secs, int *h, int *m, int *s);
 
 
 #ifdef TESTABLE_PARSER_CODE
@@ -501,6 +503,102 @@ static void Test_write_times_message()
     // Reset
     setup_time_keeper();
 }
+
+/*
+ * Tests the ignoring of a single wake.
+ * Requires some time to run, therefore should not be run everytime.
+ */
+static void Test_ignore_wake_when_wake_before_sleep()
+{
+    UCUNIT_TestcaseBegin("Checking ignore of a single wake. Wake before sleep.");
+    // Setup
+    setup_time_keeper();
+    
+    int testh = get_current_h();
+    int testm = get_current_m();
+    int tests = get_current_s();
+    // Do not run test if its to late, avoid stupid overflows.
+    if (testh == 23 && testm > 55)
+    {
+        printf("Run this test later, waking and sleeping at the very end"
+                "of a day won't occur.\n");
+        return;
+    }
+    
+    // Set wake and sleep in the very near future.
+    time_plus_secs(2, &testh, &testm, &tests);
+    set_wake((MON_T | TUE_T | WED_T | THU_T | FRI_T | SAT_T | SUN_T),
+                testh, testm, tests);
+    time_plus_secs(3, &testh, &testm, &tests);
+    set_sleep((MON_T | TUE_T | WED_T | THU_T | FRI_T | SAT_T | SUN_T),
+                testh, testm, tests);
+    
+    // Check whether wake is ignored as expected.
+    // Before wake
+    set_ignore();
+    UCUNIT_CheckIsEqual( get_ignore(), 1 );
+    update_ignore();
+    UCUNIT_CheckIsEqual( get_ignore(), 1 );
+    // After wake
+    sleep(3);
+    update_ignore();
+    UCUNIT_CheckIsEqual( get_ignore(), 1 );
+    // After sleep
+    sleep(3);
+    update_ignore();
+    UCUNIT_CheckIsEqual( get_ignore(), 0 );
+    
+    // Reset
+    setup_time_keeper();    
+}
+
+/*
+ * Tests the ignoring of a single wake.
+ * Requires some time to run, therefore should not be run everytime.
+ */
+static void Test_ignore_wake_when_sleep_before_wake()
+{
+    UCUNIT_TestcaseBegin("Checking ignore of a single wake. Sleep before wake.");
+    // Setup
+    setup_time_keeper();
+    
+    int testh = get_current_h();
+    int testm = get_current_m();
+    int tests = get_current_s();
+    // Do not run test if its to late, avoid stupid overflows.
+    if (testh == 23 && testm > 55)
+    {
+        printf("Run this test later, waking and sleeping at the very end"
+                "of a day won't occur.\n");
+        return;
+    }
+    
+    // Set wake and sleep in the very near future.
+    time_plus_secs(2, &testh, &testm, &tests);
+    set_sleep((MON_T | TUE_T | WED_T | THU_T | FRI_T | SAT_T | SUN_T),
+                testh, testm, tests);
+    time_plus_secs(3, &testh, &testm, &tests);
+    set_wake((MON_T | TUE_T | WED_T | THU_T | FRI_T | SAT_T | SUN_T),
+                testh, testm, tests);
+    
+    // Check whether wake is ignored as expected.
+    // Before sleep
+    set_ignore();
+    UCUNIT_CheckIsEqual( get_ignore(), 1 );
+    update_ignore();
+    UCUNIT_CheckIsEqual( get_ignore(), 1 );
+    // After sleep
+    sleep(3);
+    update_ignore();
+    UCUNIT_CheckIsEqual( get_ignore(), 1 );
+    // After wake
+    sleep(3);
+    update_ignore();
+    UCUNIT_CheckIsEqual( get_ignore(), 1 );
+    
+    // Reset
+    setup_time_keeper();    
+}
 #endif // TESTABLE_TK_CODE
 
 
@@ -856,6 +954,34 @@ int get_bit_of_error(uint32_t err_code)
     return i;
 }
 
+int time_plus_secs(int secs, int *h, int *m, int *s)
+{
+    if (secs > 59)
+    {
+        *h = 0;
+        *m = 0;
+        *s = 0;
+        return 1;
+    }
+    if ((*h == 23) && (*m >= 58))
+    {
+        *h = 0;
+        *m = 0;
+        *s = 0;
+        return 1;
+    }
+    
+    int inh = *h;
+    int inm = *m;
+    int ins = *s;
+    *s = (ins + secs) % 60;
+    *m = (inm + ((ins + secs) / 60)) % 60;
+    *h = inh + ((inm + ((ins + secs) / 60)) / 60);
+    
+    printf("prev %i:%i:%i; plus secs %i:%i:%i \n", inh, inm, ins, *h, *m, *s);
+    return 0;
+}
+
 /*
 static void Test_BasicChecksDemo(void)
 {
@@ -1024,6 +1150,11 @@ void Testsuite_RunTests(void)
 #ifdef TESTABLE_ALARMCHECKER_CODE
     Test_new_state_ttw_tts_today();
 #endif // TESTABLE_ALARMCHECKER_CODE
+
+    
+    // These take some time, do not run always.
+    Test_ignore_wake_when_wake_before_sleep();
+    Test_ignore_wake_when_sleep_before_wake();
 
     UCUNIT_WriteSummary();
 }

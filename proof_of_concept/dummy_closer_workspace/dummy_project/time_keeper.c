@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <string.h> // strlen
 #include <limits.h> // Max int
 #include "types_and_enums.h"
@@ -46,6 +47,8 @@ int load_times();
 
 
 /**************************** Variable definitions ****************************/
+// Ignore the next wake time.
+bool ignore_once;
 #ifndef TESTABLE_TK_CODE
 one_tm_per_wd wake_times;
 one_tm_per_wd sleep_times;
@@ -84,6 +87,7 @@ int setup_time_keeper()
 /*
  * Set the time to wake up for multiple days.
  * Days are onehot encoded as in the DAY_TYPE defined in command_parser.
+ * Unsets ignore of a single wake.
  * 
  * @param days: The weekdays to set.
  * @param h: The hour to open the curtain.
@@ -93,6 +97,8 @@ int setup_time_keeper()
  */
 int set_wake(uint32_t days, int h, int m, int s)
 {
+    // To avoid strange bugs.
+    unset_ignore();
     return set_tm_multiple_days(&wake_times,
                             days, h, m, s);
 }
@@ -100,6 +106,7 @@ int set_wake(uint32_t days, int h, int m, int s)
 /*
  * Set the time to sleep for multiple days.
  * Days are onehot encoded as in the DAY_TYPE defined in command_parser.
+ * Unsets ignore of a single wake.
  * 
  * @param days: The weekdays to set.
  * @param h: The hour to close the curtain.
@@ -109,6 +116,8 @@ int set_wake(uint32_t days, int h, int m, int s)
  */
 int set_sleep(uint32_t days, int h, int m, int s)
 {
+    // To avoid strange bugs.
+    unset_ignore();
     return set_tm_multiple_days(&sleep_times,
                             days, h, m, s);
 }
@@ -561,4 +570,28 @@ int save_times()
 int load_times()
 {
     return 1;
+}
+
+int get_ignore()
+{
+    return (int)ignore_once;
+}
+
+void set_ignore()
+{
+    ignore_once = true;
+}
+
+void unset_ignore()
+{
+    ignore_once = false;
+}
+
+/*
+ * This has to be called repeatedly.
+ */
+void update_ignore()
+{
+    
+    return;
 }
