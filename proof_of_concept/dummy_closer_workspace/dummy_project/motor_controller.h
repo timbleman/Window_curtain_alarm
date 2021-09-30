@@ -24,7 +24,11 @@ int target_steps;
 
 
 /**************************** Prototype functions *****************************/
-
+/*
+ * Sets up variables of this file. Configures inputs and outputs.
+ * 
+ * @return: 0 if successful.
+ */
 int setup_motor_control();
 
 /*
