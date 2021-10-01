@@ -1,6 +1,10 @@
 #ifndef _TYPES_AND_ENUMS_H_
 #define _TYPES_AND_ENUMS_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /********************************** Includes **********************************/
 /********************************* Constants **********************************/
 enum TIME_ERRORS
@@ -51,5 +55,8 @@ typedef struct
     uint32_t data[5];
 } user_action_t;
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _TYPES_AND_ENUMS_H_

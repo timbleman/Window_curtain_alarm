@@ -212,8 +212,9 @@ static int ucunit_testcases_passed = 0; /* Number of passed test cases */
 static int ucunit_testcases_failed_checks = 0; /* Number of failed checks in a testcase */
 static int ucunit_checklist_failed_checks = 0; /* Number of failed checks in a checklist */
 static int ucunit_action = UCUNIT_ACTION_WARNING; /* Action to take if a check fails */
-static int ucunit_checkpoints[UCUNIT_MAX_TRACEPOINTS]; /* Max. number of tracepoints */
-static int ucunit_index = 0; /* Tracepoint index */
+// I do not use tracepoints.
+//static int ucunit_checkpoints[UCUNIT_MAX_TRACEPOINTS]; /* Max. number of tracepoints */
+//static int ucunit_index = 0; /* Tracepoint index */
 
 /*****************************************************************************/
 /* Internal (private) Macros                                                 */

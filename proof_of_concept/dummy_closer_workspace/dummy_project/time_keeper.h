@@ -1,6 +1,10 @@
 #ifndef _TIME_KEEPER_H_
 #define _TIME_KEEPER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /********************************** Includes **********************************/
 #include <stdint.h>
 #include "configuration.h"
@@ -118,9 +122,38 @@ int get_current_m();
  */
 int get_current_s();
 
-int get_ignore();
+
+/*
+ * The time keeper is able to ignore the next wake.
+ * Call this if the next wake should be ignored.
+ * 
+ * @return: None.
+ */
 void set_ignore();
+
+/*
+ * The time keeper is able to ignore the next wake.
+ * Call this if the next wake should no longer be ignored.
+ * 
+ * @return: None.
+ */
 void unset_ignore();
+
+/*
+ * The time keeper is able to ignore the next wake.
+ * Check if the next wake should be ignored.
+ * 
+ * @return: 1 if to be ignored, 0 if not.
+ */
+int get_ignore();
+
+/*
+ * The time keeper is able to ignore the next wake.
+ * For the ignore to be correctly updated, this function nedds to be called 
+ * repeatedly.
+ * 
+ * @return: None.
+ */
 void update_ignore();
 
 /*
@@ -144,5 +177,9 @@ int write_sleep_times_message(char *buf, int max_len);
 #ifdef TESTABLE_TK_CODE
 int format_time_to_str(char *str, int max_len, int h, int m, int s);
 #endif // TESTABLE_TK_CODE
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _TIME_KEEPER_H_

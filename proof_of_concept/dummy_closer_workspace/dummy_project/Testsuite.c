@@ -33,7 +33,7 @@
  * If you cannot obtain a copy of the License, please contact the
  * author.
  */
-
+/********************************** Includes **********************************/
 #include <unistd.h> // sleep()
 #include <string.h>
 #include <stdio.h>  // printf()
@@ -49,13 +49,17 @@
 #include "configuration.h"
 
 
+/********************************* Constants **********************************/
 #define MESSAGE_LEN 128
+#undef RUN_TIME_INTENSIVE_TESTS
 
 
+/**************************** Prototype functions *****************************/
 int get_bit_of_error(uint32_t err_code);
 int time_plus_secs(int secs, int *h, int *m, int *s);
 
-
+/**************************** Variable definitions ****************************/
+/**************************** Function definitions ****************************/
 #ifdef TESTABLE_PARSER_CODE
 static void Test_parse_hour(void)
 {
@@ -504,6 +508,7 @@ static void Test_write_times_message()
     setup_time_keeper();
 }
 
+#ifdef RUN_TIME_INTENSIVE_TESTS
 /*
  * Tests the ignoring of a single wake.
  * Requires some time to run, therefore should not be run everytime.
@@ -543,6 +548,58 @@ static void Test_ignore_wake_when_wake_before_sleep()
     sleep(3);
     update_ignore();
     UCUNIT_CheckIsEqual( get_ignore(), 1 );
+    // After sleep
+    sleep(3);
+    update_ignore();
+    UCUNIT_CheckIsEqual( get_ignore(), 0 );
+    
+    // Reset
+    setup_time_keeper();    
+}
+
+/*
+ * Tests the ignoring of a single wake.
+ * Requires some time to run, therefore should not be run everytime.
+ */
+static void Test_ignore_wake_when_wake_before_sleep_reset()
+{
+    UCUNIT_TestcaseBegin("Checking ignore of a single wake. Wake before sleep. "
+                         "Unset ignore while wake.");
+    // Setup
+    setup_time_keeper();
+    
+    int testh = get_current_h();
+    int testm = get_current_m();
+    int tests = get_current_s();
+    // Do not run test if its to late, avoid stupid overflows.
+    if (testh == 23 && testm > 55)
+    {
+        printf("Run this test later, waking and sleeping at the very end"
+                "of a day won't occur.\n");
+        return;
+    }
+    
+    // Set wake and sleep in the very near future.
+    time_plus_secs(2, &testh, &testm, &tests);
+    set_wake((MON_T | TUE_T | WED_T | THU_T | FRI_T | SAT_T | SUN_T),
+                testh, testm, tests);
+    time_plus_secs(3, &testh, &testm, &tests);
+    set_sleep((MON_T | TUE_T | WED_T | THU_T | FRI_T | SAT_T | SUN_T),
+                testh, testm, tests);
+    
+    // Check whether wake is ignored as expected.
+    // Before wake
+    set_ignore();
+    UCUNIT_CheckIsEqual( get_ignore(), 1 );
+    update_ignore();
+    UCUNIT_CheckIsEqual( get_ignore(), 1 );
+    // After wake
+    sleep(3);
+    update_ignore();
+    UCUNIT_CheckIsEqual( get_ignore(), 1 );
+    unset_ignore();
+    update_ignore();
+    UCUNIT_CheckIsEqual( get_ignore(), 0 );
     // After sleep
     sleep(3);
     update_ignore();
@@ -599,6 +656,7 @@ static void Test_ignore_wake_when_sleep_before_wake()
     // Reset
     setup_time_keeper();    
 }
+#endif // RUN_TIME_INTENSIVE_TESTS
 #endif // TESTABLE_TK_CODE
 
 
@@ -1130,6 +1188,13 @@ void Testsuite_RunTests(void)
     Test_set_sleep_single_day();
     Test_time_until_wake_today();
     Test_write_times_message();
+    
+    // These take some time, do not run always.
+#ifdef RUN_TIME_INTENSIVE_TESTS
+    Test_ignore_wake_when_wake_before_sleep();
+    Test_ignore_wake_when_sleep_before_wake();
+    Test_ignore_wake_when_wake_before_sleep_reset();
+#endif // RUN_TIME_INTENSIVE_TESTS
 #endif // TESTABLE_TK_CODE
 
 #ifdef TESTABLE_MOTOR_CODE
@@ -1151,10 +1216,6 @@ void Testsuite_RunTests(void)
     Test_new_state_ttw_tts_today();
 #endif // TESTABLE_ALARMCHECKER_CODE
 
-    
-    // These take some time, do not run always.
-    Test_ignore_wake_when_wake_before_sleep();
-    Test_ignore_wake_when_sleep_before_wake();
 
     UCUNIT_WriteSummary();
 }

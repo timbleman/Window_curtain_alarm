@@ -42,13 +42,18 @@ int set_tm_multiple_days(one_tm_per_wd *time_strct,
                             uint32_t days, int h, int m, int s);
 int write_week_times_message(char *str, int max_len, one_tm_per_wd *week_tms);
 int format_tm_time_to_str(char *str, int max_len, struct tm *tmstrct);
+int format_time_to_str(char *str, int max_len, int h, int m, int s);
 int save_times();
 int load_times();
 
 
 /**************************** Variable definitions ****************************/
 // Ignore the next wake time.
-bool ignore_once;
+static bool ignore_once;
+// These could be static inside update_ignore(), but this complicates resetting.
+static bool already_slept = false;
+static bool already_ignored_wake = false;
+
 #ifndef TESTABLE_TK_CODE
 one_tm_per_wd wake_times;
 one_tm_per_wd sleep_times;
@@ -80,6 +85,11 @@ int setup_time_keeper()
         status |= set_tm_per_wd(&wake_times, 0, DEFAULT_WEEKEND_WAKE, 0, 0);
         status |= set_tm_per_wd(&sleep_times, 0, DEFAULT_SLEEP, 0, 0);
     }
+    
+    // Reset all the ignore one wake variables.
+    ignore_once = false;
+    already_slept = false;
+    already_ignored_wake = false;
     
     return status;
 }
@@ -572,26 +582,106 @@ int load_times()
     return 1;
 }
 
-int get_ignore()
-{
-    return (int)ignore_once;
-}
-
+/*
+ * The time keeper is able to ignore the next wake.
+ * Call this if the next wake should be ignored.
+ * 
+ * @return: None.
+ */
 void set_ignore()
 {
     ignore_once = true;
 }
 
+/*
+ * The time keeper is able to ignore the next wake.
+ * Call this if the next wake should no longer be ignored.
+ * 
+ * @return: None.
+ */
 void unset_ignore()
 {
     ignore_once = false;
 }
 
 /*
- * This has to be called repeatedly.
+ * The time keeper is able to ignore the next wake.
+ * Check if the next wake should be ignored.
+ * No bool as this code may need to interact with C++ code.
+ * 
+ * @return: 1 if to be ignored, 0 if not.
+ */
+int get_ignore()
+{
+    return (int)ignore_once;
+}
+
+/*
+ * The time keeper is able to ignore the next wake.
+ * For the ignore to be correctly updated, this function nedds to be called 
+ * repeatedly.
+ * 
+ * @return: None.
  */
 void update_ignore()
 {
+    /*
+     * Keep these cases in mind: 
+     * ... |wake| ... |sleep| ...
+     * ... |sleep| ... |wake| ...
+     */
+     long tuw = time_until_wake();
+     long tus = time_until_sleep();
+     
+    /*
+     * This should mean sleep.
+     * However this is also as sleep:
+     * Previous day: ... |sleep| ... |wake| ...
+     * Current day: now |wake| ... |sleep| ...
+     * For this reason the next wake is ignored, even if the curtain is
+     * already opened!
+     * 
+     * now |wake| ... |sleep| ...
+     * now |sleep| ... |wake| ...
+     * ... |sleep| now |wake| ...
+     * Also ((tuw < 0 && tus < 0) && (tuw < tus))? ... |wake| ... |sleep| now
+     */
+    if (((tuw > 0 && tus > 0) || (tuw > 0 && tus < 0))
+            && ignore_once)
+    {
+        already_slept = true;
+    }
     
-    return;
+    /*
+     * This should mean wake.
+     * 
+     * ... |wake| now |sleep| ...
+     * ... |sleep| ... |wake| now
+     */
+    if (((tuw < 0 && tus > 0) || (((tuw < 0 && tus < 0)) && (tus < tuw)))
+        && already_slept && ignore_once)
+    {
+        already_ignored_wake = true;
+    }
+    else if (!ignore_once)
+    {
+        // Reset if ignore_once has been disabled
+        already_slept = false;
+        already_ignored_wake = false;
+        ignore_once = false;
+    }
+    
+    /*
+     * The same sleep stuff.
+     */
+    if (((tuw > 0 && tus > 0) || (tuw > 0 && tus < 0) 
+        || ((tuw < 0 && tus < 0) && (tuw < tus)))
+        && already_ignored_wake)
+    {
+        already_slept = false;
+        already_ignored_wake = false;
+        ignore_once = false;
+    }
+    //printf("ignore_once %i, already_slept %i, already_ignored_wake %i\n", 
+    //        ignore_once, already_slept, already_ignored_wake);
 }

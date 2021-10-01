@@ -1,6 +1,10 @@
 #ifndef _COMMAND_PARSER_H_
 #define _COMMAND_PARSER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /********************************** Includes **********************************/
 #include <stdint.h>
 #include "configuration.h"
@@ -49,5 +53,9 @@ int parse_sec(char **split_command, int command_num);
 int tokenise_to_argc_argv(
         char *buffer, int *argc, char *argv[], const int argv_length);
 #endif // TESTABLE_PARSER_CODE
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _COMMAND_PARSER_H_

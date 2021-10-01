@@ -6,7 +6,7 @@
 /***************************** Struct definitions *****************************/
 /**************************** Prototype functions *****************************/
 #ifndef TESTABLE_ALARMCHECKER_CODE
-enum CURTAIN_STATE new_state_ttw_tts_today(long ttw_today, long ttw_today);
+enum CURTAIN_STATE new_state_ttw_tts_today(long tuw_today, long tus_today);
 #endif // TESTABLE_ALARMCHECKER_CODE
 
 
@@ -21,6 +21,9 @@ enum CURTAIN_STATE new_state_ttw_tts_today(long ttw_today, long ttw_today);
  */
 int check_and_alarm_non_blocking()
 {
+    // Update the ignore one wake.
+    update_ignore();
+    
     enum CURTAIN_STATE new_state = new_state_ttw_tts_today(time_until_wake(), 
                                                         time_until_sleep());
 
@@ -30,7 +33,13 @@ int check_and_alarm_non_blocking()
      */
     switch(new_state)
     {
-        case CURTAIN_OPEN_T:    return open_nonblocking();
+        case CURTAIN_OPEN_T:    // FIXME If ignore, 1 is returned. This means 
+                                // still working.
+                                // If ignore is unset, the curtain should open.
+                                if (!get_ignore())
+                                    return open_nonblocking();
+                                else
+                                    return 1;
                                 break;
         case CURTAIN_CLOSED_T:  return close_nonblocking();
                                 break;
@@ -52,11 +61,11 @@ int check_and_alarm_non_blocking()
  * @param tts_today: time_to_sleep of the current day.
  * @return: Action to perform. Open close or undefined.
  */
-enum CURTAIN_STATE new_state_ttw_tts_today(long ttw_today, long tts_today)
+enum CURTAIN_STATE new_state_ttw_tts_today(long tuw_today, long tus_today)
 {
-    if (ttw_today > 0)
+    if (tuw_today > 0)
     {
-        if (tts_today < 0)
+        if (tus_today < 0)
         {
             return CURTAIN_CLOSED_T;
         }
@@ -65,15 +74,15 @@ enum CURTAIN_STATE new_state_ttw_tts_today(long ttw_today, long tts_today)
             return CURTAIN_UNDEFINED_T;
         }
     }
-    else // ttw_today <= 0
+    else // tuw_today <= 0
     {
-        if (tts_today > 0)
+        if (tus_today > 0)
         {
             return CURTAIN_OPEN_T;
         }
         else
         {
-            if (ttw_today < tts_today)
+            if (tuw_today < tus_today)
             {
                 return CURTAIN_CLOSED_T;
             }
