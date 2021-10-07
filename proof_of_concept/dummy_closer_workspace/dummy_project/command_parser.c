@@ -334,6 +334,10 @@ int parse_days(char **split_command, int command_num)
         days = days | SAT_T;
     if (strstr(dvalue, "sun") != NULL)
         days = days | SUN_T;
+    if (strstr(dvalue, "week") != NULL)
+        days = days | MON_T | TUE_T | WED_T | THU_T | FRI_T;
+    if (strstr(dvalue, "weekend") != NULL)
+        days = days | SAT_T | SUN_T;
         
     // TODO Find writing errors!
         
@@ -581,6 +585,20 @@ enum ACTION_TYPE parse_action(char **split_command, int command_num)
         printf("CURTIME_T found command\n");
 #endif // PARSE_ACTION_DEBUG_PRINTS
         return CURTIME_T;    
+    }
+    else if (strcmp(split_command[0], "waketimes") == 0) 
+    {
+#ifdef PARSE_ACTION_DEBUG_PRINTS
+        printf("WAKE_TIMES_T found command\n");
+#endif // PARSE_ACTION_DEBUG_PRINTS
+        return WAKE_TIMES_T;    
+    }
+    else if (strcmp(split_command[0], "sleeptimes") == 0) 
+    {
+#ifdef PARSE_ACTION_DEBUG_PRINTS
+        printf("SLEEP_TIMES_T found command\n");
+#endif // PARSE_ACTION_DEBUG_PRINTS
+        return SLEEP_TIMES_T;    
     }
     else
     {

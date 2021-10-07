@@ -148,21 +148,21 @@ int curtain_control_from_act(user_action_t *act,
     // Check which curtain control should be performed.
     switch(act->data[0])
     {
-        case OPEN_T:    status = open_nonblocking();
+        case OPEN_T:    //status = open_nonblocking();
                         // Write message if successful
                         if (!status)
                         {
                             strcpy(message, "Opened curtain\n");
                         }
                         break;
-        case CLOSE_T:   status = close_nonblocking();
+        case CLOSE_T:   //status = close_nonblocking();
                         // Write message if successful
                         if (!status)
                         {
                             strcpy(message, "Closed curtain\n");
                         }
                         break;
-        case CALIBRATE_T:   status = calibrate_nonblocking();
+        case CALIBRATE_T:   //status = calibrate_nonblocking();
                             // Write message if successful
                             if (!status)
                             {

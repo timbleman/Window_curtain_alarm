@@ -24,7 +24,9 @@ enum ACTION_TYPE
     CURTIME_T = 0x0008,
     HELP_T = 0x0010,
     IGNORE_ONCE_T = 0x0020,
-    ERROR_T = 0x0040
+    WAKE_TIMES_T = 0x0040,
+    SLEEP_TIMES_T = 0x0080,
+    ERROR_T = 0x0100
 };
 
 // These should be able to be combined

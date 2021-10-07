@@ -5,6 +5,8 @@
 #include "user_communication.h"
 #include "command_parser.h"
 #include "time_keeper.h"
+#include "action_executer.h"
+#include "motor_controller.h"
 #include "types_and_enums.h"
 #include "time.h" // setenv(), do not worry about IDE warning, compiles fine
 
@@ -25,15 +27,14 @@ WiFiClient client1;
 
 bool connected1 = false;
 
-char buf[128] = {0};
-size_t max_size = 128;
-
 
 /**************************** Function definitions ****************************/
 void setup() {
   Serial.begin(9600);
 
   delay(1000);
+
+  setup_motor_control();
 
   //configTime(3 * 3600, 0, "pool.ntp.org", "time.nist.gov");
   // implement NTP update of timekeeping (with automatic hourly updates)
@@ -83,6 +84,30 @@ void setup() {
 }
 
 void loop() {
+  static char buf[256] = {0};
+  static size_t max_size = 256;
+  static bool busy = false;
+  static user_action_t usr_act;
+
+  if (!busy)
+  {
+    if (get_user_in(buf, max_size) == 0)
+    {
+      usr_act = get_action(buf);
+      busy = true;
+    }
+    // TODO Local input
+  }
+  if (busy)
+  {
+    busy = execute_action_non_blocking(&usr_act, buf, max_size);
+    if (!busy)
+    {
+      respond_to_user(buf, max_size);
+      memset(buf, 0, max_size);
+    }
+  }
+  /*
   int new_user_in_success = get_user_in(buf, max_size);
   if (new_user_in_success == 0)
   {
@@ -99,4 +124,5 @@ void loop() {
 
     memset(buf, 0, max_size);
   }
+  */
 }
