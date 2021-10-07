@@ -97,7 +97,6 @@ user_action_t get_action(char *user_str)
  * This function extracts time from user input and adds creates a user_action_t.
  * Days are saved in the first data location, hours in the second, minutes in 
  * the third, seconds in the fourth.
- * Requires -d and -h. -m and -s are optional
  * Errors are appended to the first data location (days).
  * Copy by value is used, but performance should not be critical.
  * 
@@ -110,12 +109,7 @@ user_action_t get_time_action(char **split_command, int command_num)
     uint32_t days = 0, h = 0, m = 0, s = 0;
     uint32_t all_errors = 0;
     
-    // Invalid day if day not present
-    if (command_has_arg(split_command, command_num, 'd'))
-        days = parse_days(split_command, command_num);
-    else
-        days = INVALID_DAY_ERR;
-    
+    days = parse_days(split_command, command_num);
     h = parse_hour(split_command, command_num);
     // Check whether -m is present, parse if so 
     if (command_has_arg(split_command, command_num, 'm'))
@@ -558,9 +552,7 @@ enum ACTION_TYPE parse_action(char **split_command, int command_num)
         return SLEEP_SET_T;
     }
     else if ((strcmp(split_command[0], "open") == 0)
-                || (strcmp(split_command[0], "close") == 0)
-                || (strcmp(split_command[0], "calibrate") == 0)
-                || (strcmp(split_command[0], "curtainxor") == 0)) 
+                || (strcmp(split_command[0], "close") == 0)) 
     {
 #ifdef PARSE_ACTION_DEBUG_PRINTS
         printf("CURTAIN_CONTROL_T found command\n");
@@ -613,20 +605,8 @@ enum CURTAIN_CONTROL_ACT_T parse_open_close(char *user_str)
         printf("close type \n");
 #endif // PARSE_ACTION_DEBUG_PRINTS
         return CLOSE_T;
-    }
-    else if (strstr(user_str, "calibrate") != NULL)
-    {
-#ifdef PARSE_ACTION_DEBUG_PRINTS
-        printf("calibrate type \n");
-#endif // PARSE_ACTION_DEBUG_PRINTS
-        return CALIBRATE_T;
-    }
-    else if (strstr(user_str, "curtainxor") != NULL)
-    {
-#ifdef PARSE_ACTION_DEBUG_PRINTS
-        printf("curtainxor type \n");
-#endif // PARSE_ACTION_DEBUG_PRINTS
-        return CURTAIN_XOR_T;
+        return CLOSE_T;
+        return CLOSE_T;
     }
     else
     {

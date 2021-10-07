@@ -116,7 +116,9 @@ int execute_action_non_blocking(user_action_t *act,
                                             "set_wake -h 7 -m 22 -s 0\n"
                                             "curtime\n"
                                             "open\n"
-                                            "close\n");
+                                            "close\n"
+                                            "calibrate\n"
+                                            "curtainxor\n");
                         break;
         case ERROR_T:   strcpy(message, "ERROR_T action\n");
                         break;

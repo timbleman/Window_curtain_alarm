@@ -260,7 +260,7 @@ void make_step_no_del(int close)
 {
     static unsigned long next_step_micros = 0;
     static bool high_step = false; 
-    // Keep in mind this is used two times
+    // Remember this is used two times, generates a square wave 50% duty cycle
     const int DEL_TIME = 300;
 
     // Only act if the delay time has been reached
@@ -295,6 +295,8 @@ void make_step_no_del(int close)
             
             high_step = false;
         }
+
+        // Calculate the next time step to act upon.
 #ifdef CHECK_MICROS_OVERFLOW
         // Leave approximately 1ms buffer in case of an overflow
         next_step_micros = (micros() < 0xFFFFFFFFFFFFFFD0) ? 

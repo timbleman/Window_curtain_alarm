@@ -163,11 +163,21 @@ static void Test_get_action()
     // Open
     char test_str[50] = "open \n";
     new_act = get_action(test_str);
+    UCUNIT_CheckIsEqual( CURTAIN_CONTROL_T, new_act.act_type);
     UCUNIT_CheckIsEqual( OPEN_T, new_act.data[0]);
     
     // Close
     strcpy(test_str, "close \n");
     new_act = get_action(test_str);
+    UCUNIT_CheckIsEqual( CURTAIN_CONTROL_T, new_act.act_type);
+    UCUNIT_CheckIsEqual( CLOSE_T, new_act.data[0]);
+    printf("\n new_act.data[0] %u \n", new_act.data[0]);
+    
+    // Close without space
+    strcpy(test_str, "close\n");
+    new_act = get_action(test_str);
+    UCUNIT_CheckIsEqual( CURTAIN_CONTROL_T, new_act.act_type);
+    printf("new_act.act_type actual %X, expected %X  \n", new_act.act_type, CURTAIN_CONTROL_T);
     UCUNIT_CheckIsEqual( CLOSE_T, new_act.data[0]);
     printf("\n new_act.data[0] %u \n", new_act.data[0]);
     
@@ -194,6 +204,49 @@ static void Test_get_action()
     UCUNIT_CheckIsBitSet( new_act.data[0], invalid_t_err_pos);
     strcpy(test_str, "set_sleep -d mon,tue -h 22 -m 300 -s 10 \n");
     new_act = get_action(test_str);
+    //printf("new_act.data[0] %u \n", (new_act.data[0]));
+    //printf("\n new act data get_time_action %u %u %u %u \n", new_act.data[0], new_act.data[1], new_act.data[2], new_act.data[3]);
+    UCUNIT_CheckIsBitSet( new_act.data[0], invalid_t_err_pos);
+    
+    // Invalid day: No day present
+    int invalid_d_err_pos = get_bit_of_error(INVALID_DAY_ERR);
+    strcpy(test_str, "set_sleep -h 222 -m 30 -s 10 \n");
+    new_act = get_action(test_str);
+    UCUNIT_CheckIsBitSet( new_act.data[0], invalid_d_err_pos);  
+}
+
+static void Test_get_action_set_incomplete_times(void)
+{
+    UCUNIT_TestcaseBegin("Checking parsing incomplete times set by user.");
+
+    user_action_t new_act;
+    
+    // Incomplete times 
+    char test_str[50] = "set_sleep -d mon,tue -h 22 -m 30 \n";
+    new_act = get_action(test_str);
+    UCUNIT_CheckIsEqual( MON_T | TUE_T, new_act.data[0]);
+    UCUNIT_CheckIsEqual( 22, new_act.data[1]);
+    UCUNIT_CheckIsEqual( 30, new_act.data[2]);
+    UCUNIT_CheckIsEqual( 0, new_act.data[3]);
+    printf("Actual day %X \n", new_act.data[0]);
+    printf("Actual set time %i:%i:%i \n", new_act.data[1], new_act.data[2], new_act.data[3]);
+    
+    // Times with zeros
+    strcpy(test_str, "set_sleep -d mon,tue -h 02 \n");
+    new_act = get_action(test_str);
+    UCUNIT_CheckIsEqual( MON_T | TUE_T, new_act.data[0]);
+    UCUNIT_CheckIsEqual( 2, new_act.data[1]);
+    UCUNIT_CheckIsEqual( 0, new_act.data[2]);
+    UCUNIT_CheckIsEqual( 0, new_act.data[3]);
+    printf("Actual day %X \n", new_act.data[0]);
+    printf("Actual set time %i:%i:%i \n", new_act.data[1], new_act.data[2], new_act.data[3]);
+
+    // Invalid time stuff
+    int invalid_t_err_pos = get_bit_of_error(INVALID_TIME_ERR);
+    strcpy(test_str, "set_sleep -d mon,tue -m 30 -s 10 \n");
+    new_act = get_action(test_str);
+    UCUNIT_CheckIsBitSet( new_act.data[0], invalid_t_err_pos);
+
     //printf("new_act.data[0] %u \n", (new_act.data[0]));
     //printf("\n new act data get_time_action %u %u %u %u \n", new_act.data[0], new_act.data[1], new_act.data[2], new_act.data[3]);
     UCUNIT_CheckIsBitSet( new_act.data[0], invalid_t_err_pos);
@@ -1216,6 +1269,8 @@ void Testsuite_RunTests(void)
     Test_new_state_ttw_tts_today();
 #endif // TESTABLE_ALARMCHECKER_CODE
 
+
+    Test_get_action_set_incomplete_times();
 
     UCUNIT_WriteSummary();
 }

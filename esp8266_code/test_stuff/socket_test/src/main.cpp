@@ -6,9 +6,12 @@
 
 
 /********************************* Constants **********************************/
-const char* ssid = "FRITZ!Box 7430 FC";
-const char* password =  "94044782303556147675";
-
+// Nam
+//const char* ssid = "FRITZ!Box 7430 FC";
+//const char* password =  "94044782303556147675";
+// Deg
+const char* ssid = "It hurts when IP";
+const char* password =  "SagIchDirNicht!";
  
 /***************************** Struct definitions *****************************/
 /**************************** Prototype functions *****************************/

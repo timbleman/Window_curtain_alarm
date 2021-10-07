@@ -74,7 +74,6 @@ int get_user_in(char *buf, int buf_max_len)
             }
             */
         }
-
   
     }
 
