@@ -46,6 +46,7 @@
 #include "motor_controller.h"
 #include "action_executer.h"
 #include "alarm_checker.h"
+#include "data_storage.h"
 #include "configuration.h"
 
 
@@ -1052,6 +1053,61 @@ static void Test_new_state_ttw_tts_today()
 }
 #endif // TESTABLE_ALARMCHECKER_CODE
 
+#ifdef TESTABLE_STORAGE_CODE
+static void Test_time_storage()
+{
+    UCUNIT_TestcaseBegin("Checking storing and loading some times.");
+    
+    store_time(0, 1, 2, 3, 4);
+    store_time(1, 0, 0, 0, 0);
+    store_time(2, 9, 23, 59, 59);
+    
+    uint8_t d, h, m, s;
+    load_time(0, &d, &h, &m, &s );
+    UCUNIT_CheckIsEqual( 1, d );
+    UCUNIT_CheckIsEqual( 2, h );
+    UCUNIT_CheckIsEqual( 3, m );
+    UCUNIT_CheckIsEqual( 4, s );
+    load_time(1, &d, &h, &m, &s );
+    UCUNIT_CheckIsEqual( 0, d );
+    UCUNIT_CheckIsEqual( 0, h );
+    UCUNIT_CheckIsEqual( 0, m );
+    UCUNIT_CheckIsEqual( 0, s );
+    load_time(2, &d, &h, &m, &s );
+    UCUNIT_CheckIsEqual( 9, d );
+    UCUNIT_CheckIsEqual( 23, h );
+    UCUNIT_CheckIsEqual( 59, m );
+    UCUNIT_CheckIsEqual( 59, s );
+}
+
+static void Test_ssid_storage()
+{
+    UCUNIT_TestcaseBegin("Checking storing and loading an ssid.");
+    
+    char ssid1[] = "Test123";
+    char ssid2[33] = {0};
+    int test_len = 0;
+    
+    store_ssid(ssid1, strlen(ssid1));
+    load_ssid(ssid2, 33, &test_len);
+    UCUNIT_CheckIsEqual( 0, strcmp(ssid1, ssid2) );
+    UCUNIT_CheckIsEqual( strlen(ssid1), test_len );
+}
+
+static void Test_pw_storage()
+{
+    UCUNIT_TestcaseBegin("Checking storing and loading a password.");
+    
+    char pw1[] = "Test123";
+    char pw2[33] = {0};
+    int test_len = 0;
+    
+    store_ssid(pw1, strlen(pw1));
+    load_ssid(pw2, 33, &test_len);
+    UCUNIT_CheckIsEqual( 0, strcmp(pw1, pw2) );
+    UCUNIT_CheckIsEqual( strlen(pw1), test_len );
+}
+#endif // TESTABLE_STORAGE_CODE
 
 int get_bit_of_error(uint32_t err_code)
 {
@@ -1231,6 +1287,7 @@ void Testsuite_RunTests(void)
     Test_parse_hour();
     Test_parse_command();
     Test_get_action();
+    Test_get_action_set_incomplete_times();
     Test_get_message_from_errors();
 #endif // TESTABLE_PARSER_CODE
     
@@ -1269,8 +1326,12 @@ void Testsuite_RunTests(void)
     Test_new_state_ttw_tts_today();
 #endif // TESTABLE_ALARMCHECKER_CODE
 
+#ifdef TESTABLE_STORAGE_CODE
+    Test_time_storage();
+    Test_ssid_storage();
+    Test_pw_storage();
+#endif // TESTABLE_STORAGE_CODE
 
-    Test_get_action_set_incomplete_times();
 
     UCUNIT_WriteSummary();
 }

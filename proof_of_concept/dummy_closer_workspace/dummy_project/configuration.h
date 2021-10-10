@@ -15,6 +15,7 @@ extern "C" {
 #endif
 
 #define TESTABLE_ALARMCHECKER_CODE
+#define TESTABLE_STORAGE_CODE
 
 #ifdef __cplusplus
 }

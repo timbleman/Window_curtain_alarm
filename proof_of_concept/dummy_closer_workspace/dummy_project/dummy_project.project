@@ -8,6 +8,8 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="data_storage.c"/>
+    <File Name="data_storage.h"/>
     <File Name="types_and_enums.h"/>
     <File Name="alarm_checker.c"/>
     <File Name="alarm_checker.h"/>
