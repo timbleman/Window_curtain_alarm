@@ -8,6 +8,7 @@
 #include "action_executer.h"
 #include "motor_controller.h"
 #include "types_and_enums.h"
+#include "data_storage.h" // TODO remove
 #include "time.h" // setenv(), do not worry about IDE warning, compiles fine
 
 
@@ -33,6 +34,10 @@ void setup() {
   Serial.begin(9600);
 
   delay(1000);
+
+  storage_setup();
+  printf("EEPROM is data available: %i\n\r", storage_data_available());
+  dummy_eeprom_print();
 
   setup_motor_control();
 

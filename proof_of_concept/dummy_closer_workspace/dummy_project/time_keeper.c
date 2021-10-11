@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include <string.h> // strlen
 #include <limits.h> // Max int
+#include "data_storage.h"
 #include "types_and_enums.h"
 #ifndef TESTABLE_TK_CODE
 #include <time.h>
@@ -43,8 +44,6 @@ int set_tm_multiple_days(one_tm_per_wd *time_strct,
 int write_week_times_message(char *str, int max_len, one_tm_per_wd *week_tms);
 int format_tm_time_to_str(char *str, int max_len, struct tm *tmstrct);
 int format_time_to_str(char *str, int max_len, int h, int m, int s);
-int save_times();
-int load_times();
 
 
 /**************************** Variable definitions ****************************/
@@ -326,7 +325,7 @@ int set_tm_per_wd(one_tm_per_wd *tmpwd, int wd, int h, int m, int s)
  * in more necessary checks to avoid memory segmentation errors.
  * 
  * @param tmpwd: one_tm_per_wd struct that saves a time for each weekday.
- * @param wd: The weekday in the one_tm_per_wd to select.
+ * @param wd: The weekday in the one_tm_per_wd to select. 0 to 6. 0 is sun.
  * @return: struct tm entity.
  */
 struct tm *get_wdtm(one_tm_per_wd *tmpwd, int wd)
@@ -569,7 +568,23 @@ int format_time_to_str(char *str, int max_len, int h, int m, int s)
  */
 int save_times()
 {
-    return 1;
+    struct tm *one_day;
+    int status = 0;
+    
+    // Wake at first
+    for (int i = 0; i < 7; i++)
+    {
+        one_day = get_wdtm(&wake_times, i);
+        store_time(i, i, one_day->tm_hour, one_day->tm_min, one_day->tm_sec);
+    }
+    // Then sleep
+    for (int i = 0; i < 7; i++)
+    {
+        one_day = get_wdtm(&sleep_times, i);
+        store_time(i + 7, i, one_day->tm_hour, one_day->tm_min, one_day->tm_sec);
+    }
+    
+    return status;
 }
 
 /*
@@ -579,7 +594,30 @@ int save_times()
  */
 int load_times()
 {
+    int status = 0;
+    
+    uint8_t day = 0, h = 0, m = 0, s = 0;
+    
+    // Wake at first
+    for (int i = 0; i < 7; i++)
+    {
+        load_time(i, &day, &h, &m, &s);
+        status |= set_tm_per_wd(&wake_times, day, h, m, s);
+        //store_time(i, i, one_day->tm_hour, one_day->tm_min, one_day->tm_sec);
+    }
+    // Then sleep
+    for (int i = 0; i < 7; i++)
+    {
+        load_time(i + 7, &day, &h, &m, &s);
+        status |= set_tm_per_wd(&sleep_times, day, h, m, s);
+        //store_time(i + 7, i, one_day->tm_hour, one_day->tm_min, one_day->tm_sec);
+    }
+    
+#ifdef TESTABLE_TK_CODE
     return 1;
+#else
+    return status;
+#endif // TESTABLE_TK_CODE
 }
 
 /*

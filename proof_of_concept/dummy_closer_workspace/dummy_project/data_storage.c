@@ -31,6 +31,39 @@ static uint8_t dummy_eeprom[512] = {0};
 
 /**************************** Function definitions ****************************/
 /*
+ * Sets up the eeprom.
+ * 
+ * @return: None.
+ */
+void storage_setup()
+{
+    return;
+}
+
+/*
+ * Checks whether stored data is available.
+ * 
+ * @return: 0 if no data, 1 if there is stored data. No bool due to portability.
+ */
+int storage_data_available()
+{
+    int status = 0;
+    
+    /*
+     * When storing password or ssid, the lenght is saved.
+     * If the length in the storage does not match the actual strings lenght,
+     * an error code is returned. This is used to detect valid storage status.
+     */
+    char dummy_buf[33];
+    int dummy_len = 0;
+    status |= load_ssid(dummy_buf, 33, &dummy_len);
+    status |= load_pw(dummy_buf, 33, &dummy_len);
+    
+    // If an error occured --> status == 1 --> no data available
+    return !status;
+}
+
+/*
  * Store the ssid.
  * 
  * @param ssid: The ssid string to store.

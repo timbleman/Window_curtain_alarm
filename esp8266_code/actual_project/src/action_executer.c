@@ -40,7 +40,7 @@ int execute_action_non_blocking(user_action_t *act,
     // Decide what to do.
     switch(act->act_type)
     {
-        case NONE_T:    strcpy(message, "NONE_T action\n");
+        case NONE_T:    strcpy(message, "NONE_T action\n\r");
                         break;
         case WAKE_SET_T:    // Check if the parser appended errors to the first data field.
                             if ((act->data[0] & ALL_ERRS) == 0)
@@ -67,11 +67,12 @@ int execute_action_non_blocking(user_action_t *act,
                                 get_message_from_errors(internal_status, 
                                         &message[strlen(wake_err_str)], 
                                         (message_max_len - strlen(message)));
+                                // TODO append line break
                             }
                             else
                             {
                                 sprintf(message, 
-                                        "Successfully set wake days 0x%X, h %i, m %i, s %i\n",
+                                        "Successfully set wake days 0x%X, h %i, m %i, s %i\n\r",
                                         act->data[0], act->data[1], act->data[2], 
                                             act->data[3]);
                             }
@@ -97,11 +98,12 @@ int execute_action_non_blocking(user_action_t *act,
                                 get_message_from_errors(internal_status, 
                                         &message[strlen(wake_err_str)], 
                                         (message_max_len - strlen(message)));
+                                // TODO append line break
                             }
                             else
                             {
                                 sprintf(message, 
-                                        "Successfully set sleep days 0x%X, h %i, m %i, s %i\n",
+                                        "Successfully set sleep days 0x%X, h %i, m %i, s %i\n\r",
                                         act->data[0], act->data[1], act->data[2], 
                                             act->data[3]);
                             }
@@ -109,27 +111,27 @@ int execute_action_non_blocking(user_action_t *act,
         case CURTAIN_CONTROL_T:     status = curtain_control_from_act(act, message, 
                                                         message_max_len);
                                     break;
-        case CURTIME_T: sprintf(message, "Current internal time: %i:%i:%i\n",
+        case CURTIME_T: sprintf(message, "Current internal time: %i:%i:%i\n\r",
                             get_current_h(), get_current_m(), get_current_s());
                         break;
-        case HELP_T:    sprintf(message, "Example commands:\n"
-                                            "set_wake -d mon,tue -h 7 -m 22 -s 0\n"
-                                            "set_sleep -d week,weekend -h 7 -m 22 -s 0\n"
-                                            "curtime\n"
-                                            "open\n"
-                                            "close\n"
-                                            "calibrate\n"
-                                            "curtainxor\n"
-                                            "waketimes\n"
-                                            "sleeptimes\n");
+        case HELP_T:    sprintf(message, "Example commands:\n\r"
+                                            "set_wake -d mon,tue -h 7 -m 22 -s 0\n\r"
+                                            "set_sleep -d week,weekend -h 7 -m 22 -s 0\n\r"
+                                            "curtime\n\r"
+                                            "open\n\r"
+                                            "close\n\r"
+                                            "calibrate\n\r"
+                                            "curtainxor\n\r"
+                                            "waketimes\n\r"
+                                            "sleeptimes\n\r");
                         break;
         case WAKE_TIMES_T:  status = write_wake_times_message(message, message_max_len);
                             break;
         case SLEEP_TIMES_T: status = write_sleep_times_message(message, message_max_len);
                             break;
-        case ERROR_T:   strcpy(message, "ERROR_T action\n");
+        case ERROR_T:   strcpy(message, "ERROR_T action\n\r");
                         break;
-        default:    strcpy(message, "Invalid action_type\n");
+        default:    strcpy(message, "Invalid action_type\n\r");
                     break;
     }
 
@@ -148,30 +150,30 @@ int curtain_control_from_act(user_action_t *act,
     // Check which curtain control should be performed.
     switch(act->data[0])
     {
-        case OPEN_T:    //status = open_nonblocking();
+        case OPEN_T:    status = open_nonblocking();
                         // Write message if successful
                         if (!status)
                         {
-                            strcpy(message, "Opened curtain\n");
+                            strcpy(message, "Opened curtain\n\r");
                         }
                         break;
-        case CLOSE_T:   //status = close_nonblocking();
+        case CLOSE_T:   status = close_nonblocking();
                         // Write message if successful
                         if (!status)
                         {
-                            strcpy(message, "Closed curtain\n");
+                            strcpy(message, "Closed curtain\n\r");
                         }
                         break;
-        case CALIBRATE_T:   //status = calibrate_nonblocking();
+        case CALIBRATE_T:   status = calibrate_nonblocking();
                             // Write message if successful
                             if (!status)
                             {
-                                strcpy(message, "Calibrated curtain end stop\n");
+                                strcpy(message, "Calibrated curtain end stop\n\r");
                             }
                             break;
-        case CURTAIN_ERROR_T:   strcpy(message, "CURTAIN_ERROR_T action!\n");
+        case CURTAIN_ERROR_T:   strcpy(message, "CURTAIN_ERROR_T action!\n\r");
                                 break;
-        default:    strcpy(message, "Invalid curtain action data!\n");
+        default:    strcpy(message, "Invalid curtain action data!\n\r");
                     break;
     }
     

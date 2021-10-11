@@ -1,6 +1,8 @@
 /********************************** Includes **********************************/
 #include "data_storage.h"
+#include <stdio.h>
 #include <string.h>
+#include "EEPROM.h"
 
 
 /********************************* Constants **********************************/
@@ -20,7 +22,8 @@ void dummy_eeprom_put(int const address, uint8_t const val);
 uint8_t dummy_eeprom_read(int const address);
 int store_generic_string(char *str1, int str_len, int max_size, 
                             size_t mem_offset);
-int load_generic_string(char *buf1, int buf_max_len, int *str_len);
+int load_generic_string(char *buf1, int buf_max_len, int *str_len, 
+                            size_t mem_offset);
 
 
 /**************************** Variable definitions ****************************/
@@ -29,6 +32,39 @@ static uint8_t dummy_eeprom[512] = {0};
 
 
 /**************************** Function definitions ****************************/
+/*
+ * Sets up the eeprom.
+ * 
+ * @return: None.
+ */
+void storage_setup()
+{
+    EEPROM.begin(256);
+}
+
+/*
+ * Checks whether stored data is available.
+ * 
+ * @return: 0 if no data, 1 if there is stored data. No bool due to portability.
+ */
+int storage_data_available()
+{
+    int status = 0;
+    
+    /*
+     * When storing password or ssid, the lenght is saved.
+     * If the length in the storage does not match the actual strings lenght,
+     * an error code is returned. This is used to detect valid storage status.
+     */
+    char dummy_buf[33];
+    int dummy_len = 0;
+    status |= load_ssid(dummy_buf, 33, &dummy_len);
+    status |= load_pw(dummy_buf, 33, &dummy_len);
+    
+    // If an error occured --> status == 1 --> no data available
+    return !status;
+}
+
 /*
  * Store the ssid.
  * 
@@ -97,7 +133,7 @@ int load_pw(char *pw, int buf_max_len, int *pw_len)
 int store_generic_string(char *str1, int str_len, int max_size, 
                             size_t mem_offset)
 {
-    if (str_len > max_size || str_len != strlen(str1))
+    if (str_len > max_size || (size_t)str_len != strlen(str1))
         return 1;
         
     dummy_eeprom_put(mem_offset, (uint8_t)str_len);
@@ -124,12 +160,12 @@ int store_generic_string(char *str1, int str_len, int max_size,
 int load_generic_string(char *buf1, int buf_max_len, int *str_len, 
                             size_t mem_offset)
 {
-    int saved_str_len = dummy_eeprom_read(mem_offset);
-    if (buf_max_len < saved_str_len)
+    size_t saved_str_len = dummy_eeprom_read(mem_offset);
+    if ((size_t)buf_max_len < saved_str_len)
         return 1;
         
     *str_len = saved_str_len;
-    for (int i = 0; i < saved_str_len; i++)
+    for (size_t i = 0; i < saved_str_len; i++)
     {
         buf1[i] = dummy_eeprom_read(i + 1);
     }
@@ -182,6 +218,16 @@ void load_time(int time_num, uint8_t *day, uint8_t *h, uint8_t *m, uint8_t *s)
     *h = dummy_eeprom_read(TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE + 1 * sizeof(uint8_t));
     *m = dummy_eeprom_read(TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE + 2 * sizeof(uint8_t));
     *s = dummy_eeprom_read(TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE + 3 * sizeof(uint8_t));
+}
+
+void dummy_eeprom_print()
+{
+    printf("Eeprom stuff: \n");
+    for (int i = 0; i < 10; i++)
+    {
+        printf("%i ", EEPROM.read(i));
+    }
+    printf("\n\r");
 }
 
 void dummy_eeprom_put(int const address, uint8_t const val)

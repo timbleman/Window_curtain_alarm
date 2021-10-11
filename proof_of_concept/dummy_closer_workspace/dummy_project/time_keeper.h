@@ -174,6 +174,20 @@ int write_wake_times_message(char *buf, int max_len);
  */
 int write_sleep_times_message(char *buf, int max_len);
 
+/*
+ * Store the current wake/sleep settings/times.
+ * 
+ * @return: Success status.
+ */
+int save_times();
+
+/*
+ * Load wake/sleep settings.
+ * 
+ * @return: Success status.
+ */
+int load_times();
+
 #ifdef TESTABLE_TK_CODE
 int format_time_to_str(char *str, int max_len, int h, int m, int s);
 #endif // TESTABLE_TK_CODE

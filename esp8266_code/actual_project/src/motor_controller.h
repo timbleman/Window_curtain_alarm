@@ -1,6 +1,10 @@
 #ifndef _MOTOR_CONTROLLER_H_
 #define _MOTOR_CONTROLLER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /********************************** Includes **********************************/
 /********************************* Constants **********************************/
 /***************************** Struct definitions *****************************/
@@ -43,5 +47,9 @@ void make_step(int dir);
 void make_step_no_del(int close);
 void enable_stepper();
 void disable_stepper();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _MOTOR_CONTROLLER_H_

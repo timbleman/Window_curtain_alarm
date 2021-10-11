@@ -1,6 +1,10 @@
 #ifndef _DATA_STORAGE_H_
 #define _DATA_STORAGE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /********************************** Includes **********************************/
 #include <stdint.h>
 
@@ -89,5 +93,11 @@ void store_time(int time_num, uint8_t day, uint8_t h, uint8_t m, uint8_t s);
  * @return: None.
  */
 void load_time(int time_num, uint8_t *day, uint8_t *h, uint8_t *m, uint8_t *s);
+
+void dummy_eeprom_print();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _DATA_STORAGE_H_

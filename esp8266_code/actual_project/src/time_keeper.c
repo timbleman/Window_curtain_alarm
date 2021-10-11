@@ -9,6 +9,7 @@
 #include <string.h> // strlen
 #include <limits.h> // Max int
 #include "types_and_enums.h"
+#include "data_storage.h"
 #ifndef TESTABLE_TK_CODE
 #include <time.h>
 #endif // TESTABLE_TK_CODE
@@ -455,14 +456,14 @@ int write_sleep_times_message(char *buf, int max_len)
  */
 int write_week_times_message(char *str, int max_len, one_tm_per_wd *week_tms)
 {
-    char msg[128] = "             \n"
-                "mon: xx:xx:xx\n"
-                "tue: xx:xx:xx\n"
-                "wed: xx:xx:xx\n"
-                "thu: xx:xx:xx\n"
-                "fri: xx:xx:xx\n"
-                "sat: xx:xx:xx\n"
-                "sun: xx:xx:xx\n";
+    char msg[128] = "             \n\r"
+                "mon: xx:xx:xx\n\r"
+                "tue: xx:xx:xx\n\r"
+                "wed: xx:xx:xx\n\r"
+                "thu: xx:xx:xx\n\r"
+                "fri: xx:xx:xx\n\r"
+                "sat: xx:xx:xx\n\r"
+                "sun: xx:xx:xx\n\r";
                 
     // Abort if the buffer is too small
     if (max_len < strlen(msg))
@@ -473,7 +474,7 @@ int write_week_times_message(char *str, int max_len, one_tm_per_wd *week_tms)
      * Instead of this approach some sprintf() could be used, however,
      * the function may not be as predicatable (memory) as this approach.
      */
-    const int line_offset = 14;
+    const int line_offset = 15;
     const int time_offset = 5;
     const int str_term_off = time_offset + 8;
     const int mon_offset =  time_offset + line_offset * 1;
@@ -503,7 +504,7 @@ int write_week_times_message(char *str, int max_len, one_tm_per_wd *week_tms)
      * Replace every '\0' by '\n', except the last one.
      * This is not portable, heavily tied to message format.
      */
-    for (int i = 0; i < 7; ++i)
+    for (int i = 0; i < 8; ++i)
     {
         int offs = str_term_off + line_offset * i;
         msg[offs] = '\n';
@@ -569,7 +570,23 @@ int format_time_to_str(char *str, int max_len, int h, int m, int s)
  */
 int save_times()
 {
-    return 1;
+    struct tm *one_day;
+    int status = 0;
+    
+    // Wake at first
+    for (int i = 0; i < 7; i++)
+    {
+        one_day = get_wdtm(&wake_times, i);
+        store_time(i, i, one_day->tm_hour, one_day->tm_min, one_day->tm_sec);
+    }
+    // Then sleep
+    for (int i = 0; i < 7; i++)
+    {
+        one_day = get_wdtm(&sleep_times, i);
+        store_time(i + 7, i, one_day->tm_hour, one_day->tm_min, one_day->tm_sec);
+    }
+    
+    return status;
 }
 
 /*
@@ -579,7 +596,30 @@ int save_times()
  */
 int load_times()
 {
+    int status = 0;
+    
+    uint8_t day = 0, h = 0, m = 0, s = 0;
+    
+    // Wake at first
+    for (int i = 0; i < 7; i++)
+    {
+        load_time(i, &day, &h, &m, &s);
+        status |= set_tm_per_wd(&wake_times, day, h, m, s);
+        //store_time(i, i, one_day->tm_hour, one_day->tm_min, one_day->tm_sec);
+    }
+    // Then sleep
+    for (int i = 0; i < 7; i++)
+    {
+        load_time(i + 7, &day, &h, &m, &s);
+        status |= set_tm_per_wd(&sleep_times, day, h, m, s);
+        //store_time(i + 7, i, one_day->tm_hour, one_day->tm_min, one_day->tm_sec);
+    }
+    
+#ifdef TESTABLE_TK_CODE
     return 1;
+#else
+    return status;
+#endif // TESTABLE_TK_CODE
 }
 
 /*

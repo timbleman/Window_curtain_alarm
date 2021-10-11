@@ -500,6 +500,54 @@ static void Test_time_until_wake_today()
     setup_time_keeper();
 }
 
+static void Test_store_time()
+{
+    UCUNIT_TestcaseBegin("Checking storing times.");
+    
+    // Setup
+    setup_time_keeper();
+    
+    set_wake(MON_T | TUE_T | WED_T |THU_T | SAT_T, 7, 7, 7);
+    set_wake(FRI_T | SUN_T, 9, 9, 9);
+    set_sleep(MON_T | TUE_T | WED_T |THU_T | FRI_T | SAT_T | SUN_T, 14, 15, 16);
+    
+    save_times();
+    
+    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_hour, 7);
+    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_min, 7);
+    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_sec, 7);
+    
+    set_wake(MON_T | TUE_T | WED_T |THU_T | FRI_T | SAT_T | SUN_T, 3, 3, 3);
+    set_sleep(MON_T | TUE_T | WED_T |THU_T | FRI_T | SAT_T | SUN_T, 4, 4, 4);
+    
+    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_min, 3);
+
+    // Check what has been set
+    /*
+    load_times();
+    char message_buf[512] = {0};
+    write_wake_times_message(message_buf, 512);
+    printf("wake times %s \n\r", message_buf);
+    write_sleep_times_message(message_buf, 512);
+    printf("sleep times %s \n\r", message_buf);
+    */
+
+    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_hour, 7);
+    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_min, 7);
+    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_sec, 7);
+    
+    UCUNIT_CheckIsEqual( wake_times.tm_fri.tm_hour, 9);
+    UCUNIT_CheckIsEqual( wake_times.tm_fri.tm_min, 9);
+    UCUNIT_CheckIsEqual( wake_times.tm_fri.tm_sec, 9);
+
+    UCUNIT_CheckIsEqual( sleep_times.tm_mon.tm_hour, 14);
+    UCUNIT_CheckIsEqual( sleep_times.tm_mon.tm_min, 15);
+    UCUNIT_CheckIsEqual( sleep_times.tm_mon.tm_sec, 16);
+
+    // Reset
+    setup_time_keeper();
+}
+
 static void Test_write_times_message()
 {
     UCUNIT_TestcaseBegin("Checking time_until_wake() for current time.");
@@ -1297,6 +1345,7 @@ void Testsuite_RunTests(void)
     Test_set_wake_invalid();
     Test_set_sleep_single_day();
     Test_time_until_wake_today();
+    Test_store_time();
     Test_write_times_message();
     
     // These take some time, do not run always.
@@ -1332,6 +1381,7 @@ void Testsuite_RunTests(void)
     Test_pw_storage();
 #endif // TESTABLE_STORAGE_CODE
 
+    Test_store_time();
 
     UCUNIT_WriteSummary();
 }
