@@ -20,8 +20,7 @@ void dummy_eeprom_put(int const address, uint8_t const val);
 uint8_t dummy_eeprom_read(int const address);
 int store_generic_string(char *str1, int str_len, int max_size, 
                             size_t mem_offset);
-int load_generic_string(char *buf1, int buf_max_len, int *str_len, 
-                            size_t mem_offset);
+int load_generic_string(char *buf1, int buf_max_len, int *str_len);
 
 
 /**************************** Variable definitions ****************************/
