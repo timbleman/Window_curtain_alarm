@@ -8,6 +8,7 @@
 #include "action_executer.h"
 #include "motor_controller.h"
 #include "types_and_enums.h"
+#include "local_communication.h"
 #include "data_storage.h" // TODO remove
 #include "time.h" // setenv(), do not worry about IDE warning, compiles fine
 
@@ -38,8 +39,12 @@ void setup() {
   storage_setup();
   printf("EEPROM is data available: %i\n\r", storage_data_available());
   dummy_eeprom_print();
+  char dummy_ssid[512] = "hello";
+  store_ssid(dummy_ssid, 6);
 
   setup_motor_control();
+
+  //setup_local_comm();
 
   //configTime(3 * 3600, 0, "pool.ntp.org", "time.nist.gov");
   // implement NTP update of timekeeping (with automatic hourly updates)

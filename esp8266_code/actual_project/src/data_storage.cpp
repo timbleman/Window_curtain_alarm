@@ -136,14 +136,14 @@ int store_generic_string(char *str1, int str_len, int max_size,
     if (str_len > max_size || (size_t)str_len != strlen(str1))
         return 1;
         
-    dummy_eeprom_put(mem_offset, (uint8_t)str_len);
+    EEPROM.put(mem_offset, (uint8_t)str_len);
     for (int i = 0; i < str_len; i++)
     {
-        dummy_eeprom_put(i + 1, str1[i]);
+        EEPROM.put(i + 1, str1[i]);
     }
     
-    // commit
-    
+    EEPROM.commit();
+
     return 0;
 }
 
@@ -194,12 +194,12 @@ int load_generic_string(char *buf1, int buf_max_len, int *str_len,
  */
 void store_time(int time_num, uint8_t day, uint8_t h, uint8_t m, uint8_t s)
 {
-    dummy_eeprom_put((TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE + 0 * sizeof(uint8_t)), day);
-    dummy_eeprom_put((TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE + 1 * sizeof(uint8_t)), h);
-    dummy_eeprom_put((TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE + 2 * sizeof(uint8_t)), m);
-    dummy_eeprom_put((TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE + 3 * sizeof(uint8_t)), s);
+    EEPROM.put((TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE + 0 * sizeof(uint8_t)), day);
+    EEPROM.put((TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE + 1 * sizeof(uint8_t)), h);
+    EEPROM.put((TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE + 2 * sizeof(uint8_t)), m);
+    EEPROM.put((TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE + 3 * sizeof(uint8_t)), s);
     
-    // commit
+    EEPROM.commit();
 }
 
 /*
