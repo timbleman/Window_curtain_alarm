@@ -10,21 +10,30 @@
 /**************************** Variable definitions ****************************/
 WiFiServer wifiServer(23);
 WiFiClient client;
-
-//char buf[128] = {0};
-//size_t max_size = 16;
-
 bool connected = false;
 
 
 
 /**************************** Function definitions ****************************/
+/*
+ * Setup the user communication.
+ * 
+ * @return: Success status.
+ */
 int setup_user_comm()
 {
     wifiServer.begin();
     return 0;
 }
 
+/*
+ * Check for user input.
+ * Stores the input in the buffer and returns 0 if successful.
+ * 
+ * @param buf: Buffer to store the input into.
+ * @param buf_max_len: The size of the buffer.
+ * @return: 0 if success and new input, else 1.
+ */
 int get_user_in(char *buf, int buf_max_len)
 {
     int receive_success = 1;
@@ -44,13 +53,7 @@ int get_user_in(char *buf, int buf_max_len)
         }
         
         if(client.connected()){      
-            while(client.available()>0){
-                // read data from the connected client
-                //char c = client.read();
-                //Serial.write(c); 
-                //client.read(buf, max_size);
-                //client.write(client.read());
-                
+            while(client.available()>0){                
                 // This seems to block until the number or break character is hit.
                 // Additionally, exceeding the max_size number seems to break printf() 
                 if (client.readBytesUntil('\n', &buf[0], buf_max_len) > 0)
@@ -62,19 +65,8 @@ int get_user_in(char *buf, int buf_max_len)
 #endif // RECV_DEBUG
                     receive_success = 0;
                 }
-                
-                //client.write(c);
             }
-            //Serial.print("Received buf: ");
-            //Send Data to connected client
-            /*
-            while(Serial.available()>0)
-            {
-                client.write(Serial.read());
-            }
-            */
         }
-  
     }
 
     if (connected)
@@ -93,6 +85,14 @@ int get_user_in(char *buf, int buf_max_len)
     return receive_success;
 }
 
+/* 
+ * Send text back to the user. 
+ * Does not send if the user is no longer connected.
+ *
+ * @param buf: The string to send back.
+ * @param buf_max_len: The maximum number of chars to send.
+ * @return: Success status.
+ */
 int respond_to_user(char *buf, int buf_max_len)
 {
     if (!connected || !client || !client.connected())

@@ -262,38 +262,6 @@ char *parse_arbitrary_arg(char **split_command, int command_num, char option)
     {
         return NULL;
     }
-    /*
-    char *hvalue = NULL;
-    //int index;
-    int c;
-
-    opterr = 0;
-
-    while ((c = getopt (command_num, split_command, "h:")) != -1)
-    {
-        switch (c)
-        {
-            case 'h':
-                hvalue = optarg;
-                break;
-            case '?':
-                if (optopt == 'h')
-                    printf ("Option -%c requires an argument.\n", optopt);
-                else if (isprint (optopt))
-                    printf ("Unknown option `-%c'.\n", optopt);
-                else
-                    printf ("Unknown option character `\\x%x'.\n",
-                        optopt);
-                    //return 1;
-            default:
-                continue;
-                //abort ();
-        }
-    }
-
-    // This creates problems, location may or may not be freed when returning
-    return hvalue;
-    */
 }
 
 /*

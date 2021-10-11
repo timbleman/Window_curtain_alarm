@@ -523,8 +523,8 @@ static void Test_store_time()
     UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_min, 3);
 
     // Check what has been set
-    /*
     load_times();
+    /*
     char message_buf[512] = {0};
     write_wake_times_message(message_buf, 512);
     printf("wake times %s \n\r", message_buf);
@@ -1380,8 +1380,6 @@ void Testsuite_RunTests(void)
     Test_ssid_storage();
     Test_pw_storage();
 #endif // TESTABLE_STORAGE_CODE
-
-    Test_store_time();
 
     UCUNIT_WriteSummary();
 }

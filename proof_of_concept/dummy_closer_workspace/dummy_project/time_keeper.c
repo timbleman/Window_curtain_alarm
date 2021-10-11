@@ -44,6 +44,8 @@ int set_tm_multiple_days(one_tm_per_wd *time_strct,
 int write_week_times_message(char *str, int max_len, one_tm_per_wd *week_tms);
 int format_tm_time_to_str(char *str, int max_len, struct tm *tmstrct);
 int format_time_to_str(char *str, int max_len, int h, int m, int s);
+int save_times();
+int load_times();
 
 
 /**************************** Variable definitions ****************************/
@@ -454,14 +456,14 @@ int write_sleep_times_message(char *buf, int max_len)
  */
 int write_week_times_message(char *str, int max_len, one_tm_per_wd *week_tms)
 {
-    char msg[128] = "             \n"
-                "mon: xx:xx:xx\n"
-                "tue: xx:xx:xx\n"
-                "wed: xx:xx:xx\n"
-                "thu: xx:xx:xx\n"
-                "fri: xx:xx:xx\n"
-                "sat: xx:xx:xx\n"
-                "sun: xx:xx:xx\n";
+    char msg[128] = "             \n\r"
+                "mon: xx:xx:xx\n\r"
+                "tue: xx:xx:xx\n\r"
+                "wed: xx:xx:xx\n\r"
+                "thu: xx:xx:xx\n\r"
+                "fri: xx:xx:xx\n\r"
+                "sat: xx:xx:xx\n\r"
+                "sun: xx:xx:xx\n\r";
                 
     // Abort if the buffer is too small
     if (max_len < strlen(msg))
@@ -472,7 +474,7 @@ int write_week_times_message(char *str, int max_len, one_tm_per_wd *week_tms)
      * Instead of this approach some sprintf() could be used, however,
      * the function may not be as predicatable (memory) as this approach.
      */
-    const int line_offset = 14;
+    const int line_offset = 15;
     const int time_offset = 5;
     const int str_term_off = time_offset + 8;
     const int mon_offset =  time_offset + line_offset * 1;
