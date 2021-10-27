@@ -92,6 +92,10 @@ void setup() {
   printf("cur time %i %i %i \n", get_current_h(), get_current_m(), get_current_s());
 
   setup_user_comm();
+
+  set_wake(WED_T | TUE_T | THU_T, 15, 15, 15);
+  printf("Time until wake %lu \n", time_until_wake());
+  printf("Time until sleep %lu \n", time_until_sleep());
 }
 
 void loop() {
@@ -124,7 +128,7 @@ void loop() {
   }
 
   // TODO Check if this actually is able to open/close.
-  check_and_alarm_non_blocking();
+  //check_and_alarm_non_blocking();
   /*
   int new_user_in_success = get_user_in(buf, max_size);
   if (new_user_in_success == 0)

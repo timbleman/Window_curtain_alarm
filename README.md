@@ -2,6 +2,7 @@
 
 ## Basics
 This project aims at creating an alarm that opens and closes a window curtain at certain times each weekday. The system is connected to the local network and is configured using socket communication.
+![Rendering of the physical ](./pics/physical_mounting_rendering.PNG "Physical mounting")
 
 ## Features
 ### Must-have features
