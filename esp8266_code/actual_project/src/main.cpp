@@ -9,6 +9,7 @@
 #include "motor_controller.h"
 #include "types_and_enums.h"
 #include "local_communication.h"
+#include "alarm_checker.h"
 #include "data_storage.h" // TODO remove
 #include "time.h" // setenv(), do not worry about IDE warning, compiles fine
 
@@ -105,8 +106,12 @@ void loop() {
     {
       usr_act = get_action(buf);
       busy = true;
+    } 
+    else if (get_local_input())
+    {
+      usr_act = fetch_local_action();
+      busy = true;
     }
-    // TODO Local input
   }
   if (busy)
   {
@@ -117,6 +122,9 @@ void loop() {
       memset(buf, 0, max_size);
     }
   }
+
+  // TODO Check if this actually is able to open/close.
+  check_and_alarm_non_blocking();
   /*
   int new_user_in_success = get_user_in(buf, max_size);
   if (new_user_in_success == 0)

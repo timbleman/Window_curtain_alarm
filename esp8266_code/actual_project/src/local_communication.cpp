@@ -15,8 +15,10 @@
 
 /***************************** Struct definitions *****************************/
 /**************************** Prototype functions *****************************/
+void reset_button_state();
+
+
 /**************************** Variable definitions ****************************/
-static bool input_available = false;
 static bool button1_short_press = false;
 static bool button1_long_press = false;
 
@@ -44,6 +46,29 @@ void setup_local_comm()
  */
 int get_local_input()
 {
+    static unsigned long rising_edge_micros = 0;
+
+    // TODO Verify if internal pullup is sufficient
+    if (digitalRead(BUTTON1_PIN) == LOW)
+    {
+        if (rising_edge_micros == 0)
+        {
+            rising_edge_micros = micros();
+        }
+    }
+    else
+    {
+        if (rising_edge_micros > 0)
+        {
+            long micros_since_rising = micros() - rising_edge_micros;
+            if (micros_since_rising > LONG_PRESS_TIME)
+                button1_long_press = true;
+            else if (micros_since_rising > SHORT_PRESS_TIME)
+                button1_short_press = true;
+            // else: do nothing
+            rising_edge_micros = 0;
+        }
+    }
     /* 
      * static rising_edge_micros;
      * if input
@@ -77,6 +102,7 @@ int get_local_input()
  * Fetch an action if available. 
  * Pass by value with copying is used, should not be a problem for this small
  * size.
+ * TODO Decide what to do at a long or short press.
  * 
  * @return: A user_action_t.
  */
@@ -88,11 +114,12 @@ user_action_t fetch_local_action()
     {
         new_act.act_type = CURTAIN_CONTROL_T;
         new_act.data[0] = CURTAIN_XOR_T;
+        void reset_button_state();
     }
     else if (button1_long_press)
     {
-        new_act.act_type = CURTAIN_CONTROL_T;
-        new_act.data[0] = CALIBRATE_T;
+        new_act.act_type = IGNORE_ONCE_T;
+        void reset_button_state();
     }
     else
     {
@@ -100,4 +127,16 @@ user_action_t fetch_local_action()
     }
 
     return new_act;
+}
+
+/*
+ * Resets the button activation states. Has to be called when fetching an 
+ * action. Function to be easily expandable.
+ * 
+ * @return: None.
+ */
+void reset_button_state()
+{
+    button1_short_press = false;
+    button1_long_press = false;
 }

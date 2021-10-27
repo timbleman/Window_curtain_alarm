@@ -69,7 +69,9 @@ int setup_motor_control()
  */
 int open_nonblocking()
 {
+#ifdef PRINTS_AT_EACH_STEP
     printf("Opening...\n");
+#endif // PRINTS_AT_EACH_STEP
     if (current_steps >= target_steps)
     {
         // TODO Here the passive break mode could be used instead of disabling.
@@ -95,7 +97,9 @@ int open_nonblocking()
  */
 int close_nonblocking()
 {
+#ifdef PRINTS_AT_EACH_STEP
     printf("Closing...\n");
+#endif // PRINTS_AT_EACH_STEP
     if (current_steps <= 0)
     {
         return 0;
@@ -118,7 +122,9 @@ int close_nonblocking()
  */
 int calibrate_nonblocking()
 {
+#ifdef PRINTS_AT_EACH_STEP
     printf("Closing and calibrating...\n");
+#endif // PRINTS_AT_EACH_STEP
     static bool started_calibrating = false;
     static int counted_steps = 0;
 
@@ -134,7 +140,9 @@ int calibrate_nonblocking()
     if (end_stop)
     {
         target_steps = counted_steps;
+#ifdef MOTOR_PRINTS
         printf("Set target steps to %i\n", target_steps);
+#endif // MOTOR_PRINTS
         current_steps = 0;
         started_calibrating = false;
         return 0;
@@ -142,6 +150,72 @@ int calibrate_nonblocking()
     
     make_step(1);
     counted_steps++;
+    return 1;
+}
+
+/*
+ * This function is mostly equivalent to close(), the main difference being
+ * that the internal step target for fully opening is set.
+ * Rolls back a few steps after the endstop has been activated.
+ * 
+ * TODO This has to be tried and debugged.
+ * 
+ * @return: 0 if not yet closed, 1 if fully closed.
+ */
+int calibrate_nonblocking_rollback()
+{
+#ifdef PRINTS_AT_EACH_STEP
+    printf("Closing and calibrating...\n");
+#endif // PRINTS_AT_EACH_STEP
+    static bool started_calibrating = false;
+    static bool end_stop_triggered = false;
+    static int counted_steps = 0;
+    static int rolled_back_steps = 0;
+
+    if (!started_calibrating)
+    {
+        counted_steps = 0;
+        rolled_back_steps = 0;
+        end_stop_triggered = true;
+        started_calibrating = true;
+    }
+    
+    // TODO Make this work
+    // Interrupt or polling? Polling should be fine for now...
+    int end_stop = digitalRead(END_STOP_PIN);
+    if (end_stop)
+    {
+        target_steps = counted_steps;
+#ifdef MOTOR_PRINTS
+        printf("Set target steps to %i\n", target_steps);
+#endif // MOTOR_PRINTS
+        //current_steps = 0;
+        end_stop_triggered = true;
+    }
+    /*
+     * Roll back a bit to avoid constant end stop activation.
+     */
+    if (end_stop_triggered)
+    {
+        if (rolled_back_steps >= ROLLBACK_STEPS)
+        {
+            current_steps = 0;
+            end_stop_triggered = false;
+            rolled_back_steps = 0;
+            started_calibrating = false;
+            return 0;
+        }
+
+        // Make a step in the opposing direction.
+        make_step(0);
+        rolled_back_steps++;
+    }
+    else
+    {
+        make_step(1);
+        counted_steps++;
+    }
+    
     return 1;
 }
 
@@ -184,6 +258,7 @@ void make_step(int close)
     }
 }
 
+// TODO This function is obsolete.
 void make_step_no_del_non_refact(int close)
 {
     static unsigned long next_step_micros = 0;

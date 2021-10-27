@@ -125,6 +125,9 @@ int execute_action_non_blocking(user_action_t *act,
                                             "waketimes\n\r"
                                             "sleeptimes\n\r");
                         break;
+        case IGNORE_ONCE_T: set_ignore();
+                            update_ignore();
+                            break;
         case WAKE_TIMES_T:  status = write_wake_times_message(message, message_max_len);
                             break;
         case SLEEP_TIMES_T: status = write_sleep_times_message(message, message_max_len);

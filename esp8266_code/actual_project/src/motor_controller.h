@@ -7,9 +7,29 @@ extern "C" {
 
 /********************************** Includes **********************************/
 /********************************* Constants **********************************/
+// Debugging prints to activate/deactivate
+#define MOTOR_PRINTS
+#undef PRINTS_AT_EACH_STEP
+
+
+/*
+ * TODO Configure these.
+ * These are the number of steps in the opposite direction after activating
+ * the end stop.
+ */
+#define ROLLBACK_STEPS 100
+
+enum CURTAIN_STATE
+{
+    CURTAIN_OPEN_T = 0x0001,
+    CURTAIN_CLOSED_T = 0x0002,
+    CURTAIN_UNDEFINED_T = 0x0004
+};
+
+
 /***************************** Struct definitions *****************************/
 /**************************** Variable definitions ****************************/
-/**************************** Prototype functions ****************************/
+/**************************** Prototype functions *****************************/
 /*
  * Sets up variables of this file. Configures inputs and outputs.
  * 

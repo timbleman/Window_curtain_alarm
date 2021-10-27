@@ -1,5 +1,5 @@
-#ifndef _USER_COMMUNICATION_H_
-#define _USER_COMMUNICATION_H_
+#ifndef _USER_COMM_H_
+#define _USER_COMM_H_
 
 /********************************** Includes **********************************/
 #include "types_and_enums.h"
@@ -35,4 +35,4 @@ int get_local_input();
  */
 user_action_t fetch_local_action();
 
-#endif // _USER_COMMUNICATION_H_
+#endif // _USER_COMM_H_
