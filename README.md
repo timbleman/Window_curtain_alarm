@@ -1,8 +1,8 @@
 # Window curtain alarm
 
 ## Basics
-This project aims at creating an alarm that opens and closes a window curtain at certain times each weekday. The system is connected to the local network and is configured using socket communication.
-![Rendering of the physical ](./pics/physical_mounting_rendering.PNG "Physical mounting")
+This project aims at creating an alarm that opens and closes a window curtain at certain times each weekday. The system is connected to the local network and is configured using socket communication. The alarm operates independently, it does not require a hub or external control, wake and sleep times can be set for each weekday. An internet connection is required.
+![Rendering of the physical hardware](./pics/physical_mounting_rendering.PNG "Physical mounting")
 
 ## Features
 ### Must-have features
@@ -25,6 +25,7 @@ This project aims at creating an alarm that opens and closes a window curtain at
 ## Project structure
 Here are some directories that may contain interesting files:
 * /course_python_draft/: This quick python prototype aims at visualizing the core concepts and ideas of the project. Untested.
+* /curtain_wiring/: A KiCad project for the wiring diagram. No PCB design yet.
 * /esp8266_code/actual_project/: The unit tested proof of concept code ported to ESP8266.
 * /esp8266_code/test_stuff/: Some quick projects testing basic functionality using the ESP8266.
 	* /esp8266_code/test_stuff/socket_test/: TCP socket server test project for the ESP8266.
@@ -36,12 +37,11 @@ Here are some directories that may contain interesting files:
 
 ## Implementation
 ### Hardware
-Opening and closing the curtain shall be done using a belt-driven by a stepper motor. A NEMA17 stepper in combination with a TMC2209 driver are used currently. The target platform is the ESP8266. This microcontroller has been chosen instead of a Raspberry PI due to lower costs and power consumption. 
-The target 
+Opening and closing the curtain shall be done using a belt-driven by a stepper motor. A NEMA17 stepper in combination with a TMC2209 driver are currently used. The target platform is the ESP8266. This microcontroller has been chosen instead of a Raspberry PI due to lower cost and power consumption. 
 ### Mounting
 The hardware, including especially the motor, belt, and end stop, will be mounted using 3D printed objects. Currently, the project is not intended as a 'one design fits all' solution, but will need to be adapted to the used curtain and window.
 ### Programming language and environment
-Due to its dominance in embedded systems and easier debugging, C is used for most of the more generic project components. These components include user input parsing, keeping track of time, and controlling the IO.
+Due to its dominance in embedded systems and easier debugging, C, instead of C++, is used for most of the more generic project components. These components include user input parsing, keeping track of time, and controlling the IO.
 As Arduino and most of its libraries are based on C++, the main function and socket server use this more high-level approach. The PlatformIO IDE and toolchain is used for ESP8266 code. The proof of concept has been developed using CodeLite.
 ### Testing
 The uCunit framework has been used for unit testing. The framework is basic but very portable and requires only a few header files.
