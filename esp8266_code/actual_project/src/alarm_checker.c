@@ -28,6 +28,7 @@ int check_and_alarm_non_blocking()
     // Update the ignore one wake.
     update_ignore();
     
+    enum CURTAIN_STATE actual_state = get_curtain_state();
     enum CURTAIN_STATE new_state = new_state_ttw_tts_today(time_until_wake(), 
                                                         time_until_sleep());
 

@@ -242,6 +242,23 @@ int calibrate_nonblocking_rollback()
 }
 
 /*
+ * Returns the current state of the curtain.
+ * Can be open, closed or undefined.
+ * TODO Maybe add some sort of range?
+ * 
+ * @return: enum CURTAIN_STATE open, closed or undefined.
+ */
+enum CURTAIN_STATE get_curtain_state()
+{
+    if (current_steps == target_steps)
+        return CURTAIN_OPEN_T;
+    else if (current_steps == 0)
+        return CURTAIN_CLOSED_T;
+    else
+        return CURTAIN_UNDEFINED_T;
+}
+
+/*
  * Make a step. Controls the stepper driver.
  * In the first iteration this should be GPIO based.
  * Later on a UART based approach may be chosen.

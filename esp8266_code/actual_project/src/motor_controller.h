@@ -73,6 +73,14 @@ int calibrate_nonblocking();
  */
 int calibrate_nonblocking_rollback();
 
+/*
+ * Returns the current state of the curtain.
+ * Can be open, closed or undefined.
+ * 
+ * @return: enum CURTAIN_STATE open, closed or undefined.
+ */
+enum CURTAIN_STATE get_curtain_state();
+
 // These should be private
 void make_step(int dir);
 void make_step_no_del(int close);
