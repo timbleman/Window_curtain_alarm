@@ -21,6 +21,7 @@ bool stepper_enabled = false;
 int current_steps = 0;
 int target_steps = 40;
 #endif // TESTABLE_MOTOR_CODE
+bool calibrated = false;
 
 
 /**************************** Function definitions ****************************/
@@ -57,6 +58,7 @@ int setup_motor_control()
     // Use an external pulldown and cap for debouncing
     pinMode(END_STOP_PIN, INPUT);
 
+    calibrated = false;
 
     return 0;
 }
@@ -72,6 +74,13 @@ int open_nonblocking()
 #ifdef PRINTS_AT_EACH_STEP
     printf("Opening...\n");
 #endif // PRINTS_AT_EACH_STEP
+    if (!calibrated)
+    {
+#ifdef MOTOR_PRINTS
+        printf("Cannot open when the system has not been calibrated!\n\r");
+#endif // MOTOR_PRINTS
+        return 0;
+    }
     if (current_steps >= target_steps)
     {
         // TODO Here the passive break mode could be used instead of disabling.
@@ -100,6 +109,13 @@ int close_nonblocking()
 #ifdef PRINTS_AT_EACH_STEP
     printf("Closing...\n");
 #endif // PRINTS_AT_EACH_STEP
+    if (!calibrated)
+    {
+#ifdef MOTOR_PRINTS
+        printf("Cannot close when the system has not been calibrated!\n\r");
+#endif // MOTOR_PRINTS
+        return 0;
+    }
     if (current_steps <= 0)
     {
         return 0;
@@ -145,6 +161,7 @@ int calibrate_nonblocking()
 #endif // MOTOR_PRINTS
         current_steps = 0;
         started_calibrating = false;
+        calibrated = true;
         return 0;
     }
     
@@ -204,6 +221,7 @@ int calibrate_nonblocking_rollback()
             started_calibrating = false;
             // Set the target steps
             target_steps = counted_steps - rollback_target;
+            calibrated = true;
 #ifdef MOTOR_PRINTS
             printf("Set target steps to %i\n", target_steps);
 #endif // MOTOR_PRINTS

@@ -1,5 +1,6 @@
 /********************************** Includes **********************************/
 #include "alarm_checker.h"
+#include <stdio.h>
 
 
 /********************************* Constants **********************************/
@@ -22,32 +23,44 @@ enum CURTAIN_STATE new_state_ttw_tts_today(long tuw_today, long tus_today);
  */
 int check_and_alarm_non_blocking()
 {
+    static enum CURTAIN_STATE old_state = CURTAIN_UNDEFINED_T;
+
     // Update the ignore one wake.
     update_ignore();
     
     enum CURTAIN_STATE new_state = new_state_ttw_tts_today(time_until_wake(), 
                                                         time_until_sleep());
 
+    //printf("old vs new state: %i vs %i; old != new: %i\n\r", old_state, new_state, (new_state != old_state));
     /*
      * FIXME This switch case is probably wrong...
      * Should one be checking for the current state? 
      */
-    switch(new_state)
+    int status = 0;
+    if (new_state != old_state)
     {
-        case CURTAIN_OPEN_T:    // FIXME If ignore, 1 is returned. This means 
-                                // still working.
-                                // If ignore is unset, the curtain should open.
-                                if (!get_ignore())
-                                    return open_nonblocking();
-                                else
-                                    return 1;
-                                break;
-        case CURTAIN_CLOSED_T:  return close_nonblocking();
-                                break;
-        case CURTAIN_UNDEFINED_T:   break;
-        default:    break;
+        switch(new_state)
+        {
+            case CURTAIN_OPEN_T:    // FIXME If ignore, 1 is returned. This means 
+                                    // still working.
+                                    // If ignore is unset, the curtain should open.
+                                    if (!get_ignore())
+                                        status =  open_nonblocking();
+                                    else
+                                        status =  1;
+                                    break;
+            case CURTAIN_CLOSED_T:  status = close_nonblocking();
+                                    break;
+            case CURTAIN_UNDEFINED_T:   break;
+            default:    break;
+        }
+        //printf("Hello\n\r");
     }
-    return 0;
+
+    if (status == 0)
+        old_state = new_state;
+    
+    return status;
 }
 
 
