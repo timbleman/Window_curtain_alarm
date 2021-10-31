@@ -126,26 +126,8 @@ void loop() {
       memset(buf, 0, max_size);
     }
   }
-
-  // TODO Check if this actually is able to open/close.
-  // FIXME This overrides open and close commands
-  //check_and_alarm_non_blocking();
-  /*
-  int new_user_in_success = get_user_in(buf, max_size);
-  if (new_user_in_success == 0)
+  else
   {
-    printf("User in in main: %s\n", buf);
-    printf("6 chars in user in in main %i %i %i %i %i %i \n", buf[0], buf[1], 
-                buf[2], buf[3], buf[4], buf[5]);
-    printf("6 chars in user in in main %c %c %c %c %c %c \n", buf[0], buf[1], 
-                buf[2], buf[3], buf[4], buf[5]);
-    //printf("%s\n", buf);
-    respond_to_user(buf, max_size);
-
-    user_action_t usr_act = get_action(buf);
-    printf("Usr_act type %X \n", usr_act.act_type);
-
-    memset(buf, 0, max_size);
+    check_and_alarm_non_blocking();
   }
-  */
 }

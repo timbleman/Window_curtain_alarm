@@ -28,11 +28,11 @@ int check_and_alarm_non_blocking()
     // Update the ignore one wake.
     update_ignore();
     
-    enum CURTAIN_STATE actual_state = get_curtain_state();
+    // Actual state may not be needed...
+    //enum CURTAIN_STATE actual_state = get_curtain_state();
     enum CURTAIN_STATE new_state = new_state_ttw_tts_today(time_until_wake(), 
                                                         time_until_sleep());
 
-    //printf("old vs new state: %i vs %i; old != new: %i\n\r", old_state, new_state, (new_state != old_state));
     /*
      * FIXME This switch case is probably wrong...
      * Should one be checking for the current state? 
@@ -55,7 +55,7 @@ int check_and_alarm_non_blocking()
             case CURTAIN_UNDEFINED_T:   break;
             default:    break;
         }
-        //printf("Hello\n\r");
+        //printf("old vs new state: %i vs %i\n\r", old_state, new_state);
     }
 
     if (status == 0)
