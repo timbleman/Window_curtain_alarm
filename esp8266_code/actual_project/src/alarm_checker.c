@@ -16,6 +16,7 @@ enum CURTAIN_STATE new_state_ttw_tts_today(long tuw_today, long tus_today);
  * Checks if an alarm should be triggered.
  * Factors in curtain state, the wake, sleep and current time.
  * In this current iteration only today's wake and sleep times are used.
+ * FIXME This overrides other open/close commands. 
  * 
  * @return: 0 if finished, 1 if still working?
  */

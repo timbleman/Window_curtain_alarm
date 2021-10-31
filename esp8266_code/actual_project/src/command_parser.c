@@ -302,7 +302,7 @@ int parse_days(char **split_command, int command_num)
         days = days | SAT_T;
     if (strstr(dvalue, "sun") != NULL)
         days = days | SUN_T;
-    if (strstr(dvalue, "week") != NULL)
+    if ((strstr(dvalue, "week") != NULL) && (strstr(dvalue, "weekend") == NULL))
         days = days | MON_T | TUE_T | WED_T | THU_T | FRI_T;
     if (strstr(dvalue, "weekend") != NULL)
         days = days | SAT_T | SUN_T;

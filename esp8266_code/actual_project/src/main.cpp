@@ -16,11 +16,11 @@
 
 /********************************* Constants **********************************/
 // Nam
-//const char* ssid = "FRITZ!Box 7430 FC";
-//const char* password =  "94044782303556147675";
+const char* ssid = "FRITZ!Box 7430 FC";
+const char* password =  "94044782303556147675";
 // Deg
-const char* ssid = "It hurts when IP";
-const char* password =  "SagIchDirNicht!";
+//const char* ssid = "It hurts when IP";
+//const char* password =  "SagIchDirNicht!";
  
 /***************************** Struct definitions *****************************/
 /**************************** Prototype functions *****************************/
@@ -111,7 +111,7 @@ void loop() {
       usr_act = get_action(buf);
       busy = true;
     } 
-    else if (get_local_input())
+    else if (get_local_input() == 0)
     {
       usr_act = fetch_local_action();
       busy = true;
@@ -128,6 +128,7 @@ void loop() {
   }
 
   // TODO Check if this actually is able to open/close.
+  // FIXME This overrides open and close commands
   //check_and_alarm_non_blocking();
   /*
   int new_user_in_success = get_user_in(buf, max_size);

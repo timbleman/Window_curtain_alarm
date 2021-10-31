@@ -62,6 +62,17 @@ int close_nonblocking();
  */
 int calibrate_nonblocking();
 
+/*
+ * This function is mostly equivalent to close(), the main difference being
+ * that the internal step target for fully opening is set.
+ * Rolls back a few steps after the endstop has been activated.
+ * 
+ * TODO This has to be tried and debugged.
+ * 
+ * @return: 0 if not yet closed, 1 if fully closed.
+ */
+int calibrate_nonblocking_rollback();
+
 // These should be private
 void make_step(int dir);
 void make_step_no_del(int close);
