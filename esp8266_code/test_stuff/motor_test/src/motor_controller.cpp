@@ -10,6 +10,8 @@
 
 #define CHECK_MICROS_OVERFLOW
 
+#define ROLLBACK_STEPS 500
+
 
 /***************************** Struct definitions *****************************/
 /**************************** Prototype functions *****************************/
@@ -131,7 +133,7 @@ int calibrate_nonblocking()
     // TODO Make this work
     // Interrupt or polling? Polling should be fine for now...
     int end_stop = digitalRead(END_STOP_PIN);
-    if (end_stop)
+    if (end_stop == LOW)
     {
         target_steps = counted_steps;
         printf("Set target steps to %i\n", target_steps);
@@ -140,8 +142,78 @@ int calibrate_nonblocking()
         return 0;
     }
     
-    make_step(1);
+    make_step_no_del(1);
     counted_steps++;
+    return 1;
+}
+
+/*
+ * This function is mostly equivalent to close(), the main difference being
+ * that the internal step target for fully opening is set.
+ * Rolls back a few steps after the endstop has been activated.
+ * 
+ * TODO This has to be tried and debugged.
+ * 
+ * @return: 0 if not yet closed, 1 if fully closed.
+ */
+int calibrate_nonblocking_rollback()
+{
+#ifdef PRINTS_AT_EACH_STEP
+    printf("Closing and calibrating...\n");
+#endif // PRINTS_AT_EACH_STEP
+    static bool started_calibrating = false;
+    static bool end_stop_triggered = false;
+    static int counted_steps = 0;
+    static int rolled_back_steps = 0;
+
+    if (!started_calibrating)
+    {
+        counted_steps = 0;
+        rolled_back_steps = 0;
+        end_stop_triggered = false;
+        started_calibrating = true;
+    }
+    
+    // TODO Make this work
+    // Interrupt or polling? Polling should be fine for now...
+    int end_stop = digitalRead(END_STOP_PIN);
+    if (end_stop == LOW)
+    {
+#ifdef MOTOR_PRINTS
+        printf("Set target steps to %i\n", target_steps);
+#endif // MOTOR_PRINTS
+        //current_steps = 0;
+        end_stop_triggered = true;
+    }
+    /*
+     * Roll back a bit to avoid constant end stop activation.
+     * Make sure to not roll back too far.
+     */
+    if (end_stop_triggered)
+    {
+        int rollback_target = counted_steps > ROLLBACK_STEPS ? ROLLBACK_STEPS : 0;
+        if (rolled_back_steps >= rollback_target)
+        {
+            // Reset the static variables
+            current_steps = 0;
+            end_stop_triggered = false;
+            rolled_back_steps = 0;
+            started_calibrating = false;
+            // Set the target steps
+            target_steps = counted_steps - rollback_target;
+            return 0;
+        }
+
+        // Make a step in the opposing direction.
+        make_step(0);
+        rolled_back_steps++;
+    }
+    else
+    {
+        make_step(1);
+        counted_steps++;
+    }
+    
     return 1;
 }
 

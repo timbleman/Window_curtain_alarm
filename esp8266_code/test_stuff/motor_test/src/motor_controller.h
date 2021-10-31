@@ -38,6 +38,8 @@ int close_nonblocking();
  */
 int calibrate_nonblocking();
 
+int calibrate_nonblocking_rollback();
+
 // These should be private
 void make_step(int dir);
 void make_step_no_del(int close);

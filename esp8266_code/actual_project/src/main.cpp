@@ -93,9 +93,9 @@ void setup() {
 
   setup_user_comm();
 
-  set_wake(WED_T | TUE_T | THU_T, 15, 15, 15);
-  printf("Time until wake %lu \n", time_until_wake());
-  printf("Time until sleep %lu \n", time_until_sleep());
+  //set_wake(WED_T | TUE_T | THU_T, 15, 15, 15);
+  //printf("Time until wake %lu \n", time_until_wake());
+  //printf("Time until sleep %lu \n", time_until_sleep());
 }
 
 void loop() {

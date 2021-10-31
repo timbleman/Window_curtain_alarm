@@ -176,16 +176,15 @@ int calibrate_nonblocking_rollback()
     {
         counted_steps = 0;
         rolled_back_steps = 0;
-        end_stop_triggered = true;
+        end_stop_triggered = false;
         started_calibrating = true;
     }
     
     // TODO Make this work
     // Interrupt or polling? Polling should be fine for now...
     int end_stop = digitalRead(END_STOP_PIN);
-    if (end_stop)
+    if (end_stop == LOW)
     {
-        target_steps = counted_steps;
 #ifdef MOTOR_PRINTS
         printf("Set target steps to %i\n", target_steps);
 #endif // MOTOR_PRINTS
@@ -194,15 +193,20 @@ int calibrate_nonblocking_rollback()
     }
     /*
      * Roll back a bit to avoid constant end stop activation.
+     * Make sure to not roll back too far.
      */
     if (end_stop_triggered)
     {
-        if (rolled_back_steps >= ROLLBACK_STEPS)
+        int rollback_target = counted_steps > ROLLBACK_STEPS ? ROLLBACK_STEPS : 0;
+        if (rolled_back_steps >= rollback_target)
         {
+            // Reset the static variables
             current_steps = 0;
             end_stop_triggered = false;
             rolled_back_steps = 0;
             started_calibrating = false;
+            // Set the target steps
+            target_steps = counted_steps - rollback_target;
             return 0;
         }
 
