@@ -55,6 +55,15 @@ int open_nonblocking();
 int close_nonblocking();
 
 /*
+ * This function moves the curtain in the opposite position, I call it xor.
+ * This function activates the motor. As it is nonblocking, it has to be 
+ * called multiple times until the curtain is fully xored.
+ * 
+ * @return: 0 if not yet xored, 1 if fully xored.
+ */
+int curtain_xor();
+
+/*
  * This function is mostly equivalent to close(), the main difference being
  * that the internal step target for fully opening is set.
  * 

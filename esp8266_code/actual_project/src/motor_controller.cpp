@@ -9,6 +9,8 @@
 #define END_STOP_PIN D6
 
 #define CHECK_MICROS_OVERFLOW
+// Stop the motor if the endstop is reached sooner than expected.
+#define ABORT_AT_ENDSTOP
 
 
 /***************************** Struct definitions *****************************/
@@ -81,6 +83,7 @@ int open_nonblocking()
 #endif // MOTOR_PRINTS
         return 0;
     }
+
     if (current_steps >= target_steps)
     {
         // TODO Here the passive break mode could be used instead of disabling.
@@ -116,7 +119,15 @@ int close_nonblocking()
 #endif // MOTOR_PRINTS
         return 0;
     }
+
+#ifdef ABORT_AT_ENDSTOP
+    // Stop the motor if the endstop is reached sooner than expected.
+    // Only to prevent damadge, does not roll back.
+    int end_stop = digitalRead(END_STOP_PIN);
+    if ((current_steps <= 0) || end_stop == LOW)
+#else
     if (current_steps <= 0)
+#endif // ABORT_AT_ENDSTOP
     {
         return 0;
     }
@@ -127,6 +138,41 @@ int close_nonblocking()
         make_step_no_del(1);
         return 1;
     }
+}
+
+/*
+ * This function moves the curtain in the opposite position, I call it xor.
+ * This function activates the motor. As it is nonblocking, it has to be 
+ * called multiple times until the curtain is fully xored.
+ * 
+ * @return: 0 if not yet xored, 1 if fully xored.
+ */
+int curtain_xor()
+{
+    static CURTAIN_STATE state_when_started = CURTAIN_UNDEFINED_T;
+
+    // Start the curtain XOR
+    if (state_when_started == CURTAIN_UNDEFINED_T)
+    {
+        // When in doubt use OPENED. Use the end stop to abort when closing.
+        if (get_curtain_state() == CURTAIN_CLOSED_T)
+            state_when_started = CURTAIN_CLOSED_T;
+        else // CURTAIN_OPENED_T   *or*   CURTAIN_UNDEFINED_T
+            state_when_started = CURTAIN_OPEN_T;
+    }
+
+    // Open or close
+    int status = 1;
+    if (state_when_started == CURTAIN_OPEN_T)
+        status = close_nonblocking();
+    else
+        status = open_nonblocking();
+
+    // Reset the static variable
+    if (status == 0)
+        state_when_started = CURTAIN_UNDEFINED_T;
+
+    return status;
 }
 
 /*

@@ -175,6 +175,12 @@ int curtain_control_from_act(user_action_t *act,
                                 strcpy(message, "Calibrated curtain end stop\n\r");
                             }
                             break;
+        case CURTAIN_XOR_T: status = curtain_xor();
+                            if (!status)
+                            {
+                            strcpy(message, "Curtain xored\n\r");
+                            }
+                            break;
         case CURTAIN_ERROR_T:   strcpy(message, "CURTAIN_ERROR_T action!\n\r");
                                 break;
         default:    strcpy(message, "Invalid curtain action data!\n\r");
