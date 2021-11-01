@@ -3,13 +3,14 @@
 
 /********************************** Includes **********************************/
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h> // strlen
 #include <limits.h> // Max int
-#include "data_storage.h"
 #include "types_and_enums.h"
+#include "data_storage.h"
 #ifndef TESTABLE_TK_CODE
 #include <time.h>
 #endif // TESTABLE_TK_CODE
@@ -17,6 +18,7 @@
 
 /********************************* Constants *********************************/
 #undef TUW_TUS_DEBUG
+#define TK_DEBUG_PRINTS
 
 
 /***************************** Struct definitions *****************************/
@@ -73,8 +75,11 @@ int setup_time_keeper()
     int status = 0;
     
     // If load times from the memory is unsuccessful set defaults.
-    if (load_times())
+    if (load_times() != EXIT_SUCCESS)
     {
+#ifdef TK_DEBUG_PRINTS
+        printf("No times in the EEPROM, setting defaults.\n\r");
+#endif // TK_DEBUG_PRINTS
         // Set default time for weekdays
         for (int i = 1; i < 6; i++)
         {
@@ -87,6 +92,12 @@ int setup_time_keeper()
         status |= set_tm_per_wd(&wake_times, 0, DEFAULT_WEEKEND_WAKE, 0, 0);
         status |= set_tm_per_wd(&sleep_times, 0, DEFAULT_SLEEP, 0, 0);
     }
+#ifdef TK_DEBUG_PRINTS
+    else
+    {
+        printf("Successfully loaded times from the EEPROM.\n\r");
+    }
+#endif // TK_DEBUG_PRINTS
     
     // Reset all the ignore one wake variables.
     ignore_once = false;
@@ -111,8 +122,12 @@ int set_wake(uint32_t days, int h, int m, int s)
 {
     // To avoid strange bugs.
     unset_ignore();
-    return set_tm_multiple_days(&wake_times,
+    int status = set_tm_multiple_days(&wake_times,
                             days, h, m, s);
+#ifndef TESTABLE_TK_CODE
+    save_times();
+#endif // TESTABLE_TK_CODE
+    return status;
 }
 
 /*
@@ -130,8 +145,12 @@ int set_sleep(uint32_t days, int h, int m, int s)
 {
     // To avoid strange bugs.
     unset_ignore();
-    return set_tm_multiple_days(&sleep_times,
+    int status = set_tm_multiple_days(&sleep_times,
                             days, h, m, s);
+#ifndef TESTABLE_TK_CODE
+    save_times();
+#endif // TESTABLE_TK_CODE
+    return status;
 }
 
 /*
@@ -330,7 +349,7 @@ int set_tm_per_wd(one_tm_per_wd *tmpwd, int wd, int h, int m, int s)
  * in more necessary checks to avoid memory segmentation errors.
  * 
  * @param tmpwd: one_tm_per_wd struct that saves a time for each weekday.
- * @param wd: The weekday in the one_tm_per_wd to select. 0 to 6. 0 is sun.
+ * @param wd: The weekday in the one_tm_per_wd to select.
  * @return: struct tm entity.
  */
 struct tm *get_wdtm(one_tm_per_wd *tmpwd, int wd)
@@ -507,7 +526,7 @@ int write_week_times_message(char *str, int max_len, one_tm_per_wd *week_tms)
      * Replace every '\0' by '\n', except the last one.
      * This is not portable, heavily tied to message format.
      */
-    for (int i = 0; i < 7; ++i)
+    for (int i = 0; i < 8; ++i)
     {
         int offs = str_term_off + line_offset * i;
         msg[offs] = '\n';

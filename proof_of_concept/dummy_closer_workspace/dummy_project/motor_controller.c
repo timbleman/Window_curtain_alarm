@@ -78,6 +78,41 @@ int close_nonblocking()
 }
 
 /*
+ * This function moves the curtain in the opposite position, I call it xor.
+ * This function activates the motor. As it is nonblocking, it has to be 
+ * called multiple times until the curtain is fully xored.
+ * 
+ * @return: 0 if not yet xored, 1 if fully xored.
+ */
+int curtain_xor()
+{
+    static enum CURTAIN_STATE state_when_started = CURTAIN_UNDEFINED_T;
+
+    // Start the curtain XOR
+    if (state_when_started == CURTAIN_UNDEFINED_T)
+    {
+        // When in doubt use OPENED. Use the end stop to abort when closing.
+        if (get_curtain_state() == CURTAIN_CLOSED_T)
+            state_when_started = CURTAIN_CLOSED_T;
+        else // CURTAIN_OPENED_T   *or*   CURTAIN_UNDEFINED_T
+            state_when_started = CURTAIN_OPEN_T;
+    }
+
+    // Open or close
+    int status = 1;
+    if (state_when_started == CURTAIN_OPEN_T)
+        status = close_nonblocking();
+    else
+        status = open_nonblocking();
+
+    // Reset the static variable
+    if (status == 0)
+        state_when_started = CURTAIN_UNDEFINED_T;
+
+    return status;
+}
+
+/*
  * This function is mostly equivalent to close(), the main difference being
  * that the internal step target for fully opening is set.
  * TODO Make endstop work.

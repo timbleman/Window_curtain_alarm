@@ -51,7 +51,7 @@
 
 
 /********************************* Constants **********************************/
-#define MESSAGE_LEN 128
+#define MESSAGE_LEN 512
 #undef RUN_TIME_INTENSIVE_TESTS
 
 
