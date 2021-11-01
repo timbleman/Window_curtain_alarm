@@ -3,6 +3,7 @@
 
 /********************************** Includes **********************************/
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -17,6 +18,7 @@
 
 /********************************* Constants *********************************/
 #undef TUW_TUS_DEBUG
+#define TK_DEBUG_PRINTS
 
 
 /***************************** Struct definitions *****************************/
@@ -73,8 +75,11 @@ int setup_time_keeper()
     int status = 0;
     
     // If load times from the memory is unsuccessful set defaults.
-    if (load_times())
+    if (load_times() != EXIT_SUCCESS)
     {
+#ifdef TK_DEBUG_PRINTS
+        printf("No times in the EEPROM, setting defaults.\n\r");
+#endif // TK_DEBUG_PRINTS
         // Set default time for weekdays
         for (int i = 1; i < 6; i++)
         {
@@ -87,6 +92,12 @@ int setup_time_keeper()
         status |= set_tm_per_wd(&wake_times, 0, DEFAULT_WEEKEND_WAKE, 0, 0);
         status |= set_tm_per_wd(&sleep_times, 0, DEFAULT_SLEEP, 0, 0);
     }
+#ifdef TK_DEBUG_PRINTS
+    else
+    {
+        printf("Successfully loaded times from the EEPROM.\n\r");
+    }
+#endif // TK_DEBUG_PRINTS
     
     // Reset all the ignore one wake variables.
     ignore_once = false;
@@ -111,8 +122,10 @@ int set_wake(uint32_t days, int h, int m, int s)
 {
     // To avoid strange bugs.
     unset_ignore();
-    return set_tm_multiple_days(&wake_times,
+    int status = set_tm_multiple_days(&wake_times,
                             days, h, m, s);
+    save_times();
+    return status;
 }
 
 /*
@@ -130,8 +143,10 @@ int set_sleep(uint32_t days, int h, int m, int s)
 {
     // To avoid strange bugs.
     unset_ignore();
-    return set_tm_multiple_days(&sleep_times,
+    int status = set_tm_multiple_days(&sleep_times,
                             days, h, m, s);
+    save_times();
+    return status;
 }
 
 /*
