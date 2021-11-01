@@ -122,6 +122,7 @@ int execute_action_non_blocking(user_action_t *act,
                                             "close\n\r"
                                             "calibrate\n\r"
                                             "curtainxor\n\r"
+                                            "ignore\n\r"
                                             "waketimes\n\r"
                                             "sleeptimes\n\r");
                         break;

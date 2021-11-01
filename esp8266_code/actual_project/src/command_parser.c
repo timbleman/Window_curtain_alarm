@@ -518,14 +518,14 @@ enum ACTION_TYPE parse_action(char **split_command, int command_num)
     if (strcmp(split_command[0], "set_wake") == 0)
     {
 #ifdef PARSE_ACTION_DEBUG_PRINTS
-        printf("WAKE_SET_T found command\n");
+        printf("WAKE_SET_T command found\n");
 #endif // PARSE_ACTION_DEBUG_PRINTS
         return WAKE_SET_T;
     }
     else if (strcmp(split_command[0], "set_sleep") == 0)
     {
 #ifdef PARSE_ACTION_DEBUG_PRINTS
-        printf("SLEEP_SET_T found command\n");
+        printf("SLEEP_SET_T command found\n");
 #endif // PARSE_ACTION_DEBUG_PRINTS
         return SLEEP_SET_T;
     }
@@ -535,7 +535,7 @@ enum ACTION_TYPE parse_action(char **split_command, int command_num)
                 || (strcmp(split_command[0], "curtainxor") == 0)) 
     {
 #ifdef PARSE_ACTION_DEBUG_PRINTS
-        printf("CURTAIN_CONTROL_T found command\n");
+        printf("CURTAIN_CONTROL_T command found\n");
 #endif // PARSE_ACTION_DEBUG_PRINTS
         return CURTAIN_CONTROL_T;    
     }
@@ -543,28 +543,35 @@ enum ACTION_TYPE parse_action(char **split_command, int command_num)
                 || (strcmp(split_command[0], "--help") == 0)) 
     {
 #ifdef PARSE_ACTION_DEBUG_PRINTS
-        printf("HELP_T found command\n");
+        printf("HELP_T command found\n");
 #endif // PARSE_ACTION_DEBUG_PRINTS
         return HELP_T;    
     }
     else if (strcmp(split_command[0], "curtime") == 0) 
     {
 #ifdef PARSE_ACTION_DEBUG_PRINTS
-        printf("CURTIME_T found command\n");
+        printf("CURTIME_T command found\n");
 #endif // PARSE_ACTION_DEBUG_PRINTS
         return CURTIME_T;    
+    }
+    else if (strcmp(split_command[0], "ignore") == 0) 
+    {
+#ifdef PARSE_ACTION_DEBUG_PRINTS
+        printf("IGNORE_ONCE_T command found\n");
+#endif // PARSE_ACTION_DEBUG_PRINTS
+        return IGNORE_ONCE_T;    
     }
     else if (strcmp(split_command[0], "waketimes") == 0) 
     {
 #ifdef PARSE_ACTION_DEBUG_PRINTS
-        printf("WAKE_TIMES_T found command\n");
+        printf("WAKE_TIMES_T command found\n");
 #endif // PARSE_ACTION_DEBUG_PRINTS
         return WAKE_TIMES_T;    
     }
     else if (strcmp(split_command[0], "sleeptimes") == 0) 
     {
 #ifdef PARSE_ACTION_DEBUG_PRINTS
-        printf("SLEEP_TIMES_T found command\n");
+        printf("SLEEP_TIMES_T command found\n");
 #endif // PARSE_ACTION_DEBUG_PRINTS
         return SLEEP_TIMES_T;    
     }

@@ -124,7 +124,9 @@ int set_wake(uint32_t days, int h, int m, int s)
     unset_ignore();
     int status = set_tm_multiple_days(&wake_times,
                             days, h, m, s);
+#ifndef TESTABLE_TK_CODE
     save_times();
+#endif // TESTABLE_TK_CODE
     return status;
 }
 
@@ -145,7 +147,9 @@ int set_sleep(uint32_t days, int h, int m, int s)
     unset_ignore();
     int status = set_tm_multiple_days(&sleep_times,
                             days, h, m, s);
+#ifndef TESTABLE_TK_CODE
     save_times();
+#endif // TESTABLE_TK_CODE
     return status;
 }
 

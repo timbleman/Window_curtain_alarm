@@ -149,7 +149,7 @@ int close_nonblocking()
  */
 int curtain_xor()
 {
-    static CURTAIN_STATE state_when_started = CURTAIN_UNDEFINED_T;
+    static enum CURTAIN_STATE state_when_started = CURTAIN_UNDEFINED_T;
 
     // Start the curtain XOR
     if (state_when_started == CURTAIN_UNDEFINED_T)
