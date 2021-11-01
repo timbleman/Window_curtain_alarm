@@ -16,11 +16,12 @@
 
 /********************************* Constants **********************************/
 // Nam
-const char* ssid = "FRITZ!Box 7430 FC";
-const char* password =  "94044782303556147675";
+const char* def_ssid = "FRITZ!Box 7430 FC\0";
+const char* def_password =  "94044782303556147675";
 // Deg
-//const char* ssid = "It hurts when IP";
-//const char* password =  "SagIchDirNicht!";
+//const char* def_ssid = "It hurts when IP";
+//const char* def_password =  "SagIchDirNicht!";
+#define SSID_MAX_LEN 33
  
 /***************************** Struct definitions *****************************/
 /**************************** Prototype functions *****************************/
@@ -30,6 +31,12 @@ WiFiClient client1;
 
 bool connected1 = false;
 
+// Buffers to store the ssid or password
+char ssid[33];
+char password[33];
+int ssid_len = 0;
+int pw_len = 0;
+
 
 /**************************** Function definitions ****************************/
 void setup() {
@@ -38,10 +45,25 @@ void setup() {
   delay(1000);
 
   storage_setup();
+  // Uncomment these as needed
+  store_ssid(def_ssid, strlen(def_ssid));
+  store_pw(def_password, strlen(def_password));
+  //dummy_eeprom_print();
+  // Try to load ssid and pw froom eeprom, if it does not work choose default.
   printf("EEPROM is data available: %i\n\r", storage_data_available());
-  dummy_eeprom_print();
-  char dummy_ssid[512] = "hello";
-  store_ssid(dummy_ssid, 6);
+  if ((load_ssid(ssid, SSID_MAX_LEN, &ssid_len) != EXIT_SUCCESS)
+      || (load_pw(password, SSID_MAX_LEN, &pw_len) != EXIT_SUCCESS))
+  {
+    printf("Failed to load valid ssid and password from the EEPROM. "
+            "Using the default.\n\r");
+    strcpy(ssid, def_ssid);
+    strcpy(password, def_password);
+  }
+  else
+  {
+    printf("Loaded SSID and password from the EEPROM.\n\r");
+  }
+  printf("Using ssid '%s'\n\r", ssid);
 
   setup_motor_control();
 
@@ -70,6 +92,7 @@ void setup() {
  
   WiFi.begin(ssid, password);
  
+  // TODO WPS button
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
     Serial.println("Connecting..");
@@ -78,16 +101,6 @@ void setup() {
   Serial.print("Connected to WiFi. IP:");
   Serial.println(WiFi.localIP());
 
-  //wifiServer1.begin();
-
-  /*
-  time_t rawtime;
-  struct tm currenttime;
-  time(&rawtime);
-  // Copy by value to not be affected by delays
-  currenttime = *localtime(&rawtime);
-  printf("cur time %i %i %i \n", currenttime.tm_hour, currenttime.tm_min, currenttime.tm_sec);
-  */
   setup_time_keeper();
   printf("cur time %i %i %i \n", get_current_h(), get_current_m(), get_current_s());
 

@@ -14,13 +14,16 @@
 #define TIMES_EEPROM_OFFSET 96
 #define TIMES_EL_SIZE (sizeof(uint8_t) * 4)
 
+// Debugging data storage
+#define EEPROM_DEBUGGING_PRINTS
+
 /***************************** Struct definitions *****************************/
 
 
 /**************************** Prototype functions *****************************/
 void dummy_eeprom_put(int const address, uint8_t const val);
 uint8_t dummy_eeprom_read(int const address);
-int store_generic_string(char *str1, int str_len, int max_size, 
+int store_generic_string(const char *str1, int str_len, int max_size, 
                             size_t mem_offset);
 int load_generic_string(char *buf1, int buf_max_len, int *str_len, 
                             size_t mem_offset);
@@ -56,11 +59,13 @@ int storage_data_available()
      * If the length in the storage does not match the actual strings lenght,
      * an error code is returned. This is used to detect valid storage status.
      */
-    char dummy_buf[33];
+    char dummy_buf[33] = {0};
     int dummy_len = 0;
     status |= load_ssid(dummy_buf, 33, &dummy_len);
+    //printf("status after ssid %i, dummy buf ssid: %s \n\r", status, dummy_buf);
     status |= load_pw(dummy_buf, 33, &dummy_len);
-    
+    //printf("status after pw %i, dummy buf pw: %s \n\r", status, dummy_buf);
+
     // If an error occured --> status == 1 --> no data available
     return !status;
 }
@@ -72,7 +77,7 @@ int storage_data_available()
  * @param ssid_len: The length of the ssid.
  * @return: Success
  */
-int store_ssid(char *ssid, int ssid_len)
+int store_ssid(const char *ssid, int ssid_len)
 {
     return store_generic_string(ssid, ssid_len, SSID_MAX_SIZE, 
                                 SSID_EEPROM_OFFSET);
@@ -100,7 +105,7 @@ int load_ssid(char *ssid, int buf_max_len, int *ssid_len)
  * @param pw_len: The length of the password.
  * @return: Success
  */
-int store_pw(char *pw, int pw_len)
+int store_pw(const char *pw, int pw_len)
 {
     return store_generic_string(pw, pw_len, SSID_MAX_SIZE, 
                                 PW_EEPROM_OFFSET);
@@ -130,18 +135,29 @@ int load_pw(char *pw, int buf_max_len, int *pw_len)
  * @param mem_offset: Offset in the eeprom.
  * @return: Success
  */
-int store_generic_string(char *str1, int str_len, int max_size, 
+int store_generic_string(const char *str1, int str_len, int max_size, 
                             size_t mem_offset)
 {
     if (str_len > max_size || (size_t)str_len != strlen(str1))
-        return 1;
-        
-    EEPROM.put(mem_offset, (uint8_t)str_len);
-    for (int i = 0; i < str_len; i++)
     {
-        EEPROM.put(i + 1, str1[i]);
+#ifdef EEPROM_DEBUGGING_PRINTS
+        printf("String len %i missmatches with passed str_len %i or "
+                "max_size %i.\n\r", strlen(str1), str_len, max_size);
+#endif // EEPROM_DEBUGGING_PRINTS
+        return 1;
     }
     
+    EEPROM.write(mem_offset, (uint8_t)str_len);
+    for (int i = 0; i < str_len; i++)
+    {
+        EEPROM.write(mem_offset + i + 1, str1[i]);
+    }
+    for (int i = str_len; i < max_size; i++)
+    {
+        EEPROM.write(mem_offset + i + 1, 0);
+    }
+    
+    //EEPROM.write(str_len, 0);
     EEPROM.commit();
 
     return 0;
@@ -160,17 +176,19 @@ int store_generic_string(char *str1, int str_len, int max_size,
 int load_generic_string(char *buf1, int buf_max_len, int *str_len, 
                             size_t mem_offset)
 {
-    size_t saved_str_len = dummy_eeprom_read(mem_offset);
+    size_t saved_str_len = EEPROM.read(mem_offset);
     if ((size_t)buf_max_len < saved_str_len)
         return 1;
         
     *str_len = saved_str_len;
     for (size_t i = 0; i < saved_str_len; i++)
     {
-        buf1[i] = dummy_eeprom_read(i + 1);
+        buf1[i] = EEPROM.read(mem_offset + i + 1);
     }
     
     // Check if the right length has been saved, else unsuccessful.
+    //printf("buf1 when loading from eeprom: %s \n\r", buf1);
+    //printf("strlen(buf1) %i, saved_str_len %i \n\r", strlen(buf1), saved_str_len);
     if (strlen(buf1) != saved_str_len)
     {
         memset(buf1, 0, buf_max_len);
@@ -194,10 +212,10 @@ int load_generic_string(char *buf1, int buf_max_len, int *str_len,
  */
 void store_time(int time_num, uint8_t day, uint8_t h, uint8_t m, uint8_t s)
 {
-    EEPROM.put((TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE + 0 * sizeof(uint8_t)), day);
-    EEPROM.put((TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE + 1 * sizeof(uint8_t)), h);
-    EEPROM.put((TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE + 2 * sizeof(uint8_t)), m);
-    EEPROM.put((TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE + 3 * sizeof(uint8_t)), s);
+    EEPROM.write((TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE + 0 * sizeof(uint8_t)), day);
+    EEPROM.write((TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE + 1 * sizeof(uint8_t)), h);
+    EEPROM.write((TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE + 2 * sizeof(uint8_t)), m);
+    EEPROM.write((TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE + 3 * sizeof(uint8_t)), s);
     
     EEPROM.commit();
 }
@@ -214,18 +232,18 @@ void store_time(int time_num, uint8_t day, uint8_t h, uint8_t m, uint8_t s)
  */
 void load_time(int time_num, uint8_t *day, uint8_t *h, uint8_t *m, uint8_t *s)
 {
-    *day = dummy_eeprom_read(TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE);
-    *h = dummy_eeprom_read(TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE + 1 * sizeof(uint8_t));
-    *m = dummy_eeprom_read(TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE + 2 * sizeof(uint8_t));
-    *s = dummy_eeprom_read(TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE + 3 * sizeof(uint8_t));
+    *day = EEPROM.read(TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE);
+    *h = EEPROM.read(TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE + 1 * sizeof(uint8_t));
+    *m = EEPROM.read(TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE + 2 * sizeof(uint8_t));
+    *s = EEPROM.read(TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE + 3 * sizeof(uint8_t));
 }
 
 void dummy_eeprom_print()
 {
     printf("Eeprom stuff: \n");
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 64; i++)
     {
-        printf("%i ", EEPROM.read(i));
+        printf("%c ", EEPROM.read(i));
     }
     printf("\n\r");
 }
