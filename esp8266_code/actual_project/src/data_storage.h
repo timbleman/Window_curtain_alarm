@@ -36,7 +36,7 @@ int storage_data_available();
  * @param ssid_len: The length of the ssid.
  * @return: Success
  */
-int store_ssid(char *ssid, int ssid_len);
+int store_ssid(const char *ssid, int ssid_len);
 
 /*
  * Load the ssid. 
@@ -56,7 +56,7 @@ int load_ssid(char *ssid, int buf_max_len, int *ssid_len);
  * @param pw_len: The length of the password.
  * @return: Success
  */
-int store_pw(char *pw, int pw_len);
+int store_pw(const char *pw, int pw_len);
 
 /*
  * Load the password. 

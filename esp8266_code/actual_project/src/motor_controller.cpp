@@ -9,6 +9,8 @@
 #define END_STOP_PIN D6
 
 #define CHECK_MICROS_OVERFLOW
+// Stop the motor if the endstop is reached sooner than expected.
+#define ABORT_AT_ENDSTOP
 
 
 /***************************** Struct definitions *****************************/
@@ -21,6 +23,7 @@ bool stepper_enabled = false;
 int current_steps = 0;
 int target_steps = 40;
 #endif // TESTABLE_MOTOR_CODE
+bool calibrated = false;
 
 
 /**************************** Function definitions ****************************/
@@ -57,6 +60,7 @@ int setup_motor_control()
     // Use an external pulldown and cap for debouncing
     pinMode(END_STOP_PIN, INPUT);
 
+    calibrated = false;
 
     return 0;
 }
@@ -72,6 +76,14 @@ int open_nonblocking()
 #ifdef PRINTS_AT_EACH_STEP
     printf("Opening...\n");
 #endif // PRINTS_AT_EACH_STEP
+    if (!calibrated)
+    {
+#ifdef MOTOR_PRINTS
+        printf("Cannot open when the system has not been calibrated!\n\r");
+#endif // MOTOR_PRINTS
+        return 0;
+    }
+
     if (current_steps >= target_steps)
     {
         // TODO Here the passive break mode could be used instead of disabling.
@@ -100,7 +112,22 @@ int close_nonblocking()
 #ifdef PRINTS_AT_EACH_STEP
     printf("Closing...\n");
 #endif // PRINTS_AT_EACH_STEP
+    if (!calibrated)
+    {
+#ifdef MOTOR_PRINTS
+        printf("Cannot close when the system has not been calibrated!\n\r");
+#endif // MOTOR_PRINTS
+        return 0;
+    }
+
+#ifdef ABORT_AT_ENDSTOP
+    // Stop the motor if the endstop is reached sooner than expected.
+    // Only to prevent damadge, does not roll back.
+    int end_stop = digitalRead(END_STOP_PIN);
+    if ((current_steps <= 0) || end_stop == LOW)
+#else
     if (current_steps <= 0)
+#endif // ABORT_AT_ENDSTOP
     {
         return 0;
     }
@@ -111,6 +138,41 @@ int close_nonblocking()
         make_step_no_del(1);
         return 1;
     }
+}
+
+/*
+ * This function moves the curtain in the opposite position, I call it xor.
+ * This function activates the motor. As it is nonblocking, it has to be 
+ * called multiple times until the curtain is fully xored.
+ * 
+ * @return: 0 if not yet xored, 1 if fully xored.
+ */
+int curtain_xor()
+{
+    static CURTAIN_STATE state_when_started = CURTAIN_UNDEFINED_T;
+
+    // Start the curtain XOR
+    if (state_when_started == CURTAIN_UNDEFINED_T)
+    {
+        // When in doubt use OPENED. Use the end stop to abort when closing.
+        if (get_curtain_state() == CURTAIN_CLOSED_T)
+            state_when_started = CURTAIN_CLOSED_T;
+        else // CURTAIN_OPENED_T   *or*   CURTAIN_UNDEFINED_T
+            state_when_started = CURTAIN_OPEN_T;
+    }
+
+    // Open or close
+    int status = 1;
+    if (state_when_started == CURTAIN_OPEN_T)
+        status = close_nonblocking();
+    else
+        status = open_nonblocking();
+
+    // Reset the static variable
+    if (status == 0)
+        state_when_started = CURTAIN_UNDEFINED_T;
+
+    return status;
 }
 
 /*
@@ -137,7 +199,7 @@ int calibrate_nonblocking()
     // TODO Make this work
     // Interrupt or polling? Polling should be fine for now...
     int end_stop = digitalRead(END_STOP_PIN);
-    if (end_stop)
+    if (end_stop == LOW)
     {
         target_steps = counted_steps;
 #ifdef MOTOR_PRINTS
@@ -145,6 +207,7 @@ int calibrate_nonblocking()
 #endif // MOTOR_PRINTS
         current_steps = 0;
         started_calibrating = false;
+        calibrated = true;
         return 0;
     }
     
@@ -176,33 +239,38 @@ int calibrate_nonblocking_rollback()
     {
         counted_steps = 0;
         rolled_back_steps = 0;
-        end_stop_triggered = true;
+        end_stop_triggered = false;
         started_calibrating = true;
     }
     
     // TODO Make this work
     // Interrupt or polling? Polling should be fine for now...
     int end_stop = digitalRead(END_STOP_PIN);
-    if (end_stop)
+    if (end_stop == LOW)
     {
-        target_steps = counted_steps;
-#ifdef MOTOR_PRINTS
-        printf("Set target steps to %i\n", target_steps);
-#endif // MOTOR_PRINTS
         //current_steps = 0;
         end_stop_triggered = true;
     }
     /*
      * Roll back a bit to avoid constant end stop activation.
+     * Make sure to not roll back too far.
      */
     if (end_stop_triggered)
     {
-        if (rolled_back_steps >= ROLLBACK_STEPS)
+        int rollback_target = counted_steps > ROLLBACK_STEPS ? ROLLBACK_STEPS : 0;
+        if (rolled_back_steps >= rollback_target)
         {
+            // Reset the static variables
             current_steps = 0;
             end_stop_triggered = false;
             rolled_back_steps = 0;
             started_calibrating = false;
+            // Set the target steps
+            target_steps = counted_steps - rollback_target;
+            calibrated = true;
+#ifdef MOTOR_PRINTS
+            printf("Set target steps to %i\n", target_steps);
+#endif // MOTOR_PRINTS
             return 0;
         }
 
@@ -217,6 +285,23 @@ int calibrate_nonblocking_rollback()
     }
     
     return 1;
+}
+
+/*
+ * Returns the current state of the curtain.
+ * Can be open, closed or undefined.
+ * TODO Maybe add some sort of range?
+ * 
+ * @return: enum CURTAIN_STATE open, closed or undefined.
+ */
+enum CURTAIN_STATE get_curtain_state()
+{
+    if (current_steps == target_steps)
+        return CURTAIN_OPEN_T;
+    else if (current_steps == 0)
+        return CURTAIN_CLOSED_T;
+    else
+        return CURTAIN_UNDEFINED_T;
 }
 
 /*

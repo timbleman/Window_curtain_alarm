@@ -16,6 +16,7 @@
 
 
 /********************************* Constants *********************************/
+#undef TUW_TUS_DEBUG
 
 
 /***************************** Struct definitions *****************************/
@@ -276,11 +277,13 @@ long secs_until_tm_today(one_tm_per_wd *tmpwd)
     if (tm_to_comp == NULL)
         return LONG_MAX;
     
+#ifdef TUW_TUS_DEBUG
     printf("currenttime: hour %i, min %i, sec %i \n", 
             currenttime.tm_hour, currenttime.tm_min, currenttime.tm_sec);
     printf("tm_to_comp: hour %i, min %i, sec %i \n", 
             tm_to_comp->tm_hour, tm_to_comp->tm_min, tm_to_comp->tm_sec);
-    
+#endif // TUW_TUS_DEBUG
+
     return only_time_diff(&currenttime, tm_to_comp); 
 }
 

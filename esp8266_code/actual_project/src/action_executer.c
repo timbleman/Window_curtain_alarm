@@ -127,6 +127,7 @@ int execute_action_non_blocking(user_action_t *act,
                         break;
         case IGNORE_ONCE_T: set_ignore();
                             update_ignore();
+                            strcpy(message, "Ignoring the next wake\n\r");
                             break;
         case WAKE_TIMES_T:  status = write_wake_times_message(message, message_max_len);
                             break;
@@ -167,11 +168,17 @@ int curtain_control_from_act(user_action_t *act,
                             strcpy(message, "Closed curtain\n\r");
                         }
                         break;
-        case CALIBRATE_T:   status = calibrate_nonblocking();
+        case CALIBRATE_T:   status = calibrate_nonblocking_rollback();
                             // Write message if successful
                             if (!status)
                             {
                                 strcpy(message, "Calibrated curtain end stop\n\r");
+                            }
+                            break;
+        case CURTAIN_XOR_T: status = curtain_xor();
+                            if (!status)
+                            {
+                            strcpy(message, "Curtain xored\n\r");
                             }
                             break;
         case CURTAIN_ERROR_T:   strcpy(message, "CURTAIN_ERROR_T action!\n\r");

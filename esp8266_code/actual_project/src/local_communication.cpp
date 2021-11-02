@@ -12,6 +12,8 @@
 #define SHORT_PRESS_TIME 50000
 #define LONG_PRESS_TIME 700000
 
+#define BUTTON_DEBUG
+
 
 /***************************** Struct definitions *****************************/
 /**************************** Prototype functions *****************************/
@@ -32,8 +34,10 @@ static bool button1_long_press = false;
  */
 void setup_local_comm()
 {
-    pinMode(BUTTON1_PIN, INPUT_PULLUP);
+    pinMode(BUTTON1_PIN, INPUT);
     pinMode(LED_PIN, OUTPUT);
+
+    reset_button_state();
 }
 
 /* 
@@ -62,9 +66,19 @@ int get_local_input()
         {
             long micros_since_rising = micros() - rising_edge_micros;
             if (micros_since_rising > LONG_PRESS_TIME)
+            {
+#ifdef BUTTON_DEBUG
+                printf("Detected a long press!\n\r");
+#endif // BUTTON_DEBUG
                 button1_long_press = true;
+            }
             else if (micros_since_rising > SHORT_PRESS_TIME)
+            {
+#ifdef BUTTON_DEBUG
+                printf("Detected a short press!\n\r");
+#endif // BUTTON_DEBUG
                 button1_short_press = true;
+            }
             // else: do nothing
             rising_edge_micros = 0;
         }
@@ -114,17 +128,21 @@ user_action_t fetch_local_action()
     {
         new_act.act_type = CURTAIN_CONTROL_T;
         new_act.data[0] = CURTAIN_XOR_T;
-        void reset_button_state();
+        reset_button_state();
     }
     else if (button1_long_press)
     {
         new_act.act_type = IGNORE_ONCE_T;
-        void reset_button_state();
+        reset_button_state();
     }
     else
     {
         new_act.act_type = NONE_T;
     }
+
+#ifdef BUTTON_DEBUG
+    printf("Fetched button action!\n\r");
+#endif // BUTTON_DEBUG
 
     return new_act;
 }

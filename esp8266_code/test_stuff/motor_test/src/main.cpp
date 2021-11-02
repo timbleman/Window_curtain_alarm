@@ -43,7 +43,10 @@ void setup() {
   delay(1000);
 
   enable_stepper();
-  while(calibrate_nonblocking());
+  while(calibrate_nonblocking_rollback())
+  {
+    yield();
+  }
 
 }
 
