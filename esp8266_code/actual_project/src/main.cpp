@@ -16,11 +16,11 @@
 
 /********************************* Constants **********************************/
 // Nam
-const char* def_ssid = "FRITZ!Box 7430 FC\0";
-const char* def_password =  "94044782303556147675";
+//const char* def_ssid = "FRITZ!Box 7430 FC\0";
+//const char* def_password =  "94044782303556147675";
 // Deg
-//const char* def_ssid = "It hurts when IP";
-//const char* def_password =  "SagIchDirNicht!";
+const char* def_ssid = "It hurts when IP";
+const char* def_password =  "SagIchDirNicht!";
 #define SSID_MAX_LEN 33
  
 /***************************** Struct definitions *****************************/

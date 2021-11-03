@@ -60,6 +60,8 @@ int setup_motor_control()
     // Use an external pulldown and cap for debouncing
     pinMode(END_STOP_PIN, INPUT);
 
+    disable_stepper();
+
     calibrated = false;
 
     return 0;
@@ -123,12 +125,14 @@ int close_nonblocking()
 #ifdef ABORT_AT_ENDSTOP
     // Stop the motor if the endstop is reached sooner than expected.
     // Only to prevent damadge, does not roll back.
+    // TODO Add rollback
     int end_stop = digitalRead(END_STOP_PIN);
     if ((current_steps <= 0) || end_stop == LOW)
 #else
     if (current_steps <= 0)
 #endif // ABORT_AT_ENDSTOP
     {
+        disable_stepper();
         return 0;
     }
     else
@@ -194,6 +198,9 @@ int calibrate_nonblocking()
     {
         counted_steps = 0;
         started_calibrating = true;
+
+        if (!stepper_enabled)
+            enable_stepper();
     }
     
     // TODO Make this work
@@ -208,6 +215,8 @@ int calibrate_nonblocking()
         current_steps = 0;
         started_calibrating = false;
         calibrated = true;
+
+        disable_stepper();
         return 0;
     }
     
@@ -241,6 +250,9 @@ int calibrate_nonblocking_rollback()
         rolled_back_steps = 0;
         end_stop_triggered = false;
         started_calibrating = true;
+
+        if (!stepper_enabled)
+            enable_stepper();
     }
     
     // TODO Make this work
@@ -271,6 +283,7 @@ int calibrate_nonblocking_rollback()
 #ifdef MOTOR_PRINTS
             printf("Set target steps to %i\n", target_steps);
 #endif // MOTOR_PRINTS
+            disable_stepper();
             return 0;
         }
 
