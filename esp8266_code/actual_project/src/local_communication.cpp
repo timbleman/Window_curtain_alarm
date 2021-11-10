@@ -8,16 +8,22 @@
 #define BUTTON1_PIN D3
 #define LED_PIN D0
 
-// Presstimes in microseconds, can be adjusted
-#define SHORT_PRESS_TIME 50000
-#define LONG_PRESS_TIME 700000
+// Presstimes in milliseconds, can be adjusted
+#define SHORT_PRESS_TIME 50
+#define LONG_PRESS_TIME 700
 
 #define BUTTON_DEBUG
+
+// Times for visualization using the LED
+#define LONG_HOLD_MILLIS 1000
+#define SHORT_HOLD_MILLIS 300
 
 
 /***************************** Struct definitions *****************************/
 /**************************** Prototype functions *****************************/
 void reset_button_state();
+int display_short_press();
+int display_long_press();
 
 
 /**************************** Variable definitions ****************************/
@@ -50,29 +56,31 @@ void setup_local_comm()
  */
 int get_local_input()
 {
-    static unsigned long rising_edge_micros = 0;
+    static unsigned long rising_edge_millis = 0;
+    static bool display_finished = false;
 
     // TODO Verify if internal pullup is sufficient
     if (digitalRead(BUTTON1_PIN) == LOW)
     {
-        if (rising_edge_micros == 0)
+        if (rising_edge_millis == 0)
         {
-            rising_edge_micros = micros();
+            rising_edge_millis = millis();
+            display_finished = false;
         }
     }
     else
     {
-        if (rising_edge_micros > 0)
+        if (rising_edge_millis > 0)
         {
-            long micros_since_rising = micros() - rising_edge_micros;
-            if (micros_since_rising > LONG_PRESS_TIME)
+            long millis_since_rising = millis() - rising_edge_millis;
+            if (millis_since_rising > LONG_PRESS_TIME)
             {
 #ifdef BUTTON_DEBUG
                 printf("Detected a long press!\n\r");
 #endif // BUTTON_DEBUG
                 button1_long_press = true;
             }
-            else if (micros_since_rising > SHORT_PRESS_TIME)
+            else if (millis_since_rising > SHORT_PRESS_TIME)
             {
 #ifdef BUTTON_DEBUG
                 printf("Detected a short press!\n\r");
@@ -80,7 +88,7 @@ int get_local_input()
                 button1_short_press = true;
             }
             // else: do nothing
-            rising_edge_micros = 0;
+            rising_edge_millis = 0;
         }
     }
     /* 
@@ -103,10 +111,20 @@ int get_local_input()
      *      nothing
      */
 
-    // TODO Check for micros overflow?
+    // Display the press stats, negate the success status.
+    if (button1_short_press && !display_finished)
+    {
+        display_finished = !(bool)display_short_press();
+    }
+    if (button1_long_press && !display_finished)
+    {
+        display_finished = !(bool)display_long_press();
+    }
 
-    // Check if an input is available
-    if (button1_long_press || button1_short_press)
+    // TODO Check for millis() overflow?
+
+    // Check if an input is available, only return success if display finished.
+    if ((button1_long_press || button1_short_press) && display_finished)
         return 0;
     else
         return 1;
@@ -157,4 +175,78 @@ void reset_button_state()
 {
     button1_short_press = false;
     button1_long_press = false;
+}
+
+
+/*
+ * Visualize, that a short press has been detected.
+ * TODO This can be pressed into a loop when using bit math:
+ * TODO Should there be a check for millis() overflow?
+ * 
+ * @return: Success status.
+ */ 
+int display_short_press()
+{
+    static unsigned long first_millis = 0;
+    // LED blink state
+    static int state = 0;
+    int status = 1;
+
+    if (first_millis == 0)
+    {
+        first_millis = millis();
+        digitalWrite(LED_PIN, HIGH);
+        state = 1;
+    }
+
+    if (state == 1 && (millis() > (first_millis + SHORT_HOLD_MILLIS)))
+    {
+        digitalWrite(LED_PIN, LOW);
+        state = 2;
+    }
+
+    if (state == 2 && (millis() > (first_millis + 2 * SHORT_HOLD_MILLIS)))
+    {
+        digitalWrite(LED_PIN, HIGH);
+        state = 3;
+    }  
+
+    if (state == 3 && (millis() > (first_millis + 3 * SHORT_HOLD_MILLIS)))
+    {
+        digitalWrite(LED_PIN, LOW);
+        state = 0;
+        first_millis = 0;
+        // Set success status after blinking two times
+        status = 0;
+    }  
+
+    return status;
+}
+
+/*
+ * Visualize, that a long press has been detected.
+ * TODO Should there be a check for millis() overflow?
+ * 
+ * @return: Success status.
+ */
+int display_long_press()
+{
+    static unsigned long first_millis = 0;
+    int status = 1;
+
+    if (first_millis == 0)
+    {
+        first_millis = millis();
+        digitalWrite(LED_PIN, HIGH);
+        status = 1;
+    }
+
+    if (millis() > first_millis + LONG_HOLD_MILLIS)
+    {
+        first_millis = 0;
+        digitalWrite(LED_PIN, LOW);
+        status = 0;
+    }
+    
+    return status;
 }

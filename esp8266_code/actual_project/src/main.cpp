@@ -67,7 +67,7 @@ void setup() {
 
   setup_motor_control();
 
-  //setup_local_comm();
+  setup_local_comm();
 
   //configTime(3 * 3600, 0, "pool.ntp.org", "time.nist.gov");
   // implement NTP update of timekeeping (with automatic hourly updates)
