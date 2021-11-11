@@ -48,7 +48,8 @@ bool stepper_enabled = false;
 
 /*
  * Notes concerning the TMC2209:
- *
+ * Passive breakmode can be enabled using UART.
+ * Default current is about 0.5A. This is enough at 5v for curtain operation.
  */
 
 /*

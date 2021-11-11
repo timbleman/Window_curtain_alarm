@@ -40,9 +40,11 @@ int execute_action_non_blocking(user_action_t *act,
     // Decide what to do.
     switch(act->act_type)
     {
-        case NONE_T:    strcpy(message, "NONE_T action\n\r");
+        case NONE_T:    strcpy(message, "No executable action: "
+                                        "NONE_T action\n\r");
                         break;
-        case WAKE_SET_T:    // Check if the parser appended errors to the first data field.
+        case WAKE_SET_T:    // Check if the parser appended errors 
+                            // to the first data field.
                             if ((act->data[0] & ALL_ERRS) == 0)
                             {
                                 internal_status = set_wake(act->data[0], 
@@ -72,12 +74,14 @@ int execute_action_non_blocking(user_action_t *act,
                             else
                             {
                                 sprintf(message, 
-                                        "Successfully set wake days 0x%X, h %i, m %i, s %i\n\r",
-                                        act->data[0], act->data[1], act->data[2], 
-                                            act->data[3]);
+                                        "Successfully set wake days "
+                                        "0x%X, h %i, m %i, s %i\n\r",
+                                        act->data[0], act->data[1], 
+                                        act->data[2], act->data[3]);
                             }
                             break;
-        case SLEEP_SET_T:   // Check if the parser appended errors to the first data field.
+        case SLEEP_SET_T:   // Check if the parser appended errors 
+                            // to the first data field.
                             if ((act->data[0] & ALL_ERRS) == 0)
                             {
                                 internal_status = set_sleep(act->data[0], 
@@ -103,9 +107,10 @@ int execute_action_non_blocking(user_action_t *act,
                             else
                             {
                                 sprintf(message, 
-                                        "Successfully set sleep days 0x%X, h %i, m %i, s %i\n\r",
-                                        act->data[0], act->data[1], act->data[2], 
-                                            act->data[3]);
+                                        "Successfully set sleep days "
+                                        "0x%X, h %i, m %i, s %i\n\r",
+                                        act->data[0], act->data[1], 
+                                        act->data[2], act->data[3]);
                             }
                             break;
         case CURTAIN_CONTROL_T:     status = curtain_control_from_act(act, message, 
@@ -130,9 +135,11 @@ int execute_action_non_blocking(user_action_t *act,
                             update_ignore();
                             strcpy(message, "Ignoring the next wake\n\r");
                             break;
-        case WAKE_TIMES_T:  status = write_wake_times_message(message, message_max_len);
+        case WAKE_TIMES_T:  status = write_wake_times_message(message, 
+                                                        message_max_len);
                             break;
-        case SLEEP_TIMES_T: status = write_sleep_times_message(message, message_max_len);
+        case SLEEP_TIMES_T: status = write_sleep_times_message(message, 
+                                                        message_max_len);
                             break;
         case ERROR_T:   strcpy(message, "ERROR_T action\n\r");
                         break;
@@ -143,6 +150,14 @@ int execute_action_non_blocking(user_action_t *act,
     return status;
 }
 
+/* 
+ * Determine what motor action to perform from a CURTAIN_CONTROL_T.
+ * 
+ * @param act: A CURTAIN_CONTROL_T action to execute.
+ * @param message: String location to copy into.
+ * @param message_max_len: Max string length.
+ * @return: 0 if finished, 1 if still working.
+ */
 int curtain_control_from_act(user_action_t *act,
                                 char *message,
                                 int message_max_len)
@@ -173,7 +188,8 @@ int curtain_control_from_act(user_action_t *act,
                             // Write message if successful
                             if (!status)
                             {
-                                strcpy(message, "Calibrated curtain end stop\n\r");
+                                strcpy(message, "Calibrated curtain end "
+                                                "stop\n\r");
                             }
                             break;
         case CURTAIN_XOR_T: status = curtain_xor();

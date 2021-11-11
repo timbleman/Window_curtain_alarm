@@ -3,7 +3,7 @@
 extern "C" {
 #endif
 
-#define UNITTESTS_INSTEAD_OF_MAIN
+#undef UNITTESTS_INSTEAD_OF_MAIN
 
 #undef TESTABLE_TK_CODE
 #define TESTABLE_PARSER_CODE

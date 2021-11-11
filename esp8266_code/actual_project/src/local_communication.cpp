@@ -91,25 +91,6 @@ int get_local_input()
             rising_edge_millis = 0;
         }
     }
-    /* 
-     * static rising_edge_micros;
-     * if input
-     *  if rising_edge_micros == 0
-     *      rising_edge_micros = micros()
-     *  else 
-     *      nothing
-     * else
-     *  if rising_edge_micros > 0
-     *      if micros() - rising_edge_micros > LONG_PRESS_TIME
-     *          button1_long_press = true;
-     *      else if micros() - rising_edge_micros > SHORT_PRESS_TIME
-     *          button1_short_press = true;
-     *      else
-     *          nothing
-     *      rising_edge_micros = 0;
-     *  else
-     *      nothing
-     */
 
     // Display the press stats, negate the success status.
     if (button1_short_press && !display_finished)
@@ -134,7 +115,6 @@ int get_local_input()
  * Fetch an action if available. 
  * Pass by value with copying is used, should not be a problem for this small
  * size.
- * TODO Decide what to do at a long or short press.
  * 
  * @return: A user_action_t.
  */
@@ -176,7 +156,6 @@ void reset_button_state()
     button1_short_press = false;
     button1_long_press = false;
 }
-
 
 /*
  * Visualize, that a short press has been detected.
