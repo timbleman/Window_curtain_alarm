@@ -2,7 +2,10 @@
 #include <Arduino.h>
 #include <stdint.h>
 #include "ESP8266WiFi.h"
+#include "configuration.h"
 #include "user_communication.h"
+#ifndef UNITTESTS_INSTEAD_OF_MAIN
+/*
 #include "command_parser.h"
 #include "time_keeper.h"
 #include "action_executer.h"
@@ -11,6 +14,10 @@
 #include "local_communication.h"
 #include "alarm_checker.h"
 #include "data_storage.h" // TODO remove
+*/
+#else
+#include "Testsuite.h"
+#endif // UNITTESTS_INSTEAD_OF_MAIN
 #include "time.h" // setenv(), do not worry about IDE warning, compiles fine
 
 
@@ -41,8 +48,8 @@ int pw_len = 0;
 /**************************** Function definitions ****************************/
 void setup() {
   Serial.begin(9600);
-
   delay(1000);
+#ifndef UNITTESTS_INSTEAD_OF_MAIN
 
   storage_setup();
   // Uncomment these as needed
@@ -109,9 +116,14 @@ void setup() {
   //set_wake(WED_T | TUE_T | THU_T, 15, 15, 15);
   //printf("Time until wake %lu \n", time_until_wake());
   //printf("Time until sleep %lu \n", time_until_sleep());
+#else
+  printf("Hellloooo\n\r");
+  main_ucunit();
+#endif // UNITTESTS_INSTEAD_OF_MAIN
 }
 
 void loop() {
+#ifndef UNITTESTS_INSTEAD_OF_MAIN
   static char buf[256] = {0};
   static size_t max_size = 256;
   static bool busy = false;
@@ -143,4 +155,5 @@ void loop() {
   {
     check_and_alarm_non_blocking();
   }
+#endif // UNITTESTS_INSTEAD_OF_MAIN
 }
