@@ -2,7 +2,7 @@
 
 ## Basics
 This project aims at creating an alarm that opens and closes a window curtain at certain times each weekday. The system is connected to the local network and is configured using socket communication. The alarm operates independently, it does not require a hub or external control, wake and sleep times can be set for each weekday. An internet connection is required.
-![Rendering of the physical hardware](./pics/physical_mounting_rendering.PNG "Physical mounting")
+![Rendering of the physical hardware](./pics/physical_mounting_rendering_1.PNG "Physical mounting")
 
 ## Features
 ### Must-have features
