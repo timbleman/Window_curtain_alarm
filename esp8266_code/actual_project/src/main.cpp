@@ -2,8 +2,12 @@
 #include <Arduino.h>
 #include <stdint.h>
 #include "ESP8266WiFi.h"
+#include "configuration.h"
 #include "user_communication.h"
 #include "configuration.h"
+#ifndef UNITTESTS_INSTEAD_OF_MAIN
+/*
+>>>>>>> .merge_file_a18424
 #include "command_parser.h"
 #include "time_keeper.h"
 #include "action_executer.h"
@@ -12,6 +16,10 @@
 #include "local_communication.h"
 #include "alarm_checker.h"
 #include "data_storage.h" // TODO remove
+*/
+#else
+#include "Testsuite.h"
+#endif // UNITTESTS_INSTEAD_OF_MAIN
 #include "time.h" // setenv(), do not worry about IDE warning, compiles fine
 
 
@@ -42,8 +50,8 @@ int pw_len = 0;
 /**************************** Function definitions ****************************/
 void setup() {
   Serial.begin(9600);
-
   delay(1000);
+#ifndef UNITTESTS_INSTEAD_OF_MAIN
 
 #ifndef UNITTESTS_INSTEAD_OF_MAIN
   storage_setup();
@@ -92,7 +100,6 @@ void setup() {
   printf("cur time %i %i %i \n", get_current_h(), get_current_m(), get_current_s());
 
   setup_user_comm();
-
 #endif // UNITTESTS_INSTEAD_OF_MAIN
 }
 
