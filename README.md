@@ -17,6 +17,7 @@ This project aims at creating an alarm that opens and closes a window curtain at
 * WPS button for easy WIFI connection
 * Locally hosting a website for more comfortable interaction
 * Different end stop locations
+* Using more advanced features of the ESP8266 stepper driver (e.g.: sensorless homing)
 ### Intentional limitations
 * Only accessible in the local network
 * No secure communication
@@ -37,11 +38,11 @@ Here are some directories that may contain interesting files:
 
 ## Implementation
 ### Hardware
-Opening and closing the curtain shall be done using a belt-driven by a stepper motor. A NEMA17 stepper in combination with a TMC2209 driver are currently used. The target platform is the ESP8266. This microcontroller has been chosen instead of a Raspberry PI due to lower cost and power consumption. 
+Opening and closing the curtain shall be done using a belt driven by a stepper motor. A NEMA17 stepper in combination with a TMC2209 driver is currently used. The target platform is the ESP8266. This microcontroller has been chosen instead of a Raspberry PI due to lower cost and power consumption. 
 ### Mounting
 The hardware, including especially the motor, belt, and end stop, will be mounted using 3D printed objects. Currently, the project is not intended as a 'one design fits all' solution, but will need to be adapted to the used curtain and window.
 ### Programming language and environment
 Due to its dominance in embedded systems and easier debugging, C, instead of C++, is used for most of the more generic project components. These components include user input parsing, keeping track of time, and controlling the IO.
-As Arduino and most of its libraries are based on C++, the main function and socket server use this more high-level approach. The PlatformIO IDE and toolchain is used for ESP8266 code. The proof of concept has been developed using CodeLite.
+As Arduino and most of its libraries are based on C++, the main function and socket server use this more high-level approach. The PlatformIO IDE and toolchain is used for the ESP8266 code. The proof of concept has been developed using CodeLite.
 ### Testing
 The uCunit framework has been used for unit testing. The framework is basic but very portable and requires only a few header files.
