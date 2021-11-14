@@ -9,13 +9,21 @@
 #define END_STOP_PIN D6
 
 #define CHECK_MICROS_OVERFLOW
-// Stop the motor if the endstop is reached sooner than expected.
-#define ABORT_AT_ENDSTOP
+
+// Time in ms between steps. Controls the motor speed.
+// TODO In mm/s
+#define FAST_STEP_TIME 400
+#define SLOW_STEP_TIME 800
 
 
 /***************************** Struct definitions *****************************/
 /**************************** Prototype functions *****************************/
-bool stepper_enabled = false;
+void make_step(int dir);
+void make_step_delay(int dir);
+int make_step_no_del(int close, int deltime);
+void enable_stepper();
+void disable_stepper();
+int rollback();
 
 
 /**************************** Variable definitions ****************************/
@@ -24,6 +32,7 @@ int current_steps = 0;
 int target_steps = 40;
 #endif // TESTABLE_MOTOR_CODE
 bool calibrated = false;
+bool stepper_enabled = false;
 
 
 /**************************** Function definitions ****************************/
@@ -39,7 +48,8 @@ bool calibrated = false;
 
 /*
  * Notes concerning the TMC2209:
- *
+ * Passive breakmode can be enabled using UART.
+ * Default current is about 0.5A. This is enough at 5v for curtain operation.
  */
 
 /*
@@ -59,6 +69,8 @@ int setup_motor_control()
     pinMode(PERFORM_STEP_PIN, OUTPUT);
     // Use an external pulldown and cap for debouncing
     pinMode(END_STOP_PIN, INPUT);
+
+    disable_stepper();
 
     calibrated = false;
 
@@ -95,7 +107,7 @@ int open_nonblocking()
         // TODO A check if already enabled could be employed.
         if (!stepper_enabled)
             enable_stepper();
-        make_step_no_del(0);
+        make_step(0);
         return 1;
     }
 }
@@ -104,11 +116,13 @@ int open_nonblocking()
  * This function activates the motor. As it is nonblocking, it has to be 
  * called multiple times until the curtain is fully opened.
  * Uses an internal step target to determine fully opened.
+ * Rolls back if the end stop has been reached sooner than expected.
  * 
  * @return: 0 if not yet opened, 1 if fully opened.
  */
 int close_nonblocking()
 {
+    static bool rollback_necessary = false;
 #ifdef PRINTS_AT_EACH_STEP
     printf("Closing...\n");
 #endif // PRINTS_AT_EACH_STEP
@@ -120,24 +134,39 @@ int close_nonblocking()
         return 0;
     }
 
-#ifdef ABORT_AT_ENDSTOP
-    // Stop the motor if the endstop is reached sooner than expected.
-    // Only to prevent damadge, does not roll back.
+    // Roll back the motor if the endstop is reached sooner than expected.
     int end_stop = digitalRead(END_STOP_PIN);
-    if ((current_steps <= 0) || end_stop == LOW)
-#else
-    if (current_steps <= 0)
-#endif // ABORT_AT_ENDSTOP
+    if (end_stop == LOW)
     {
-        return 0;
+        rollback_necessary = true;
+    }
+
+    int motor_status = 1;
+    if (rollback_necessary)
+    {
+        motor_status = rollback();
+        if (motor_status == 0)
+        {
+            rollback_necessary = false;
+            disable_stepper();
+            // TODO Does this make sense?
+            current_steps = 0;
+        }
+    }
+    else if ((current_steps <= 0))
+    {
+        disable_stepper();
+        motor_status = 0;
     }
     else
     {
         if (!stepper_enabled)
             enable_stepper();
-        make_step_no_del(1);
-        return 1;
+        make_step(1);
+        motor_status = 1;
     }
+
+    return motor_status;
 }
 
 /*
@@ -178,50 +207,7 @@ int curtain_xor()
 /*
  * This function is mostly equivalent to close(), the main difference being
  * that the internal step target for fully opening is set.
- * TODO Make endstop work.
- * 
- * @return: 0 if not yet closed, 1 if fully closed.
- */
-int calibrate_nonblocking()
-{
-#ifdef PRINTS_AT_EACH_STEP
-    printf("Closing and calibrating...\n");
-#endif // PRINTS_AT_EACH_STEP
-    static bool started_calibrating = false;
-    static int counted_steps = 0;
-
-    if (!started_calibrating)
-    {
-        counted_steps = 0;
-        started_calibrating = true;
-    }
-    
-    // TODO Make this work
-    // Interrupt or polling? Polling should be fine for now...
-    int end_stop = digitalRead(END_STOP_PIN);
-    if (end_stop == LOW)
-    {
-        target_steps = counted_steps;
-#ifdef MOTOR_PRINTS
-        printf("Set target steps to %i\n", target_steps);
-#endif // MOTOR_PRINTS
-        current_steps = 0;
-        started_calibrating = false;
-        calibrated = true;
-        return 0;
-    }
-    
-    make_step(1);
-    counted_steps++;
-    return 1;
-}
-
-/*
- * This function is mostly equivalent to close(), the main difference being
- * that the internal step target for fully opening is set.
  * Rolls back a few steps after the endstop has been activated.
- * 
- * TODO This has to be tried and debugged.
  * 
  * @return: 0 if not yet closed, 1 if fully closed.
  */
@@ -233,17 +219,17 @@ int calibrate_nonblocking_rollback()
     static bool started_calibrating = false;
     static bool end_stop_triggered = false;
     static int counted_steps = 0;
-    static int rolled_back_steps = 0;
 
     if (!started_calibrating)
     {
         counted_steps = 0;
-        rolled_back_steps = 0;
         end_stop_triggered = false;
         started_calibrating = true;
+
+        if (!stepper_enabled)
+            enable_stepper();
     }
     
-    // TODO Make this work
     // Interrupt or polling? Polling should be fine for now...
     int end_stop = digitalRead(END_STOP_PIN);
     if (end_stop == LOW)
@@ -258,30 +244,26 @@ int calibrate_nonblocking_rollback()
     if (end_stop_triggered)
     {
         int rollback_target = counted_steps > ROLLBACK_STEPS ? ROLLBACK_STEPS : 0;
-        if (rolled_back_steps >= rollback_target)
+        int rollback_status = rollback();
+        if (rollback_status == 0 || rollback_target == 0)
         {
             // Reset the static variables
             current_steps = 0;
             end_stop_triggered = false;
-            rolled_back_steps = 0;
             started_calibrating = false;
+            calibrated = true;
             // Set the target steps
             target_steps = counted_steps - rollback_target;
-            calibrated = true;
 #ifdef MOTOR_PRINTS
             printf("Set target steps to %i\n", target_steps);
 #endif // MOTOR_PRINTS
+            disable_stepper();
             return 0;
         }
-
-        // Make a step in the opposing direction.
-        make_step(0);
-        rolled_back_steps++;
     }
     else
     {
-        make_step(1);
-        counted_steps++;
+        counted_steps += make_step_no_del(1, SLOW_STEP_TIME);
     }
     
     return 1;
@@ -304,6 +286,29 @@ enum CURTAIN_STATE get_curtain_state()
         return CURTAIN_UNDEFINED_T;
 }
 
+int rollback()
+{
+    static int rolled_back_steps = 0;
+
+    // Ensure that you don't roll back further than the maximum steps
+    //int rollback_target = target_steps > ROLLBACK_STEPS ? ROLLBACK_STEPS : 0;
+    if (rolled_back_steps >= ROLLBACK_STEPS)
+    {
+            // Reset the static variables
+            rolled_back_steps = 0;
+            return 0;
+    }
+
+    // Make a step in the opposing direction.
+    rolled_back_steps += make_step_no_del(0, SLOW_STEP_TIME);
+    return 1;
+}
+
+void make_step(int close)
+{
+    make_step_no_del(close, FAST_STEP_TIME);
+}
+
 /*
  * Make a step. Controls the stepper driver.
  * In the first iteration this should be GPIO based.
@@ -314,7 +319,7 @@ enum CURTAIN_STATE get_curtain_state()
  * @param dir: The direction. 1 closes, 0 opens.
  * @return: None.
  */
-void make_step(int close)
+void make_step_delay(int close)
 {
     const int DEL_TIME = 1;
 
@@ -343,69 +348,6 @@ void make_step(int close)
     }
 }
 
-// TODO This function is obsolete.
-void make_step_no_del_non_refact(int close)
-{
-    static unsigned long next_step_micros = 0;
-    static bool high_step = false; 
-    // Keep in mind this is used two times
-    const int DEL_TIME = 300;
-
-    if (close)
-    {
-        if (micros() >= next_step_micros)
-        {
-            // Close
-            if (!high_step)
-            {
-                // TODO Maybe check if already set
-                digitalWrite(STEPPER_DIR_PIN, LOW);
-                // TODO Delay is not optimal, but may be short enough to not be noticeable
-                digitalWrite(PERFORM_STEP_PIN, LOW);
-                high_step = true;
-            }
-            if (high_step)
-            {
-                // TODO Try 1, 2, 5
-                //delay(DEL_TIME);
-                
-                digitalWrite(PERFORM_STEP_PIN, HIGH);
-                current_steps--;
-                high_step = false;
-            }
-            next_step_micros = micros() + DEL_TIME;
-        }
-    }
-    else
-    {
-        if (micros() >= next_step_micros)
-        {
-            // Open
-            if (!high_step)
-            {
-                // TODO Maybe check if already set
-                digitalWrite(STEPPER_DIR_PIN, HIGH);
-                // TODO Delay is not optimal, but may be short enough to not be noticeable
-                digitalWrite(PERFORM_STEP_PIN, LOW);
-                next_step_micros = micros() + DEL_TIME;
-                high_step = true;
-            }
-            if (high_step)
-            {
-                // TODO Try 1, 2, 5
-                //delay(DEL_TIME);
-                if (micros() >= next_step_micros)
-                {
-                    digitalWrite(PERFORM_STEP_PIN, HIGH);
-                    current_steps++;
-                    high_step = false;
-                }
-            }
-            next_step_micros = micros() + DEL_TIME;
-        }
-    }
-}
-
 /*
  * Make a step. Controls the stepper driver.
  * In the first iteration this should be GPIO based.
@@ -414,14 +356,14 @@ void make_step_no_del_non_refact(int close)
  * a step will not be performed each call.
  * 
  * @param dir: The direction. 1 closes, 0 opens.
- * @return: None.
+ * @return: How many steps have been performed (1 or 0).
  */
-void make_step_no_del(int close)
+int make_step_no_del(int close, int deltime)
 {
     static unsigned long next_step_micros = 0;
     static bool high_step = false; 
-    // Remember this is used two times, generates a square wave 50% duty cycle
-    const int DEL_TIME = 300;
+
+    int step_performed = 0;
 
     // Only act if the delay time has been reached
     if (micros() >= next_step_micros)
@@ -436,17 +378,12 @@ void make_step_no_del(int close)
         if (!high_step)
         {
             // TODO Maybe check if already set
-            //digitalWrite(STEPPER_DIR_PIN, LOW);
-            // TODO Delay is not optimal, but may be short enough to not be noticeable
             digitalWrite(PERFORM_STEP_PIN, LOW);
             high_step = true;
         }
         // Write high
         if (high_step)
-        {
-            // TODO Try 1, 2, 5
-            //delay(DEL_TIME);
-            
+        {            
             digitalWrite(PERFORM_STEP_PIN, HIGH);
             if (close)
                 current_steps--;
@@ -454,17 +391,21 @@ void make_step_no_del(int close)
                 current_steps++;
             
             high_step = false;
+
+            step_performed = 1;
         }
 
         // Calculate the next time step to act upon.
 #ifdef CHECK_MICROS_OVERFLOW
         // Leave approximately 1ms buffer in case of an overflow
         next_step_micros = (micros() < 0xFFFFFFFFFFFFFFD0) ? 
-                            (micros() + DEL_TIME) : 0;
+                            (micros() + deltime) : 0;
 #else
         next_step_micros = micros() + DEL_TIME;
 #endif // CHECK_MICROS_OVERFLOW
     }
+
+    return step_performed;
 }
 
 /*
@@ -485,7 +426,7 @@ void enable_stepper()
  * This could be acchieved by either completely disabling the driver
  * or by enabling the passive breakmode.
  * 
- * @retun: Mone.
+ * @retun: None.
  */
 void disable_stepper()
 {

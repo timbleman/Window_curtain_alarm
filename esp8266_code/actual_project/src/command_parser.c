@@ -82,7 +82,7 @@ user_action_t get_action(char *user_str)
                             break;
         case SLEEP_SET_T:   new_act = get_time_action(argv, argc);
                             break;
-        case CURTAIN_CONTROL_T: new_act.data[0] = parse_open_close(user_str);
+        case CURTAIN_CONTROL_T: new_act.data[0] = parse_open_close(str_lower);
                                 break;
         default: break;
     }

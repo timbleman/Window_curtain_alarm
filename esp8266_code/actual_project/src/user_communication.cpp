@@ -13,7 +13,6 @@ WiFiClient client;
 bool connected = false;
 
 
-
 /**************************** Function definitions ****************************/
 /*
  * Setup the user communication.

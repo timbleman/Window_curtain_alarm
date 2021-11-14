@@ -49,6 +49,7 @@ int open_nonblocking();
  * This function activates the motor. As it is nonblocking, it has to be 
  * called multiple times until the curtain is fully opened.
  * Uses an internal step target to determine fully opened.
+ * Rolls back if the end stop has been reached sooner than expected.
  * 
  * @return: 0 if not yet opened, 1 if fully opened.
  */
@@ -62,14 +63,6 @@ int close_nonblocking();
  * @return: 0 if not yet xored, 1 if fully xored.
  */
 int curtain_xor();
-
-/*
- * This function is mostly equivalent to close(), the main difference being
- * that the internal step target for fully opening is set.
- * 
- * @return: 0 if not yet closed, 1 if fully closed.
- */
-int calibrate_nonblocking();
 
 /*
  * This function is mostly equivalent to close(), the main difference being
@@ -91,10 +84,9 @@ int calibrate_nonblocking_rollback();
 enum CURTAIN_STATE get_curtain_state();
 
 // These should be private
-void make_step(int dir);
-void make_step_no_del(int close);
-void enable_stepper();
-void disable_stepper();
+//void make_step(int dir);
+//void enable_stepper();
+//void disable_stepper();
 
 #ifdef __cplusplus
 }

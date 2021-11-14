@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include "ESP8266WiFi.h"
 #include "user_communication.h"
+#include "configuration.h"
 #include "command_parser.h"
 #include "time_keeper.h"
 #include "action_executer.h"
@@ -16,11 +17,11 @@
 
 /********************************* Constants **********************************/
 // Nam
-const char* def_ssid = "FRITZ!Box 7430 FC\0";
-const char* def_password =  "94044782303556147675";
+//const char* def_ssid = "FRITZ!Box 7430 FC\0";
+//const char* def_password =  "94044782303556147675";
 // Deg
-//const char* def_ssid = "It hurts when IP";
-//const char* def_password =  "SagIchDirNicht!";
+const char* def_ssid = "It hurts when IP";
+const char* def_password =  "SagIchDirNicht!";
 #define SSID_MAX_LEN 33
  
 /***************************** Struct definitions *****************************/
@@ -44,6 +45,7 @@ void setup() {
 
   delay(1000);
 
+#ifndef UNITTESTS_INSTEAD_OF_MAIN
   storage_setup();
   // Uncomment these as needed
   store_ssid(def_ssid, strlen(def_ssid));
@@ -67,28 +69,13 @@ void setup() {
 
   setup_motor_control();
 
-  //setup_local_comm();
+  setup_local_comm();
 
-  //configTime(3 * 3600, 0, "pool.ntp.org", "time.nist.gov");
-  // implement NTP update of timekeeping (with automatic hourly updates)
-  //configTime("CET-1CEST,M3.5.0,M10.5.0/3", "fritz.box", "de.pool.ntp.org");
-  //configTime(0, 0, "pool.ntp.org");
   /*
    * This allows the correct timeoffset to be used for localtime().
    * Do not worry about the IDE warning, the function is defined in a macro.
    */
   setenv("TZ", "CET-1CEST,M3.5.0,M10.5.0/3", 3);
-  //configTime("CET-1CEST,M3.5.0/02,M10.5.0/03", "pool.ntp.org");
-
-  // info to convert UNIX time to local time (including automatic DST update)
-  //setenv("TZ", "EST+5EDT,M3.2.0/2:00:00,M11.1.0/2:00:00", 1);
-  /*
-  Serial.println("\nWaiting for time");
-  while (!time(nullptr)) {
-    Serial.print(".");
-    delay(1000);
-  }
-  */
  
   WiFi.begin(ssid, password);
  
@@ -106,12 +93,11 @@ void setup() {
 
   setup_user_comm();
 
-  //set_wake(WED_T | TUE_T | THU_T, 15, 15, 15);
-  //printf("Time until wake %lu \n", time_until_wake());
-  //printf("Time until sleep %lu \n", time_until_sleep());
+#endif // UNITTESTS_INSTEAD_OF_MAIN
 }
 
 void loop() {
+#ifndef UNITTESTS_INSTEAD_OF_MAIN
   static char buf[256] = {0};
   static size_t max_size = 256;
   static bool busy = false;
@@ -143,4 +129,5 @@ void loop() {
   {
     check_and_alarm_non_blocking();
   }
+#endif // UNITTESTS_INSTEAD_OF_MAIN
 }
