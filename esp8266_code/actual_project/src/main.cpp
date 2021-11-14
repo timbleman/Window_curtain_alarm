@@ -6,13 +6,7 @@
 #include "user_communication.h"
 #include "configuration.h"
 #ifndef UNITTESTS_INSTEAD_OF_MAIN
-#include "command_parser.h"
-#include "time_keeper.h"
-#include "action_executer.h"
-#include "motor_controller.h"
-#include "types_and_enums.h"
-#include "local_communication.h"
-#include "alarm_checker.h"
+#ifndef UNITTESTS_INSTEAD_OF_MAIN
 #else
 #include "Testsuite.h"
 #endif // UNITTESTS_INSTEAD_OF_MAIN
