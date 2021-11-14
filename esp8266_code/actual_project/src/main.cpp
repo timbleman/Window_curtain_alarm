@@ -6,8 +6,6 @@
 #include "user_communication.h"
 #include "configuration.h"
 #ifndef UNITTESTS_INSTEAD_OF_MAIN
-/*
->>>>>>> .merge_file_a18424
 #include "command_parser.h"
 #include "time_keeper.h"
 #include "action_executer.h"
@@ -15,8 +13,6 @@
 #include "types_and_enums.h"
 #include "local_communication.h"
 #include "alarm_checker.h"
-#include "data_storage.h" // TODO remove
-*/
 #else
 #include "Testsuite.h"
 #endif // UNITTESTS_INSTEAD_OF_MAIN
