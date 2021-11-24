@@ -37,8 +37,8 @@ You can manually move the curtain using "open", "close" or "curtainxor".
 You can XOR the curtainstate by short pressing the hardware button, long pressing ignores the next wake.
 
 <p float="left">
-  <img src="/pics/screenshots/Screenshot_help_curtime_JuiceSSH.jpg" width="300" />
-  <img src="/pics/screenshots/Screenshot_set_sleep_sleeptimes_JuiceSSH.jpg" width="300" /> 
+  <img src="/pics/screenshots/Screenshot_help_curtime_JuiceSSH.jpg" width="400" />
+  <img src="/pics/screenshots/Screenshot_set_sleep_sleeptimes_JuiceSSH.jpg" width="400" /> 
 </p>
 
 
