@@ -19,4 +19,4 @@ As many of the components are under constant (but not very big) load, I would go
 
 ### Installing everything
 Cut the rails to the appropriate length and mount printed components using the m4 screws and nuts. Insert the curtain.
-Mount the motor, the pulley, the roller with inserted bearings, and the gt2 belt. Tighten the belt either using the belt connector or the sliding motor mount. Install all electronic components.
+Mount the motor, the pulley, the roller with inserted bearings, and the gt2 belt. Tighten the belt either using the belt connector or the sliding motor mount. Solder components to the board. Install all electronic components. Mount the rail to your desired location and connect a micro USB cord to the NodeMCU.

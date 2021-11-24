@@ -5,13 +5,12 @@ This project aims at creating an alarm that opens and closes a window curtain at
 ![Rendering of the physical hardware](./pics/physical_mounting_rendering_1.PNG "Physical mounting")
 
 ## Features
-### Must-have features
+### Implemented features
 * Automatically keeping track of time
 * One wake and sleep time for each weekday
 * Belt driven opening and closing of curtains
 * Socket based user communication
-* Button for snoozing one day
-* Button for manually opening and closing the curtain
+* Button for snoozing one day and manually opening and closing the curtain
 ### Possible future work
 * Multiple wake and sleep times for each weekday
 * WPS button for easy WIFI connection
@@ -23,8 +22,26 @@ This project aims at creating an alarm that opens and closes a window curtain at
 * No secure communication
 
 
+## Usage
+### Setup
+Install the system according to the readme in /3D_objects/. Adjust the SSID in the code, compile and upload.
+Connect a 5V 2A power supply. Assign a static IP using your router. You will need this IP to configure the system.
+### Basic controls
+Currently, this alarm is configured using the telnet protocol. Connect using the IP and port 23 with a client of your choice.
+Sending "help" gets a list of example commands.  
+Upon powering up, the curtain position has to be calibrated. Open the curtain to the desired position by hand and 
+send "calibrate". Make sure the motor moves in the right direction and hits the endstop. 
+Now everything should be ready to go. Use "set_wake" and "set_sleep" to set the alarm. Check if the times have been correctly 
+set using "waketimes" and "sleeptimes". Check if the right timezone is selected using "curtime".
+You can manually move the curtain using "open", "close" or "curtainxor".  
+You can XOR the curtainstate by short pressing the hardware button, long pressing ignores the next wake.
+
+![help command](pics/screenshots/Screenshot_help_curtime_JuiceSSH.jpg "help command") ![set_sleep and sleeptimes command](pics/screenshots/Screenshot_set_sleep_sleeptimes_JuiceSSH.jpg "set_sleep and sleeptimes command")
+
+
 ## Project structure
 Here are some directories that may contain interesting files:
+* /3D_objects/: 3D-printable objects and installation instructions.
 * /course_python_draft/: This quick python prototype aims at visualizing the core concepts and ideas of the project. Untested.
 * /curtain_wiring/: A KiCad project for the wiring diagram. No PCB design yet.
 * /esp8266_code/actual_project/: The unit tested proof of concept code ported to ESP8266.

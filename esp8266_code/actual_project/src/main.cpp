@@ -6,7 +6,14 @@
 #include "user_communication.h"
 #include "configuration.h"
 #ifndef UNITTESTS_INSTEAD_OF_MAIN
-#ifndef UNITTESTS_INSTEAD_OF_MAIN
+#include "action_executer.h"
+#include "alarm_checker.h"
+#include "command_parser.h"
+#include "data_storage.h"
+#include "local_communication.h"
+#include "motor_controller.h"
+#include "time_keeper.h"
+#include "types_and_enums.h"
 #else
 #include "Testsuite.h"
 #endif // UNITTESTS_INSTEAD_OF_MAIN
@@ -14,12 +21,10 @@
 
 
 /********************************* Constants **********************************/
-// Nam
-//const char* def_ssid = "FRITZ!Box 7430 FC\0";
-//const char* def_password =  "94044782303556147675";
-// Deg
-const char* def_ssid = "It hurts when IP";
-const char* def_password =  "SagIchDirNicht!";
+// Adjust these
+// TODO This should be done using WPS.
+const char* def_ssid = "your_ssid";
+const char* def_password =  "********";
 #define SSID_MAX_LEN 33
  
 /***************************** Struct definitions *****************************/
@@ -41,7 +46,6 @@ int pw_len = 0;
 void setup() {
   Serial.begin(9600);
   delay(1000);
-#ifndef UNITTESTS_INSTEAD_OF_MAIN
 
 #ifndef UNITTESTS_INSTEAD_OF_MAIN
   storage_setup();
@@ -100,6 +104,7 @@ void loop() {
   static bool busy = false;
   static user_action_t usr_act;
 
+  // Check for new input if no action is currently executed.
   if (!busy)
   {
     if (get_user_in(buf, max_size) == 0)
@@ -113,8 +118,10 @@ void loop() {
       busy = true;
     }
   }
+  
   if (busy)
   {
+    // Execute an action.
     busy = execute_action_non_blocking(&usr_act, buf, max_size);
     if (!busy)
     {
@@ -124,6 +131,7 @@ void loop() {
   }
   else
   {
+    // Check for alarms, open or close the curtain.
     check_and_alarm_non_blocking();
   }
 #endif // UNITTESTS_INSTEAD_OF_MAIN
