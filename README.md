@@ -36,7 +36,10 @@ set using "waketimes" and "sleeptimes". Check if the right timezone is selected 
 You can manually move the curtain using "open", "close" or "curtainxor".  
 You can XOR the curtainstate by short pressing the hardware button, long pressing ignores the next wake.
 
-![help command](pics/screenshots/Screenshot_help_curtime_JuiceSSH.jpg "help command") ![set_sleep and sleeptimes command](pics/screenshots/Screenshot_set_sleep_sleeptimes_JuiceSSH.jpg "set_sleep and sleeptimes command")
+<p float="left">
+  <img src="/pics/screenshots/Screenshot_help_curtime_JuiceSSH.jpg" width="300" />
+  <img src="/pics/screenshots/Screenshot_set_sleep_sleeptimes_JuiceSSH.jpg" width="300" /> 
+</p>
 
 
 ## Project structure
