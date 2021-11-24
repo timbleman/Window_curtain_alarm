@@ -12,6 +12,7 @@ This project aims at creating an alarm that opens and closes a window curtain at
 * Socket based user communication
 * Button for snoozing one day and manually opening and closing the curtain
 ### Possible future work
+* Creating a PCB design from the KiCad wiring diagram
 * Multiple wake and sleep times for each weekday
 * WPS button for easy WIFI connection
 * Locally hosting a website for more comfortable interaction
