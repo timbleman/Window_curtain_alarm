@@ -15,7 +15,7 @@ These directories contain the 3D models:
 You will need metric m4 screws of the following lengths: 10mm, 16mm, and 30mm. M3x6mm screws are also needed. You will also need square m4 nuts with dimensions of 7x7x2mm. The curtain rail has a diameter of 12mm. The flat u-shaped rail to mount all the components can be found in most German hardware stores. A 6mm wide gt2 belt and 684zz bearings are needed to move the curtain. Please look up the required electronic components in the wiring diagram.
 
 ### Printing
-As many of the components are under constant (but not very big) load, I would go with PETG instead of PLA, due to possible creep. The optimal print orientation should be obvious for most parts. Supports should only be needed for the belt connector. An end cap can be printed using TPU to prevent the metal curtain rail from directly hitting the wall. The beam holders require the m4 nuts to be inserted while printing. Remember to add pauses in the slicer!
+As many of the components are under constant (but not very big) load, I would go with PETG instead of PLA, due to possible creep. The optimal print orientation should be obvious for most parts. Supports should only be needed for the belt connector. An end cap can be printed using TPU to prevent the metal curtain rail from directly hitting the wall. The beam holders require the m4 nuts to be inserted while printing. Remember to add pauses in the slicer! About 250g of Filament are needed.
 
 ### Installing everything
 Cut the rails to the appropriate length and mount printed components using the m4 screws and nuts. Insert the curtain.
