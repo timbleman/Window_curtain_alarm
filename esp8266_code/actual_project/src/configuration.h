@@ -16,6 +16,10 @@ extern "C" {
 
 #define TESTABLE_ALARMCHECKER_CODE
 
+#ifndef UNITTESTS_INSTEAD_OF_MAIN
+#define PRINT_HEAP_STATS_EVERY_MILLIS 240000
+#endif // UNITTESTS_INSTEAD_OF_MAIN
+
 #ifdef __cplusplus
 }
 #endif
