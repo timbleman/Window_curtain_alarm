@@ -11,13 +11,13 @@ This project aims at creating an alarm that opens and closes a window curtain at
 * Belt driven opening and closing of curtains
 * Socket based user communication
 * Button for snoozing one day and manually opening and closing the curtain
+* PCB design
 ### Possible future work
-* Creating a PCB design from the KiCad wiring diagram
 * Multiple wake and sleep times for each weekday
 * WPS button for easy WIFI connection
 * Locally hosting a website for more comfortable interaction
 * Different end stop locations
-* Using more advanced features of the ESP8266 stepper driver (e.g.: sensorless homing)
+* Using more advanced features of the TMC2209 stepper driver (e.g.: sensorless homing)
 ### Intentional limitations
 * Only accessible in the local network
 * No secure communication

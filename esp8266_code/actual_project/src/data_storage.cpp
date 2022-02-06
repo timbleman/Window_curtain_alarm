@@ -7,10 +7,13 @@
 
 /********************************* Constants **********************************/
 // 1 Kb for now
+// IMPORTANT: MAKE SURE THESE VALUES ARE MULTIPLES OF 4!!!
 #define EEPROM_MAX_SIZE 0x400
 #define SSID_MAX_SIZE 32
 #define SSID_EEPROM_OFFSET 0
 #define PW_EEPROM_OFFSET ((SSID_MAX_SIZE) + 4)
+#define CURRENT_STEPS_OFFSET (2 * ((SSID_MAX_SIZE) + sizeof(int)))
+#define TARGET_STEPS_OFFSET (CURRENT_STEPS_OFFSET + sizeof(int))
 #define TIMES_EEPROM_OFFSET 96
 #define TIMES_EL_SIZE (sizeof(uint8_t) * 4)
 
@@ -21,8 +24,8 @@
 
 
 /**************************** Prototype functions *****************************/
-void dummy_eeprom_put(int const address, uint8_t const val);
-uint8_t dummy_eeprom_read(int const address);
+void store_int(int int_num, uint32_t mem_offset);
+int load_int(uint32_t mem_offset);
 int store_generic_string(const char *str1, int str_len, int max_size, 
                             size_t mem_offset);
 int load_generic_string(char *buf1, int buf_max_len, int *str_len, 
@@ -31,7 +34,7 @@ int load_generic_string(char *buf1, int buf_max_len, int *str_len,
 
 /**************************** Variable definitions ****************************/
 // Dummy eeprom for unit testing
-static uint8_t dummy_eeprom[512] = {0};
+//static uint8_t dummy_eeprom[512] = {0};
 
 
 /**************************** Function definitions ****************************/
@@ -103,7 +106,7 @@ int load_ssid(char *ssid, int buf_max_len, int *ssid_len)
  * 
  * @param pw: The password string to store.
  * @param pw_len: The length of the password.
- * @return: Success
+ * @return: Success.
  */
 int store_pw(const char *pw, int pw_len)
 {
@@ -176,6 +179,9 @@ int store_generic_string(const char *str1, int str_len, int max_size,
 int load_generic_string(char *buf1, int buf_max_len, int *str_len, 
                             size_t mem_offset)
 {
+    // Reset the input locations to prevent weird stuff
+    memset(buf1, 0, (size_t)buf_max_len);
+
     size_t saved_str_len = EEPROM.read(mem_offset);
     if ((size_t)buf_max_len < saved_str_len)
         return 1;
@@ -197,6 +203,42 @@ int load_generic_string(char *buf1, int buf_max_len, int *str_len,
     }
     
     return 0;
+}
+
+/*
+ * Stores an integer into EEPROM.
+ * TODO You might check for the EEPROM.commit() retval.
+ *
+ * @param int_num: An integer value to store.
+ * @param mem_offset: Offset in the eeprom.
+ * @return: None.
+ */
+void store_int(int int_num, uint32_t mem_offset)
+{
+    uint8_t val = 0;
+    for (size_t i = 0; i < sizeof(int); i++)
+    { 
+        val = *(((uint8_t *)&int_num) + i);
+        EEPROM.write(mem_offset + i, val);
+    }
+
+    EEPROM.commit();
+}
+
+/*
+ * Loads an integer from EEPROM.
+ *
+ * @param mem_offset: Offset in the eeprom.
+ * @return: The integer value.
+ */
+int load_int(uint32_t mem_offset)
+{
+    int val = 0;
+    for (size_t i = 0; i < sizeof(int); i++)
+    { 
+        *(((uint8_t *)&val) + i) = EEPROM.read(mem_offset + i);;
+    }
+    return val;
 }
 
 /*
@@ -238,6 +280,50 @@ void load_time(int time_num, uint8_t *day, uint8_t *h, uint8_t *m, uint8_t *s)
     *s = EEPROM.read(TIMES_EEPROM_OFFSET + time_num * TIMES_EL_SIZE + 3 * sizeof(uint8_t));
 }
 
+/*
+ * Store the current position of the curtain.
+ * 
+ * @param cur_steps: The current position of the curtain.
+ * @return: None.
+ */
+void store_current_steps(int cur_steps)
+{
+    store_int(cur_steps, CURRENT_STEPS_OFFSET);
+}
+
+/*
+ * Store the target (opened) position of the curtain.
+ * 
+ * @param cur_steps: The target position of the curtain.
+ * @return: None.
+ */
+void store_target_steps(int target_steps)
+{
+    store_int(target_steps, TARGET_STEPS_OFFSET);
+}
+
+/*
+ * Load the current position of the curtain.
+ * Be cautious using this value.
+ * 
+ * @return: The saved position of the curtain.
+ */
+int load_current_steps()
+{
+    return load_int(CURRENT_STEPS_OFFSET);
+}
+
+/*
+ * Load the target (open) position of the curtain.
+ * Be cautious using this value.
+ * 
+ * @return: The saved target position of the curtain.
+ */
+int load_target_steps()
+{
+    return load_int(TARGET_STEPS_OFFSET);
+}
+
 void dummy_eeprom_print()
 {
     printf("Eeprom stuff: \n");
@@ -248,13 +334,4 @@ void dummy_eeprom_print()
     printf("\n\r");
 }
 
-void dummy_eeprom_put(int const address, uint8_t const val)
-{
-    dummy_eeprom[address] = val;
-}
-
-uint8_t dummy_eeprom_read(int const address)
-{
-    return dummy_eeprom[address];
-}
 

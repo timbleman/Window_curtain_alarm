@@ -16,6 +16,13 @@ extern "C" {
 
 #define TESTABLE_ALARMCHECKER_CODE
 
+#ifndef UNITTESTS_INSTEAD_OF_MAIN
+#define PRINT_HEAP_STATS_EVERY_MILLIS 240000
+#endif // UNITTESTS_INSTEAD_OF_MAIN
+
+// Enable this if the system should continue without calibration after a reboot
+#define RECOVER_AFTER_RESTART
+
 #ifdef __cplusplus
 }
 #endif

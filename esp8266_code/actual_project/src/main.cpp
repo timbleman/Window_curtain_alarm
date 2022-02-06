@@ -23,8 +23,8 @@
 /********************************* Constants **********************************/
 // Adjust these
 // TODO This should be done using WPS.
-const char* def_ssid = "your_ssid";
-const char* def_password =  "********";
+const char* def_ssid = "It hurts when IP\0";
+const char* def_password =  "SagIchDirNicht!\0";
 #define SSID_MAX_LEN 33
  
 /***************************** Struct definitions *****************************/
@@ -40,6 +40,10 @@ char ssid[33];
 char password[33];
 int ssid_len = 0;
 int pw_len = 0;
+
+#ifdef PRINT_HEAP_STATS_EVERY_MILLIS
+unsigned long last_heap_print = 0;
+#endif // PRINT_HEAP_STATS_EVERY_MILLIS
 
 
 /**************************** Function definitions ****************************/
@@ -134,5 +138,14 @@ void loop() {
     // Check for alarms, open or close the curtain.
     check_and_alarm_non_blocking();
   }
+
+#ifdef PRINT_HEAP_STATS_EVERY_MILLIS
+  if (millis() - last_heap_print > PRINT_HEAP_STATS_EVERY_MILLIS)
+  {
+    printf("Free heap: %u, heap fragmentation: %u\n\r", ESP.getFreeHeap(),
+            ESP.getHeapFragmentation());
+    last_heap_print = millis();
+  }
+#endif // PRINT_HEAP_STATS_EVERY_MILLIS
 #endif // UNITTESTS_INSTEAD_OF_MAIN
 }
