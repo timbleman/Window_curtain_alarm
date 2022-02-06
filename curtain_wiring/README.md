@@ -1,0 +1,21 @@
+# Wiring
+This directory contains a wiring diagram and a PCB design. Created using KiCad.
+
+## Wiring
+This wiring diagram is also present as a PDF. Please refer to the document for needed components. 
+Low noise power supplies are expected, if the input voltage is noisy you may need to add some components.
+<img src="Screenshot 2021-12-27 233518.png" width="400" />
+
+## PCB
+This is the board designed for the curtain alarm. 
+The board has a status LED and a button for user input. 
+To fit inside the 3D printed housing, the ESP8266 (NodeMCU 12E) and TMC2209 should be socketed. The LED standoff needs to be installed.  
+The stepper driver and ESP can use separate power supplies. This is recommended to avoid noise. 
+Theoretically, you could power both the ESP and motor using the micro USB port and connecting the ESPs VU to the TMCs VM.
+If you detect power-related problems (like crashing when the motor starts turning), you could add some additional filtering. 
+There is some additional space to include some components like a low pass filter.   
+While the code does not yet utilize the TMCs UART functionality, the board is ready for it. Depending on the desired mode of communication, J9, J10, or JP1 need to be connected. 
+R2 may need to be added.
+
+<img src="curtain_wiring_board_some_components.png" width="400" />
+
