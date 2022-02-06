@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name curtain_wiring-rescue)(type Legacy)(uri ${KIPRJMOD}/curtain_wiring-rescue.lib)(options "")(descr ""))
+  (lib (name TMC_new_lib)(type Legacy)(uri ${KIPRJMOD}/TMC_new_lib.lib)(options "")(descr ""))
+)
