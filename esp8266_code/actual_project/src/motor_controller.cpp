@@ -1,6 +1,8 @@
 /********************************** Includes **********************************/
 #include <Arduino.h>
 #include "motor_controller.h"
+#include "data_storage.h"
+#include "configuration.h"
 
 /********************************* Constants **********************************/
 #define STEPPER_ENABLE_PIN D1
@@ -59,10 +61,6 @@ bool stepper_enabled = false;
  */
 int setup_motor_control()
 {
-    // Setup variables
-    current_steps = 0;
-    target_steps = 40;
-
     // Setup pins
     pinMode(STEPPER_ENABLE_PIN, OUTPUT);
     pinMode(STEPPER_DIR_PIN, OUTPUT);
@@ -72,16 +70,28 @@ int setup_motor_control()
 
     disable_stepper();
 
+    // Setup variables
+    current_steps = 0;
+    target_steps = 40;
     calibrated = false;
+#ifdef RECOVER_AFTER_RESTART
+    if (storage_data_available())
+    {
+        current_steps = load_current_steps();
+        target_steps = load_target_steps();;
+        calibrated = true;
+    }
+#endif // RECOVER_AFTER_RESTART
 
     return 0;
 }
 
 /*
  * This function activates the motor. As it is nonblocking, it has to be 
- * called multiple times until the curtain is fully closed.
+ * called multiple times until the curtain is fully opened.
+ * Uses an internal step target to determine fully opened.
  * 
- * @return: 0 if not yet closed, 1 if fully closed.
+ * @return: Success status: 1 if not yet opened, 0 if fully opened.
  */
 int open_nonblocking()
 {
@@ -93,6 +103,7 @@ int open_nonblocking()
 #ifdef MOTOR_PRINTS
         printf("Cannot open when the system has not been calibrated!\n\r");
 #endif // MOTOR_PRINTS
+
         return 0;
     }
 
@@ -100,6 +111,9 @@ int open_nonblocking()
     {
         // TODO Here the passive break mode could be used instead of disabling.
         disable_stepper();
+#ifdef RECOVER_AFTER_RESTART
+        store_current_steps(current_steps);
+#endif // RECOVER_AFTER_RESTART
         return 0;
     }
     else
@@ -108,17 +122,17 @@ int open_nonblocking()
         if (!stepper_enabled)
             enable_stepper();
         make_step(0);
+
         return 1;
     }
 }
 
 /*
  * This function activates the motor. As it is nonblocking, it has to be 
- * called multiple times until the curtain is fully opened.
- * Uses an internal step target to determine fully opened.
+ * called multiple times until the curtain is fully closed.
  * Rolls back if the end stop has been reached sooner than expected.
  * 
- * @return: 0 if not yet opened, 1 if fully opened.
+ * @return: Success status: 1 if not yet closed, 0 if fully closed.
  */
 int close_nonblocking()
 {
@@ -166,6 +180,11 @@ int close_nonblocking()
         motor_status = 1;
     }
 
+#ifdef RECOVER_AFTER_RESTART
+    if (motor_status == 0)
+        store_current_steps(current_steps);
+#endif // RECOVER_AFTER_RESTART
+
     return motor_status;
 }
 
@@ -174,7 +193,7 @@ int close_nonblocking()
  * This function activates the motor. As it is nonblocking, it has to be 
  * called multiple times until the curtain is fully xored.
  * 
- * @return: 0 if not yet xored, 1 if fully xored.
+ * @return: Success status: 1 if not yet xored, 0 if fully xored.
  */
 int curtain_xor()
 {
@@ -209,7 +228,7 @@ int curtain_xor()
  * that the internal step target for fully opening is set.
  * Rolls back a few steps after the endstop has been activated.
  * 
- * @return: 0 if not yet closed, 1 if fully closed.
+ * @return: FIXME realy? 0 if not yet closed, 1 if fully closed.
  */
 int calibrate_nonblocking_rollback()
 {
@@ -254,6 +273,10 @@ int calibrate_nonblocking_rollback()
             calibrated = true;
             // Set the target steps
             target_steps = counted_steps - rollback_target;
+#ifdef RECOVER_AFTER_RESTART
+            store_current_steps(current_steps);
+            store_target_steps(target_steps);
+#endif // RECOVER_AFTER_RESTART
 #ifdef MOTOR_PRINTS
             printf("Set target steps to %i\n", target_steps);
 #endif // MOTOR_PRINTS
@@ -396,6 +419,7 @@ int make_step_no_del(int close, int deltime)
         }
 
         // Calculate the next time step to act upon.
+        // TODO This can be solved in a smarter way...
 #ifdef CHECK_MICROS_OVERFLOW
         // Leave approximately 1ms buffer in case of an overflow
         next_step_micros = (micros() < 0xFFFFFFFFFFFFFFD0) ? 

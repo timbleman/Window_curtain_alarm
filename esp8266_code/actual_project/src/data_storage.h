@@ -94,6 +94,38 @@ void store_time(int time_num, uint8_t day, uint8_t h, uint8_t m, uint8_t s);
  */
 void load_time(int time_num, uint8_t *day, uint8_t *h, uint8_t *m, uint8_t *s);
 
+/*
+ * Store the current position of the curtain.
+ * 
+ * @param cur_steps: The current position of the curtain.
+ * @return: None.
+ */
+void store_current_steps(int cur_steps);
+
+/*
+ * Store the target (opened) position of the curtain.
+ * 
+ * @param cur_steps: The target position of the curtain.
+ * @return: None.
+ */
+void store_target_steps(int target_steps);
+
+/*
+ * Load the current position of the curtain.
+ * Be cautious using this value.
+ * 
+ * @return: The saved position of the curtain.
+ */
+int load_current_steps();
+
+/*
+ * Load the target (open) position of the curtain.
+ * Be cautious using this value.
+ * 
+ * @return: The saved target position of the curtain.
+ */
+int load_target_steps();
+
 void dummy_eeprom_print();
 
 #ifdef __cplusplus
