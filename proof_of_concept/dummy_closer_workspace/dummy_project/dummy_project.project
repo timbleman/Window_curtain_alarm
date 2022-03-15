@@ -8,26 +8,32 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
-    <File Name="data_storage.c"/>
-    <File Name="data_storage.h"/>
-    <File Name="types_and_enums.h"/>
-    <File Name="alarm_checker.c"/>
-    <File Name="alarm_checker.h"/>
-    <File Name="action_executer.h"/>
-    <File Name="action_executer.c"/>
+    <VirtualDirectory Name="hardware_specific_code">
+      <File Name="motor_controller.h"/>
+      <File Name="motor_controller.c"/>
+      <File Name="data_storage.h"/>
+      <File Name="data_storage.c"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="portable_code">
+      <File Name="types_and_enums.h"/>
+      <File Name="time_keeper.h"/>
+      <File Name="time_keeper.c"/>
+      <File Name="command_parser.h"/>
+      <File Name="command_parser.c"/>
+      <File Name="alarm_checker.h"/>
+      <File Name="alarm_checker.c"/>
+      <File Name="action_executer.h"/>
+      <File Name="action_executer.c"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="ucunit_test_suite">
+      <File Name="uCUnit-v1.0.h"/>
+      <File Name="Testsuite.h"/>
+      <File Name="Testsuite.c"/>
+      <File Name="System.h"/>
+      <File Name="System.c"/>
+    </VirtualDirectory>
     <File Name="README.md"/>
-    <File Name="uCUnit-v1.0.h"/>
-    <File Name="time_keeper.h"/>
-    <File Name="time_keeper.c"/>
-    <File Name="Testsuite.h"/>
-    <File Name="Testsuite.c"/>
-    <File Name="System.h"/>
-    <File Name="System.c"/>
-    <File Name="motor_controller.h"/>
-    <File Name="motor_controller.c"/>
     <File Name="configuration.h"/>
-    <File Name="command_parser.h"/>
-    <File Name="command_parser.c"/>
     <File Name="main.c"/>
   </VirtualDirectory>
   <Settings Type="Executable">

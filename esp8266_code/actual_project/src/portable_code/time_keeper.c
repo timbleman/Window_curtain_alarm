@@ -8,7 +8,7 @@
 #include <string.h> // strlen
 #include <limits.h> // Max int
 #include "types_and_enums.h"
-#include "data_storage.h"
+#include "hardware_specific_code/data_storage.h"
 #ifndef TESTABLE_TK_CODE
 #include <time.h>
 #endif // TESTABLE_TK_CODE

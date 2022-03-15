@@ -274,7 +274,6 @@ char *parse_arbitrary_arg(char **split_command, int command_num, char option)
  */
 int parse_days(char **split_command, int command_num)
 {
-    // TODO Replace by calloc and free, make size variable.
     char *dvalue = NULL;
     
     dvalue = parse_arbitrary_arg(split_command, command_num, 'd');

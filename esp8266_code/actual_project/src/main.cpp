@@ -3,17 +3,17 @@
 #include <stdint.h>
 #include "ESP8266WiFi.h"
 #include "configuration.h"
-#include "user_communication.h"
+#include "hardware_specific_code/user_communication.h"
 #include "configuration.h"
 #ifndef UNITTESTS_INSTEAD_OF_MAIN
-#include "action_executer.h"
-#include "alarm_checker.h"
-#include "command_parser.h"
-#include "data_storage.h"
-#include "local_communication.h"
-#include "motor_controller.h"
-#include "time_keeper.h"
-#include "types_and_enums.h"
+#include "portable_code/action_executer.h"
+#include "portable_code/alarm_checker.h"
+#include "portable_code/command_parser.h"
+#include "hardware_specific_code/data_storage.h"
+#include "hardware_specific_code/local_communication.h"
+#include "hardware_specific_code/motor_controller.h"
+#include "portable_code/time_keeper.h"
+#include "portable_code/types_and_enums.h"
 #else
 #include "Testsuite.h"
 #endif // UNITTESTS_INSTEAD_OF_MAIN
