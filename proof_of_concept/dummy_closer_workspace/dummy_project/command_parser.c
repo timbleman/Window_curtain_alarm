@@ -12,9 +12,25 @@
 
 
 /********************************* Constants *********************************/
+#define MAX_DAYS_PATTERNS 12
+#define DAY_PATTERN_MAX_LEN 8
+
+#define MAX_ACTS_PATTERNS 16
+#define ACT_PATTERN_MAX_LEN 16
 
 
 /***************************** Struct definitions *****************************/
+typedef struct
+{
+    char match[DAY_PATTERN_MAX_LEN];
+    enum DAY_TYPE dayt;
+} day_match_t;
+
+typedef struct
+{
+    char match[ACT_PATTERN_MAX_LEN];
+    enum ACTION_TYPE actt;
+} act_match_t;
 
 
 /**************************** Prototype functions ****************************/
@@ -27,6 +43,11 @@ enum CURTAIN_CONTROL_ACT_T parse_open_close(char *user_str);
 user_action_t get_time_action(char **split_command, int command_num);
 int parse_days(char **split_command, int command_num);
 uint32_t check_mins_secs_validity(int m_s_int, char *m_s_str);
+int add_days_pattern(const char *match, enum DAY_TYPE dayt);
+int add_act_pattern(const char *match, enum ACTION_TYPE actt);
+void setup_days_to_match();
+void setup_acts_to_match();
+int parse_days_template();
 //static void print_buffer(char *buffer, int size);
 //static void print_argc_argv(int argc, char *argv[]);
 #ifndef TESTABLE_PARSER_CODE
@@ -40,10 +61,27 @@ int tokenise_to_argc_argv(
 
 
 /**************************** Variable definitions ****************************/
+day_match_t days_to_match[MAX_DAYS_PATTERNS] = {0};
+uint16_t days_to_match_num = 0;
 
+act_match_t acts_to_match[MAX_ACTS_PATTERNS] = {0};
+uint16_t acts_to_match_num = 0;
 
 
 /**************************** Function definitions ****************************/
+int setup_command_parser()
+{
+    int status = 0;
+    
+    memset(days_to_match, 0, (MAX_DAYS_PATTERNS) * sizeof(day_match_t));
+    setup_days_to_match();
+    
+    memset(acts_to_match, 0, (MAX_ACTS_PATTERNS) * sizeof(act_match_t));
+    setup_acts_to_match();
+    
+    return status;
+}
+
 /*
  * A user_action_t is created from user input as string.
  * Currently wake set, sleep set and curtain actions are parsed.
@@ -266,7 +304,6 @@ char *parse_arbitrary_arg(char **split_command, int command_num, char option)
 
 /*
  * This function is used to extract day codes from the user input.
- * TODO No error handling has been implemented yet.
  * 
  * @param split_command: Array pointing tokenized user input.
  * @param command_num: Number of substrings.
@@ -285,30 +322,95 @@ int parse_days(char **split_command, int command_num)
     printf("dvalue %s \n", dvalue);
 #endif // PARSE_TIME_DEBUG_PRINTS
     
-    uint32_t days = 0;
+    uint32_t days = parse_days_template(dvalue, strlen(dvalue));
     
-    if (strstr(dvalue, "mon") != NULL)
-        days = days | MON_T;
-    if (strstr(dvalue, "tue") != NULL)
-        days = days | TUE_T;
-    if (strstr(dvalue, "wed") != NULL)
-        days = days | WED_T;
-    if (strstr(dvalue, "thu") != NULL)
-        days = days | THU_T;
-    if (strstr(dvalue, "fri") != NULL)
-        days = days | FRI_T;
-    if (strstr(dvalue, "sat") != NULL)
-        days = days | SAT_T;
-    if (strstr(dvalue, "sun") != NULL)
-        days = days | SUN_T;
-    if ((strstr(dvalue, "week") != NULL) && (strstr(dvalue, "weekend") == NULL))
-        days = days | MON_T | TUE_T | WED_T | THU_T | FRI_T;
-    if (strstr(dvalue, "weekend") != NULL)
-        days = days | SAT_T | SUN_T;
-        
-    // TODO Find writing errors!
     if (days == 0)
         days |= INVALID_DAY_ERR;
+        
+    return days;
+}
+
+/*
+ * Add a single day pattern.
+ * @return: Success status.
+ */
+int add_pattern(const char *match, enum DAY_TYPE dayt)
+{
+    if (days_to_match_num < MAX_DAYS_PATTERNS)
+    {
+        strncpy(days_to_match[days_to_match_num].match, match, DAY_PATTERN_MAX_LEN);
+        days_to_match[days_to_match_num].dayt = dayt;
+        days_to_match_num++;
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
+}
+
+/*
+ * Setup patterns for day matching.
+ * @return: None.
+ */
+void setup_days_to_match()
+{
+    days_to_match_num = 0;
+    add_pattern("mon,", MON_T);
+    add_pattern("tue", TUE_T);
+    add_pattern("wed", WED_T);
+    add_pattern("thu", THU_T);
+    add_pattern("fri", FRI_T);
+    add_pattern("sat", SAT_T);
+    add_pattern("sun", SUN_T);
+    add_pattern("weekend", SAT_T | SUN_T);
+    add_pattern("week", MON_T | TUE_T | WED_T | THU_T | FRI_T);
+}
+
+/*
+ * Parse days using multiple template.
+ * Requires more memory than a static approach.
+ * 
+ * @param message: String containing days, separated by ','.
+ * @param message_max_len:
+ * @return: Parsed days, potentially including error.
+ */
+int parse_days_template(char *message, int message_max_len)
+{
+    // Alternative: Use malloc
+    // Bad practice magic numbers
+    char days_cpy[MAX_DAYS_PATTERNS * DAY_PATTERN_MAX_LEN] = {0};
+    const int patlen = MAX_DAYS_PATTERNS * DAY_PATTERN_MAX_LEN;
+    int min_len = message_max_len < patlen ? message_max_len : patlen;
+    strncpy(days_cpy, message, min_len);
+    
+    int days = 0;
+    
+    /*
+     * Remove matching days
+     */
+    for (int i = 0; i < days_to_match_num; i++)
+    {
+        char *strpos = strstr(days_cpy, days_to_match[i].match);
+        if (strpos != NULL)
+        {
+            days |= days_to_match[i].dayt;
+            memset(strpos, ' ', strlen(days_to_match[i].match));
+        }
+    }
+        
+    /* 
+     * Check if there are still invalid chars left. 
+     */
+    for (int i = 0; i < strlen(days_cpy); i++)
+    {
+        char chr = days_cpy[i];
+        if (chr != ' ' && chr != '\n' && chr != '\r' && chr != '\0' && chr != ',' )
+        {
+            days |= INVALID_DAY_ERR;
+            break;
+        }
+    }
         
     return days;
 }
@@ -323,61 +425,12 @@ int parse_days(char **split_command, int command_num)
 int parse_hour(char **split_command, int command_num)
 {
     char *hvalue = NULL;
-    //int index;
-    //int c;
     
     int errors = 0;
-
-    //opterr = 0;
-
-    /*
-    int str_i = 0;
-    while (str_i < command_num)
-    {
-        printf("str at %i: %s \n", str_i, split_command[str_i]);
-        if (!strcmp(split_command[str_i], "-h"))
-        {
-            str_i++;
-            break;
-        }
-        str_i++;
-    }
-    if (str_i != command_num)
-    {
-        hvalue = split_com mand[str_i];
-    }
-    */
     
     hvalue = parse_arbitrary_arg(split_command, command_num, 'h');
     if (hvalue == NULL)
         hvalue = "";
-    /*
-    while ((c = getopt (command_num, split_command, "h:")) != -1)
-    {
-        switch (c)
-        {
-            case 'h':
-                printf("h option detected!\n");
-                hvalue = optarg;
-                break;
-            case '?':
-                if (optopt == 'h')
-                {
-                    printf ("Option -%c requires an argument.\n", optopt);
-                    errors &= INVALID_HOUR_ERR;
-                }
-                else if (isprint (optopt))
-                    printf ("Unknown option `-%c'.\n", optopt);
-                else
-                    printf ("Unknown option character `\\x%x'.\n",
-                        optopt);
-                    //return 1;
-            default:
-                continue;
-                //abort ();
-        }
-    }
-    */
     
     uint32_t parsed_hour = atoi(hvalue);
     
@@ -508,80 +561,73 @@ uint32_t check_mins_secs_validity(int m_s_int, char *m_s_str)
  * @return: The parsed ACTION_TYPE.
  */
 enum ACTION_TYPE parse_action(char **split_command, int command_num)
-{
+{    
     if (command_num == 0)
         return NONE_T;
         
-    printf("argv[0] %s \n", split_command[0]);
+    for (int i = 0; i < acts_to_match_num; i++)
+    {
+        if (strcmp(split_command[0], acts_to_match[i].match) == 0)
+        {
+#ifdef PARSE_ACTION_DEBUG_PRINTS
+            printf("Found %s command!\n", acts_to_match[i].match);
+#endif // PARSE_ACTION_DEBUG_PRINTS
+            return acts_to_match[i].actt;
+        }
+    }
+    
+#ifdef PARSE_ACTION_DEBUG_PRINTS
+    printf("Found no matching command (NONE_T)!\n");
+#endif // PARSE_ACTION_DEBUG_PRINTS
+    
+    return NONE_T;
+}
 
-    if (strcmp(split_command[0], "set_wake") == 0)
+/*
+ * Add a single action pattern.
+ * @return: Success status.
+ */
+int add_act_pattern(const char *match, enum ACTION_TYPE actt)
+{
+    if (acts_to_match_num < MAX_ACTS_PATTERNS)
     {
-#ifdef PARSE_ACTION_DEBUG_PRINTS
-        printf("WAKE_SET_T command found\n");
-#endif // PARSE_ACTION_DEBUG_PRINTS
-        return WAKE_SET_T;
-    }
-    else if (strcmp(split_command[0], "set_sleep") == 0)
-    {
-#ifdef PARSE_ACTION_DEBUG_PRINTS
-        printf("SLEEP_SET_T command found\n");
-#endif // PARSE_ACTION_DEBUG_PRINTS
-        return SLEEP_SET_T;
-    }
-    else if ((strcmp(split_command[0], "open") == 0)
-                || (strcmp(split_command[0], "close") == 0)
-                || (strcmp(split_command[0], "calibrate") == 0)
-                || (strcmp(split_command[0], "curtainxor") == 0)) 
-    {
-#ifdef PARSE_ACTION_DEBUG_PRINTS
-        printf("CURTAIN_CONTROL_T command found\n");
-#endif // PARSE_ACTION_DEBUG_PRINTS
-        return CURTAIN_CONTROL_T;    
-    }
-    else if ((strcmp(split_command[0], "help") == 0)
-                || (strcmp(split_command[0], "--help") == 0)) 
-    {
-#ifdef PARSE_ACTION_DEBUG_PRINTS
-        printf("HELP_T command found\n");
-#endif // PARSE_ACTION_DEBUG_PRINTS
-        return HELP_T;    
-    }
-    else if (strcmp(split_command[0], "curtime") == 0) 
-    {
-#ifdef PARSE_ACTION_DEBUG_PRINTS
-        printf("CURTIME_T command found\n");
-#endif // PARSE_ACTION_DEBUG_PRINTS
-        return CURTIME_T;    
-    }
-    else if (strcmp(split_command[0], "ignore") == 0) 
-    {
-#ifdef PARSE_ACTION_DEBUG_PRINTS
-        printf("IGNORE_ONCE_T command found\n");
-#endif // PARSE_ACTION_DEBUG_PRINTS
-        return IGNORE_ONCE_T;    
-    }
-    else if (strcmp(split_command[0], "waketimes") == 0) 
-    {
-#ifdef PARSE_ACTION_DEBUG_PRINTS
-        printf("WAKE_TIMES_T command found\n");
-#endif // PARSE_ACTION_DEBUG_PRINTS
-        return WAKE_TIMES_T;    
-    }
-    else if (strcmp(split_command[0], "sleeptimes") == 0) 
-    {
-#ifdef PARSE_ACTION_DEBUG_PRINTS
-        printf("SLEEP_TIMES_T command found\n");
-#endif // PARSE_ACTION_DEBUG_PRINTS
-        return SLEEP_TIMES_T;    
+        strncpy(acts_to_match[acts_to_match_num].match, match, ACT_PATTERN_MAX_LEN);
+        acts_to_match[acts_to_match_num].actt = actt;
+        acts_to_match_num++;
+        return 0;
     }
     else
     {
-#ifdef PARSE_ACTION_DEBUG_PRINTS
-        printf("No valid command found!\n");
-#endif // PARSE_ACTION_DEBUG_PRINTS
-        return NONE_T;
+        return 1;
     }
+}
+
+/*
+ * Setup patterns for command recognition.
+ * @return: None.
+ */
+void setup_acts_to_match()
+{
+    acts_to_match_num = 0;
     
+    add_act_pattern("set_wake", WAKE_SET_T);
+    add_act_pattern("set_sleep", SLEEP_SET_T);
+    
+    add_act_pattern("open", CURTAIN_CONTROL_T);
+    add_act_pattern("close", CURTAIN_CONTROL_T);
+    add_act_pattern("calibrate", CURTAIN_CONTROL_T);
+    add_act_pattern("curtainxor", CURTAIN_CONTROL_T);
+    
+    add_act_pattern("help", HELP_T);
+    add_act_pattern("--help", HELP_T);
+    
+    add_act_pattern("curtime", CURTIME_T);
+    
+    add_act_pattern("ignore", IGNORE_ONCE_T);
+    
+    add_act_pattern("waketimes", WAKE_TIMES_T);
+    
+    add_act_pattern("sleeptimes", SLEEP_TIMES_T);
 }
 
 /*
@@ -691,43 +737,8 @@ int get_message_from_errors(enum TIME_ERRORS errs, char *buf, int str_max_len)
 }
 
 /*
-static void demonstrate_tokenise_to_argc_argv(char buffer[], int buffer_size)
-{ // This demonstrates usage of tokenise_to_argc_argv 
-  int   argc     = 0;
-  char *argv[10] = {0};
-
-  printf("* **Initial State**\n");
-  //print_buffer(buffer, buffer_size);
-
-  // Tokenise Command Buffer 
-  tokenise_to_argc_argv(buffer, &argc, argv, sizeof(argv));
-
-  printf("* **After Tokenizing**\n");
-  //print_buffer(buffer, buffer_size);
-  //print_argc_argv(argc,argv);
-  printf("\n\n");
-}
-*/
-
-/*
-static void print_buffer(char *buffer, int size)
-{
-  printf(" - Buffer Content `");
-  for (int i = 0 ; i < size; i++) printf("%c",isprint(buffer[i])?buffer[i]:'0');
-  printf("` | HEX: ");
-  for (int i = 0 ; i < size; i++) printf("%02X ", buffer[i]);
-  printf("\n");
-}
-*/
-
-/*
-static void print_argc_argv(int argc, char *argv[])
-{ // This displays the content of argc and argv 
-  printf("* **Argv content** (argc = %d): %s\n", argc, argc ? "":"Argv Is Empty");
-  for (int i = 0 ; i < argc ; i++) printf(" - `argv[%d]` = `%s`\n", i, argv[i]);
-}
-*/
-
+ * Replace the last char in a string by a termination \0.
+ */
 void replace_last_return_by_space(char *buf)
 {
     buf[strlen(buf) - 1] = '\0';
@@ -768,48 +779,4 @@ char * strtok_space(char **save_ptr)
   *end = '\0';
   *save_ptr = end + 1;
   return start;
-}
-
-int getopt_example (int argc, char **argv)
-{
-  int aflag = 0;
-  int bflag = 0;
-  char *cvalue = NULL;
-  int index;
-  int c;
-
-  opterr = 0;
-
-  while ((c = getopt (argc, argv, "abc:")) != -1)
-    switch (c)
-      {
-      case 'a':
-        aflag = 1;
-        break;
-      case 'b':
-        bflag = 1;
-        break;
-      case 'c':
-        cvalue = optarg;
-        break;
-      case '?':
-        if (optopt == 'c')
-          fprintf (stderr, "Option -%c requires an argument.\n", optopt);
-        else if (isprint (optopt))
-          fprintf (stderr, "Unknown option `-%c'.\n", optopt);
-        else
-          fprintf (stderr,
-                   "Unknown option character `\\x%x'.\n",
-                   optopt);
-        return 1;
-      default:
-        abort ();
-      }
-
-  printf ("aflag = %d, bflag = %d, cvalue = %s\n",
-          aflag, bflag, cvalue);
-
-  for (index = optind; index < argc; index++)
-    printf ("Non-option argument %s\n", argv[index]);
-  return 0;
 }

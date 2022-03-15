@@ -21,6 +21,7 @@ extern "C" {
 /***************************** Struct definitions *****************************/
 /**************************** Variable definitions ****************************/
 /**************************** Prototype functions *****************************/
+int setup_command_parser();
 
 /*
  * This function returns a user_action_t. 

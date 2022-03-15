@@ -56,8 +56,10 @@
 
 
 /**************************** Prototype functions *****************************/
+int setup_files();
 int get_bit_of_error(uint32_t err_code);
 int time_plus_secs(int secs, int *h, int *m, int *s);
+
 
 /**************************** Variable definitions ****************************/
 /**************************** Function definitions ****************************/
@@ -121,6 +123,8 @@ static void Test_parse_command(void)
     int argc = 0;
     const int ARGV_LEN = 20;
     char *argv[20] = {0};
+
+    setup_files();
     
     // Regular parsing
     char test_str[50] = "set_wake -d mon,tue -h 22 -m 30 -s 10 \n";
@@ -156,12 +160,16 @@ static void Test_parse_command(void)
     tokenise_to_argc_argv(test_str, &argc, argv, ARGV_LEN);
     UCUNIT_CheckIsEqual(parse_action(argv, argc), NONE_T);
     
+    setup_files();
+    
     UCUNIT_TestcaseEnd();
 }
 
 static void Test_get_action()
 {
     UCUNIT_TestcaseBegin("DEMO: Checking basic action generation for set_sleep.");
+
+    setup_files();
 
     user_action_t new_act;
     
@@ -219,6 +227,8 @@ static void Test_get_action()
     new_act = get_action(test_str);
     UCUNIT_CheckIsBitSet(new_act.data[0], invalid_d_err_pos);
     
+    setup_files();
+    
     UCUNIT_TestcaseEnd();
 }
 
@@ -226,12 +236,15 @@ static void Test_get_action_set_incomplete_times(void)
 {
     UCUNIT_TestcaseBegin("Checking parsing incomplete times set by user.");
 
+    setup_files();
+    
     user_action_t new_act;
     
     // Incomplete times 
     char test_str[50] = "set_sleep -d mon,tue -h 22 -m 30 \n";
     new_act = get_action(test_str);
     UCUNIT_CheckIsEqual(new_act.data[0], MON_T | TUE_T);
+    printf("\n\r\nactual %X expected %X\n\n\r", new_act.data[0], MON_T | TUE_T);
     UCUNIT_CheckIsEqual(new_act.data[1], 22);
     UCUNIT_CheckIsEqual(new_act.data[2], 30);
     UCUNIT_CheckIsEqual(new_act.data[3], 0);
@@ -270,6 +283,8 @@ static void Test_get_action_set_incomplete_times(void)
     strcpy(test_str, "set_sleep -d mon,bri -h 11 -m 10 \n");
     new_act = get_action(test_str);
     UCUNIT_CheckIsBitSet(new_act.data[0], invalid_d_err_pos);
+    
+    setup_files();
     
     UCUNIT_TestcaseEnd();
 }
@@ -313,7 +328,7 @@ static void Test_set_wake_single_day()
     /*
      * Check the basic setup
      */
-    setup_time_keeper();
+    setup_files();
     
     UCUNIT_CheckIsEqual(wake_times.tm_mon.tm_wday, 1);
     UCUNIT_CheckIsEqual(wake_times.tm_mon.tm_hour, DEFAULT_WEEK_WAKE);
@@ -382,7 +397,7 @@ static void Test_set_wake_single_day()
     UCUNIT_CheckIsEqual(wake_times.tm_sun.tm_sec, 59);
     
     // Reset
-    setup_time_keeper();   
+    setup_files();  
     
     UCUNIT_TestcaseEnd();
 }
@@ -391,7 +406,7 @@ static void Test_set_wake_invalid()
 {
     UCUNIT_TestcaseBegin("DEMO: Checking set_wake() for invalid inputs.");
     // Setup
-    setup_time_keeper();
+    setup_files();
     
     // Invalid day
     UCUNIT_CheckIsInRange(set_wake(0, 1, 2, 3), 1, UINT32_MAX);
@@ -416,7 +431,7 @@ static void Test_set_wake_invalid()
     UCUNIT_CheckIsEqual(wake_times.tm_mon.tm_sec, 0);
     
     // Reset
-    setup_time_keeper();    
+    setup_files();    
 
     UCUNIT_TestcaseEnd(); 
 }
@@ -425,7 +440,7 @@ static void Test_set_wake_multiple_days()
 {
     UCUNIT_TestcaseBegin("DEMO: Checking set_wake() for multiple days at once.");
     // Setup
-    setup_time_keeper();
+    setup_files();
     
     set_wake(MON_T | TUE_T | SAT_T, 11, 2, 3);
     
@@ -438,7 +453,7 @@ static void Test_set_wake_multiple_days()
     UCUNIT_CheckIsEqual(wake_times.tm_sun.tm_hour, DEFAULT_WEEKEND_WAKE);
     
     // Reset
-    setup_time_keeper();
+    setup_files();
 
     UCUNIT_TestcaseEnd();  
 }
@@ -449,7 +464,7 @@ static void Test_set_sleep_single_day()
     /*
      * Check the basic setup
      */
-    setup_time_keeper();
+    setup_files();
     
     UCUNIT_CheckIsEqual(sleep_times.tm_mon.tm_wday, 1);
     UCUNIT_CheckIsEqual(sleep_times.tm_mon.tm_hour, DEFAULT_SLEEP);
@@ -478,7 +493,7 @@ static void Test_set_sleep_single_day()
     UCUNIT_CheckIsEqual(sleep_times.tm_mon.tm_sec, 33);
     
     // Reset
-    setup_time_keeper();
+    setup_files();
     
     UCUNIT_TestcaseEnd();
 }
@@ -487,7 +502,7 @@ static void Test_time_until_wake_today()
 {
     UCUNIT_TestcaseBegin("Checking time_until_wake() for current time.");
     // Setup
-    setup_time_keeper();
+    setup_files();
     
     bool min_prev = get_current_m() > 30;
     
@@ -523,7 +538,7 @@ static void Test_time_until_wake_today()
     //printf("time_till_wake %ld target_diff %i \n", time_till_wake, TARGET_DIFF_SECS);
     
     // Reset
-    setup_time_keeper();
+    setup_files();
     
     UCUNIT_TestcaseEnd();
 }
@@ -533,7 +548,7 @@ static void Test_store_time()
     UCUNIT_TestcaseBegin("Checking storing times.");
     
     // Setup
-    setup_time_keeper();
+    setup_files();
     
     set_wake(MON_T | TUE_T | WED_T |THU_T | SAT_T, 7, 7, 7);
     set_wake(FRI_T | SUN_T, 9, 9, 9);
@@ -573,7 +588,7 @@ static void Test_store_time()
     UCUNIT_CheckIsEqual(sleep_times.tm_mon.tm_sec, 16);
 
     // Reset
-    setup_time_keeper();
+    setup_files();
     
     UCUNIT_TestcaseEnd();
 }
@@ -582,7 +597,7 @@ static void Test_write_times_message()
 {
     UCUNIT_TestcaseBegin("Checking time_until_wake() for current time.");
     // Setup
-    setup_time_keeper();
+    setup_files();
     
     char message[10] = {0};
     
@@ -637,7 +652,7 @@ static void Test_write_times_message()
     printf("Sleep times print:\n%s \n", formatted_times);
     
     // Reset
-    setup_time_keeper();
+    setup_files();
     
     UCUNIT_TestcaseEnd();
 }
@@ -651,7 +666,7 @@ static void Test_ignore_wake_when_wake_before_sleep()
 {
     UCUNIT_TestcaseBegin("Checking ignore of a single wake. Wake before sleep.");
     // Setup
-    setup_time_keeper();
+    setup_files();
     
     int testh = get_current_h();
     int testm = get_current_m();
@@ -688,7 +703,7 @@ static void Test_ignore_wake_when_wake_before_sleep()
     UCUNIT_CheckIsEqual(get_ignore(), 0 );
     
     // Reset
-    setup_time_keeper();
+    setup_files();
     
     UCUNIT_TestcaseEnd();
 }
@@ -702,7 +717,7 @@ static void Test_ignore_wake_when_wake_before_sleep_reset()
     UCUNIT_TestcaseBegin("Checking ignore of a single wake. Wake before sleep. "
                          "Unset ignore while wake.");
     // Setup
-    setup_time_keeper();
+    setup_files();
     
     int testh = get_current_h();
     int testm = get_current_m();
@@ -742,7 +757,7 @@ static void Test_ignore_wake_when_wake_before_sleep_reset()
     UCUNIT_CheckIsEqual(get_ignore(), 0 );
     
     // Reset
-    setup_time_keeper();
+    setup_files();
     
     UCUNIT_TestcaseEnd();
 }
@@ -755,7 +770,7 @@ static void Test_ignore_wake_when_sleep_before_wake()
 {
     UCUNIT_TestcaseBegin("Checking ignore of a single wake. Sleep before wake.");
     // Setup
-    setup_time_keeper();
+    setup_files();
     
     int testh = get_current_h();
     int testm = get_current_m();
@@ -792,7 +807,7 @@ static void Test_ignore_wake_when_sleep_before_wake()
     UCUNIT_CheckIsEqual(get_ignore(), 1 );
     
     // Reset
-    setup_time_keeper();
+    setup_files();
     
     UCUNIT_TestcaseEnd();
 }
@@ -899,7 +914,7 @@ static void Test_basic_wake_actions()
 {
     UCUNIT_TestcaseBegin("Setting wake for multiple days using an action.");
     // Setup
-    setup_time_keeper();
+    setup_files();
     
     // Create the action
     user_action_t wake_set_act = {0};
@@ -927,7 +942,7 @@ static void Test_basic_wake_actions()
     UCUNIT_CheckIsEqual(wake_times.tm_sun.tm_hour, DEFAULT_WEEKEND_WAKE);
     
     // Reset
-    setup_time_keeper();
+    setup_files();
     
     UCUNIT_TestcaseEnd();
 }
@@ -937,7 +952,7 @@ static void Test_invalid_time_in_wake_actions()
     UCUNIT_TestcaseBegin("Trying to set wake for multiple days using an invalid"
                             " action.\nThe time is not valid.");
     // Setup
-    setup_time_keeper();
+    setup_files();
     
     // Create the action
     user_action_t wake_set_act = {0};
@@ -965,7 +980,7 @@ static void Test_invalid_time_in_wake_actions()
     UCUNIT_CheckIsEqual(wake_times.tm_sun.tm_hour, DEFAULT_WEEKEND_WAKE);
     
     // Reset
-    setup_time_keeper();
+    setup_files();
     
     UCUNIT_TestcaseEnd();
 }
@@ -975,7 +990,7 @@ static void Test_invalid_command_in_wake_actions()
     UCUNIT_TestcaseBegin("Trying to set wake for multiple days using an invalid"
                             " action.\nThe command is invalid.");
     // Setup
-    setup_time_keeper();
+    setup_files();
     
     // Create the action
     user_action_t wake_set_act = {0};
@@ -1004,7 +1019,7 @@ static void Test_invalid_command_in_wake_actions()
     UCUNIT_CheckIsEqual(wake_times.tm_sun.tm_hour, DEFAULT_WEEKEND_WAKE);
     
     // Reset
-    setup_time_keeper();
+    setup_files();
     
     UCUNIT_TestcaseEnd();
 }
@@ -1014,7 +1029,7 @@ static void Test_parser_errors_in_wake_actions()
     UCUNIT_TestcaseBegin("Trying to set wake for multiple days using an invalid"
                             "action.\nThe parser appended errors.");
     // Setup
-    setup_time_keeper();
+    setup_files();
     
     // Create the action
     user_action_t wake_set_act = {0};
@@ -1043,7 +1058,7 @@ static void Test_parser_errors_in_wake_actions()
     UCUNIT_CheckIsEqual(wake_times.tm_sun.tm_hour, DEFAULT_WEEKEND_WAKE);
     
     // Reset
-    setup_time_keeper();
+    setup_files();
     
     UCUNIT_TestcaseEnd();
 }
@@ -1053,7 +1068,7 @@ static void Test_basic_sleep_actions()
 {
     UCUNIT_TestcaseBegin("Setting sleep for multiple days using an action.");
     // Setup
-    setup_time_keeper();
+    setup_files();
     
     // Create the action
     user_action_t sleep_set_act = {0};
@@ -1081,7 +1096,7 @@ static void Test_basic_sleep_actions()
     UCUNIT_CheckIsEqual(sleep_times.tm_sun.tm_hour, 18);
     
     // Reset
-    setup_time_keeper();
+    setup_files();
     
     UCUNIT_TestcaseEnd();
 }
@@ -1090,7 +1105,7 @@ static void Test_other_actions()
 {
     UCUNIT_TestcaseBegin("Checking other actions.");
     // Setup
-    setup_time_keeper();
+    setup_files();
     
     // Help string
     // Create the action
@@ -1120,6 +1135,9 @@ static void Test_other_actions()
                                 MESSAGE_LEN));
                                 
     printf("Curtime string: \n%s", message);
+    
+    // Reset
+    setup_files();
     
     UCUNIT_TestcaseEnd();
 }
@@ -1258,6 +1276,18 @@ int time_plus_secs(int secs, int *h, int *m, int *s)
     
     printf("prev %i:%i:%i; plus secs %i:%i:%i \n", inh, inm, ins, *h, *m, *s);
     return 0;
+}
+
+int setup_files()
+{
+    int status = 0;
+    
+    status = setup_time_keeper();
+    status = setup_command_parser();
+    status = setup_motor_control();
+    status = setup_storage();
+
+    return status;
 }
 
 /*

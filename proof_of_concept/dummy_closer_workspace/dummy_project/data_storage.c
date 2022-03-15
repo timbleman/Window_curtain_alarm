@@ -35,9 +35,9 @@ static uint8_t dummy_eeprom[512] = {0};
  * 
  * @return: None.
  */
-void storage_setup()
+int setup_storage()
 {
-    return;
+    return 0;
 }
 
 /*

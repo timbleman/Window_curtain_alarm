@@ -16,7 +16,7 @@
  * 
  * @return: None.
  */
-void storage_setup();
+int setup_storage();
 
 /*
  * Checks whether stored data is available.
