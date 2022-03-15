@@ -36,8 +36,8 @@ WiFiClient client1;
 bool connected1 = false;
 
 // Buffers to store the ssid or password
-char ssid[33];
-char password[33];
+char ssid[SSID_MAX_LEN];
+char password[SSID_MAX_LEN];
 int ssid_len = 0;
 int pw_len = 0;
 
@@ -140,6 +140,10 @@ void loop() {
   }
 
 #ifdef PRINT_HEAP_STATS_EVERY_MILLIS
+  /* 
+   * There seem to be no memory leaks. 
+   * I will, however, still leave this code as it does not hurt to check.
+   */
   if (millis() - last_heap_print > PRINT_HEAP_STATS_EVERY_MILLIS)
   {
     printf("Free heap: %u, heap fragmentation: %u\n\r", ESP.getFreeHeap(),

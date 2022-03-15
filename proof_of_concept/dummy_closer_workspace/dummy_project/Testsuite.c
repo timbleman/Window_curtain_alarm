@@ -64,7 +64,7 @@ int time_plus_secs(int secs, int *h, int *m, int *s);
 #ifdef TESTABLE_PARSER_CODE
 static void Test_parse_hour(void)
 {
-    UCUNIT_TestcaseBegin("DEMO: Checking parsing of hours from user input.");
+    UCUNIT_TestcaseBegin("Checking parsing of hours from user input.");
 
     int argc = 0;
     const int ARGV_LEN = 20;
@@ -75,46 +75,48 @@ static void Test_parse_hour(void)
     // Intermediate representation, normally created internally
     tokenise_to_argc_argv(test_str, &argc, argv, ARGV_LEN);
     printf("argv in testsuite ptr %p \n", argv);
-    UCUNIT_CheckIsEqual( 22, parse_hour(argv, argc));
+    UCUNIT_CheckIsEqual(parse_hour(argv, argc), 22);
 
     // Parsing zero without error
     strcpy(test_str, "set_wake -d mon,tue -h 0 -m 30 -s 10 \n");
     tokenise_to_argc_argv(test_str, &argc, argv, ARGV_LEN);
-    UCUNIT_CheckIsEqual( 0, parse_hour(argv, argc));
+    UCUNIT_CheckIsEqual(parse_hour(argv, argc), 0);
     strcpy(test_str, "set_wake -d mon,tue -h 00 -m 30 -s 10 \n");
     tokenise_to_argc_argv(test_str, &argc, argv, ARGV_LEN);
-    UCUNIT_CheckIsEqual( 0, parse_hour(argv, argc));
+    UCUNIT_CheckIsEqual(parse_hour(argv, argc), 0);
     
     //Invalid options
     int invalid_t_err_pos = get_bit_of_error(INVALID_TIME_ERR);
     printf("invalid_t_err_pos %i \n", invalid_t_err_pos);
     strcpy(test_str, "set_wake -d mon,tue -h 000 -m 30 -s 10 \n");
     tokenise_to_argc_argv(test_str, &argc, argv, ARGV_LEN);
-    UCUNIT_CheckIsBitSet( parse_hour(argv, argc), invalid_t_err_pos);
+    UCUNIT_CheckIsBitSet(parse_hour(argv, argc), invalid_t_err_pos);
     strcpy(test_str, "set_wake -d mon,tue -h jks -m 30 -s 10 \n");
     tokenise_to_argc_argv(test_str, &argc, argv, ARGV_LEN);
-    UCUNIT_CheckIsBitSet( parse_hour(argv, argc), invalid_t_err_pos);
+    UCUNIT_CheckIsBitSet(parse_hour(argv, argc), invalid_t_err_pos);
     strcpy(test_str, "set_wake -d mon,tue -h -1 -m 30 -s 10 \n");
     tokenise_to_argc_argv(test_str, &argc, argv, ARGV_LEN);
-    UCUNIT_CheckIsBitSet( parse_hour(argv, argc), invalid_t_err_pos);
+    UCUNIT_CheckIsBitSet(parse_hour(argv, argc), invalid_t_err_pos);
     strcpy(test_str, "set_wake -d mon,tue -h 24 -m 30 -s 10 \n");
     tokenise_to_argc_argv(test_str, &argc, argv, ARGV_LEN);
-    UCUNIT_CheckIsBitSet( parse_hour(argv, argc), invalid_t_err_pos);
+    UCUNIT_CheckIsBitSet(parse_hour(argv, argc), invalid_t_err_pos);
     strcpy(test_str, "set_wake -d mon,tue -b 24 -m 30 -s 10 \n");
     tokenise_to_argc_argv(test_str, &argc, argv, ARGV_LEN);
-    UCUNIT_CheckIsBitSet( parse_hour(argv, argc), invalid_t_err_pos);
+    UCUNIT_CheckIsBitSet(parse_hour(argv, argc), invalid_t_err_pos);
     strcpy(test_str, "");
     tokenise_to_argc_argv(test_str, &argc, argv, ARGV_LEN);
-    UCUNIT_CheckIsBitSet( parse_hour(argv, argc), invalid_t_err_pos);
+    UCUNIT_CheckIsBitSet(parse_hour(argv, argc), invalid_t_err_pos);
     
     /*strcpy(test_str, "set_wake -d mon,tue -h 00 -m 30 -s 10 \n");
     tokenise_to_argc_argv(test_str, &argc, argv, ARGV_LEN);
     UCUNIT_CheckIsEqual( 0, parse_hour(argv, argc));*/
+    
+    UCUNIT_TestcaseEnd();
 }
 
 static void Test_parse_command(void)
 {
-    UCUNIT_TestcaseBegin("DEMO: Checking parsing user input.");
+    UCUNIT_TestcaseBegin("Checking parsing user input.");
 
     int argc = 0;
     const int ARGV_LEN = 20;
@@ -124,35 +126,37 @@ static void Test_parse_command(void)
     char test_str[50] = "set_wake -d mon,tue -h 22 -m 30 -s 10 \n";
     // Intermediate representation, normally created internally
     tokenise_to_argc_argv(test_str, &argc, argv, ARGV_LEN);
-    UCUNIT_CheckIsEqual( WAKE_SET_T, parse_action(argv, argc));
+    UCUNIT_CheckIsEqual(parse_action(argv, argc), WAKE_SET_T);
 
     strcpy(test_str, "set_sleep -d mon,tue -h 22 -m 30 -s 10 \n");
     tokenise_to_argc_argv(test_str, &argc, argv, ARGV_LEN);
-    UCUNIT_CheckIsEqual( SLEEP_SET_T, parse_action(argv, argc));
+    UCUNIT_CheckIsEqual(parse_action(argv, argc), SLEEP_SET_T);
     
     strcpy(test_str, "invalid_command -d mon,tue -h 22 -m 30 -s 10 \n");
     tokenise_to_argc_argv(test_str, &argc, argv, ARGV_LEN);
-    UCUNIT_CheckIsEqual( NONE_T, parse_action(argv, argc));
+    UCUNIT_CheckIsEqual(parse_action(argv, argc), NONE_T);
     
     strcpy(test_str, "open \n");
     tokenise_to_argc_argv(test_str, &argc, argv, ARGV_LEN);
-    UCUNIT_CheckIsEqual( CURTAIN_CONTROL_T, parse_action(argv, argc));
+    UCUNIT_CheckIsEqual(parse_action(argv, argc), CURTAIN_CONTROL_T);
     
     strcpy(test_str, "close \n");
     tokenise_to_argc_argv(test_str, &argc, argv, ARGV_LEN);
-    UCUNIT_CheckIsEqual( CURTAIN_CONTROL_T, parse_action(argv, argc));
+    UCUNIT_CheckIsEqual(parse_action(argv, argc), CURTAIN_CONTROL_T);
     
     strcpy(test_str, "help \n");
     tokenise_to_argc_argv(test_str, &argc, argv, ARGV_LEN);
-    UCUNIT_CheckIsEqual( HELP_T, parse_action(argv, argc));
+    UCUNIT_CheckIsEqual(parse_action(argv, argc), HELP_T);
     
     strcpy(test_str, "curtime \n");
     tokenise_to_argc_argv(test_str, &argc, argv, ARGV_LEN);
-    UCUNIT_CheckIsEqual( CURTIME_T, parse_action(argv, argc));
+    UCUNIT_CheckIsEqual(parse_action(argv, argc), CURTIME_T);
     
     strcpy(test_str, "");
     tokenise_to_argc_argv(test_str, &argc, argv, ARGV_LEN);
-    UCUNIT_CheckIsEqual( NONE_T, parse_action(argv, argc));
+    UCUNIT_CheckIsEqual(parse_action(argv, argc), NONE_T);
+    
+    UCUNIT_TestcaseEnd();
 }
 
 static void Test_get_action()
@@ -164,56 +168,58 @@ static void Test_get_action()
     // Open
     char test_str[50] = "open \n";
     new_act = get_action(test_str);
-    UCUNIT_CheckIsEqual( CURTAIN_CONTROL_T, new_act.act_type);
-    UCUNIT_CheckIsEqual( OPEN_T, new_act.data[0]);
+    UCUNIT_CheckIsEqual(new_act.act_type, CURTAIN_CONTROL_T);
+    UCUNIT_CheckIsEqual(new_act.data[0], OPEN_T);
     
     // Close
     strcpy(test_str, "close \n");
     new_act = get_action(test_str);
-    UCUNIT_CheckIsEqual( CURTAIN_CONTROL_T, new_act.act_type);
-    UCUNIT_CheckIsEqual( CLOSE_T, new_act.data[0]);
+    UCUNIT_CheckIsEqual(new_act.act_type, CURTAIN_CONTROL_T);
+    UCUNIT_CheckIsEqual(new_act.data[0], CLOSE_T);
     printf("\n new_act.data[0] %u \n", new_act.data[0]);
     
     // Close without space
     strcpy(test_str, "close\n");
     new_act = get_action(test_str);
-    UCUNIT_CheckIsEqual( CURTAIN_CONTROL_T, new_act.act_type);
+    UCUNIT_CheckIsEqual(new_act.act_type, CURTAIN_CONTROL_T);
     printf("new_act.act_type actual %X, expected %X  \n", new_act.act_type, CURTAIN_CONTROL_T);
-    UCUNIT_CheckIsEqual( CLOSE_T, new_act.data[0]);
+    UCUNIT_CheckIsEqual(new_act.data[0], CLOSE_T);
     printf("\n new_act.data[0] %u \n", new_act.data[0]);
     
     // Times
     strcpy(test_str, "set_sleep -d mon,tue -h 22 -m 30 -s 10 \n");
     new_act = get_action(test_str);
-    UCUNIT_CheckIsEqual( MON_T | TUE_T, new_act.data[0]);
-    UCUNIT_CheckIsEqual( 22, new_act.data[1]);
-    UCUNIT_CheckIsEqual( 30, new_act.data[2]);
-    UCUNIT_CheckIsEqual( 10, new_act.data[3]);
+    UCUNIT_CheckIsEqual(new_act.data[0], MON_T | TUE_T);
+    UCUNIT_CheckIsEqual(new_act.data[1], 22);
+    UCUNIT_CheckIsEqual(new_act.data[2], 30);
+    UCUNIT_CheckIsEqual(new_act.data[3], 10);
     
     // Times with zeros
     strcpy(test_str, "set_sleep -d mon,tue -h 02 -m 05 -s 00 \n");
     new_act = get_action(test_str);
-    UCUNIT_CheckIsEqual( MON_T | TUE_T, new_act.data[0]);
-    UCUNIT_CheckIsEqual( 2, new_act.data[1]);
-    UCUNIT_CheckIsEqual( 5, new_act.data[2]);
-    UCUNIT_CheckIsEqual( 0, new_act.data[3]);
+    UCUNIT_CheckIsEqual(new_act.data[0], MON_T | TUE_T);
+    UCUNIT_CheckIsEqual(new_act.data[1], 2);
+    UCUNIT_CheckIsEqual(new_act.data[2], 5);
+    UCUNIT_CheckIsEqual(new_act.data[3], 0);
 
     // Invalid time stuff
     int invalid_t_err_pos = get_bit_of_error(INVALID_TIME_ERR);
     strcpy(test_str, "set_sleep -d mon,tue -h 222 -m 30 -s 10 \n");
     new_act = get_action(test_str);
-    UCUNIT_CheckIsBitSet( new_act.data[0], invalid_t_err_pos);
+    UCUNIT_CheckIsBitSet(new_act.data[0], invalid_t_err_pos);
     strcpy(test_str, "set_sleep -d mon,tue -h 22 -m 300 -s 10 \n");
     new_act = get_action(test_str);
     //printf("new_act.data[0] %u \n", (new_act.data[0]));
     //printf("\n new act data get_time_action %u %u %u %u \n", new_act.data[0], new_act.data[1], new_act.data[2], new_act.data[3]);
-    UCUNIT_CheckIsBitSet( new_act.data[0], invalid_t_err_pos);
+    UCUNIT_CheckIsBitSet(new_act.data[0], invalid_t_err_pos);
     
     // Invalid day: No day present
     int invalid_d_err_pos = get_bit_of_error(INVALID_DAY_ERR);
     strcpy(test_str, "set_sleep -h 222 -m 30 -s 10 \n");
     new_act = get_action(test_str);
-    UCUNIT_CheckIsBitSet( new_act.data[0], invalid_d_err_pos);  
+    UCUNIT_CheckIsBitSet(new_act.data[0], invalid_d_err_pos);
+    
+    UCUNIT_TestcaseEnd();
 }
 
 static void Test_get_action_set_incomplete_times(void)
@@ -225,32 +231,47 @@ static void Test_get_action_set_incomplete_times(void)
     // Incomplete times 
     char test_str[50] = "set_sleep -d mon,tue -h 22 -m 30 \n";
     new_act = get_action(test_str);
-    UCUNIT_CheckIsEqual( MON_T | TUE_T, new_act.data[0]);
-    UCUNIT_CheckIsEqual( 22, new_act.data[1]);
-    UCUNIT_CheckIsEqual( 30, new_act.data[2]);
-    UCUNIT_CheckIsEqual( 0, new_act.data[3]);
+    UCUNIT_CheckIsEqual(new_act.data[0], MON_T | TUE_T);
+    UCUNIT_CheckIsEqual(new_act.data[1], 22);
+    UCUNIT_CheckIsEqual(new_act.data[2], 30);
+    UCUNIT_CheckIsEqual(new_act.data[3], 0);
     printf("Actual day %X \n", new_act.data[0]);
     printf("Actual set time %i:%i:%i \n", new_act.data[1], new_act.data[2], new_act.data[3]);
     
     // Times with zeros
     strcpy(test_str, "set_sleep -d mon,tue -h 02 \n");
     new_act = get_action(test_str);
-    UCUNIT_CheckIsEqual( MON_T | TUE_T, new_act.data[0]);
-    UCUNIT_CheckIsEqual( 2, new_act.data[1]);
-    UCUNIT_CheckIsEqual( 0, new_act.data[2]);
-    UCUNIT_CheckIsEqual( 0, new_act.data[3]);
+    UCUNIT_CheckIsEqual(new_act.data[0], MON_T | TUE_T);
+    UCUNIT_CheckIsEqual(new_act.data[1], 2);
+    UCUNIT_CheckIsEqual(new_act.data[2], 0);
+    UCUNIT_CheckIsEqual(new_act.data[3], 0);
     printf("Actual day %X \n", new_act.data[0]);
     printf("Actual set time %i:%i:%i \n", new_act.data[1], new_act.data[2], new_act.data[3]);
+    
+    // Week and weekend
+    strcpy(test_str, "set_sleep -d week,weekend -h 2 \n");
+    new_act = get_action(test_str);
+    UCUNIT_CheckIsEqual(new_act.data[0],
+            MON_T | TUE_T | WED_T | THU_T | FRI_T | SAT_T | SUN_T);
 
     // Invalid time stuff
     int invalid_t_err_pos = get_bit_of_error(INVALID_TIME_ERR);
     strcpy(test_str, "set_sleep -d mon,tue -m 30 -s 10 \n");
     new_act = get_action(test_str);
-    UCUNIT_CheckIsBitSet( new_act.data[0], invalid_t_err_pos);
-
-    //printf("new_act.data[0] %u \n", (new_act.data[0]));
-    //printf("\n new act data get_time_action %u %u %u %u \n", new_act.data[0], new_act.data[1], new_act.data[2], new_act.data[3]);
-    UCUNIT_CheckIsBitSet( new_act.data[0], invalid_t_err_pos);
+    UCUNIT_CheckIsBitSet(new_act.data[0], invalid_t_err_pos);
+    
+    // Invalid day stuff
+    // Only one invalid day
+    int invalid_d_err_pos = get_bit_of_error(INVALID_DAY_ERR);
+    strcpy(test_str, "set_sleep -d bri -h 11 -m 10 \n");
+    new_act = get_action(test_str);
+    UCUNIT_CheckIsBitSet(new_act.data[0], invalid_d_err_pos);
+    // One invalid day among valid ones
+    strcpy(test_str, "set_sleep -d mon,bri -h 11 -m 10 \n");
+    new_act = get_action(test_str);
+    UCUNIT_CheckIsBitSet(new_act.data[0], invalid_d_err_pos);
+    
+    UCUNIT_TestcaseEnd();
 }
 
 static void Test_get_message_from_errors()
@@ -261,25 +282,27 @@ static void Test_get_message_from_errors()
     char buf[32] = {0};
     
     get_message_from_errors(INVALID_DAY_ERR, buf, BUF_LEN);
-    UCUNIT_CheckIsEqual( strcmp(buf, "DAY_ERR"), 0);
+    UCUNIT_CheckIsEqual(strcmp(buf, "DAY_ERR"), 0);
     
     memset(buf, 0, BUF_LEN);
     get_message_from_errors(INVALID_TIME_ERR, buf, BUF_LEN);
-    UCUNIT_CheckIsEqual( strcmp(buf, "TIME_ERR"), 0);
+    UCUNIT_CheckIsEqual(strcmp(buf, "TIME_ERR"), 0);
     
     memset(buf, 0, BUF_LEN);
     get_message_from_errors(INVALID_COMMAND_ERR, buf, BUF_LEN);
-    UCUNIT_CheckIsEqual( strcmp(buf, "COMMAND_ERR"), 0);
+    UCUNIT_CheckIsEqual(strcmp(buf, "COMMAND_ERR"), 0);
     
     memset(buf, 0, BUF_LEN);
     get_message_from_errors(ALL_ERRS, buf, BUF_LEN);
     printf("all_errs buf %s\n", buf);
-    UCUNIT_CheckIsEqual( strcmp(buf, "DAY_ERR, TIME_ERR, COMMAND_ERR"), 0);
+    UCUNIT_CheckIsEqual(strcmp(buf, "DAY_ERR, TIME_ERR, COMMAND_ERR"), 0);
     
     // Too small buffer
     memset(buf, 0, BUF_LEN);
-    UCUNIT_CheckIsEqual( get_message_from_errors(ALL_ERRS, buf, 5), 1);
-    UCUNIT_CheckIsEqual( strcmp(buf, "SLEN"), 0);
+    UCUNIT_CheckIsEqual(get_message_from_errors(ALL_ERRS, buf, 5), 1);
+    UCUNIT_CheckIsEqual(strcmp(buf, "SLEN"), 0);
+    
+    UCUNIT_TestcaseEnd();
 }
 #endif // TESTABLE_PARSER_CODE
 
@@ -292,18 +315,18 @@ static void Test_set_wake_single_day()
      */
     setup_time_keeper();
     
-    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_wday, 1);
-    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_hour, DEFAULT_WEEK_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_min, 0);
-    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_sec, 0);
-    UCUNIT_CheckIsEqual( wake_times.tm_sat.tm_wday, 6);
-    UCUNIT_CheckIsEqual( wake_times.tm_sat.tm_hour, DEFAULT_WEEKEND_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_sat.tm_min, 0);
-    UCUNIT_CheckIsEqual( wake_times.tm_sat.tm_sec, 0);
-    UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_wday, 0);
-    UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_hour, DEFAULT_WEEKEND_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_min, 0);
-    UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_sec, 0);
+    UCUNIT_CheckIsEqual(wake_times.tm_mon.tm_wday, 1);
+    UCUNIT_CheckIsEqual(wake_times.tm_mon.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_mon.tm_min, 0);
+    UCUNIT_CheckIsEqual(wake_times.tm_mon.tm_sec, 0);
+    UCUNIT_CheckIsEqual(wake_times.tm_sat.tm_wday, 6);
+    UCUNIT_CheckIsEqual(wake_times.tm_sat.tm_hour, DEFAULT_WEEKEND_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_sat.tm_min, 0);
+    UCUNIT_CheckIsEqual(wake_times.tm_sat.tm_sec, 0);
+    UCUNIT_CheckIsEqual(wake_times.tm_sun.tm_wday, 0);
+    UCUNIT_CheckIsEqual(wake_times.tm_sun.tm_hour, DEFAULT_WEEKEND_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_sun.tm_min, 0);
+    UCUNIT_CheckIsEqual(wake_times.tm_sun.tm_sec, 0);
     
     
     /*
@@ -319,52 +342,49 @@ static void Test_set_wake_single_day()
     
     // Check whether times are set correctly
     // Mon
-    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_wday, 1);
-    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_hour, 1);
-    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_min, 2);
-    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_sec, 3);
+    UCUNIT_CheckIsEqual(wake_times.tm_mon.tm_wday, 1);
+    UCUNIT_CheckIsEqual(wake_times.tm_mon.tm_hour, 1);
+    UCUNIT_CheckIsEqual(wake_times.tm_mon.tm_min, 2);
+    UCUNIT_CheckIsEqual(wake_times.tm_mon.tm_sec, 3);
     printf("mon wd h m s: %i %i %i %i \n", wake_times.tm_mon.tm_wday, 
             wake_times.tm_mon.tm_hour, wake_times.tm_mon.tm_min, 
             wake_times.tm_mon.tm_sec);
     // Tue
-    UCUNIT_CheckIsEqual( wake_times.tm_tue.tm_wday, 2);
-    UCUNIT_CheckIsEqual( wake_times.tm_tue.tm_hour, 4);
-    UCUNIT_CheckIsEqual( wake_times.tm_tue.tm_min, 5);
-    UCUNIT_CheckIsEqual( wake_times.tm_tue.tm_sec, 6);   
+    UCUNIT_CheckIsEqual(wake_times.tm_tue.tm_wday, 2);
+    UCUNIT_CheckIsEqual(wake_times.tm_tue.tm_hour, 4);
+    UCUNIT_CheckIsEqual(wake_times.tm_tue.tm_min, 5);
+    UCUNIT_CheckIsEqual(wake_times.tm_tue.tm_sec, 6);   
     // Wed
-    UCUNIT_CheckIsEqual( wake_times.tm_wed.tm_wday, 3);
-    UCUNIT_CheckIsEqual( wake_times.tm_wed.tm_hour, 7);
-    UCUNIT_CheckIsEqual( wake_times.tm_wed.tm_min, 8);
-    UCUNIT_CheckIsEqual( wake_times.tm_wed.tm_sec, 9);    
+    UCUNIT_CheckIsEqual(wake_times.tm_wed.tm_wday, 3);
+    UCUNIT_CheckIsEqual(wake_times.tm_wed.tm_hour, 7);
+    UCUNIT_CheckIsEqual(wake_times.tm_wed.tm_min, 8);
+    UCUNIT_CheckIsEqual(wake_times.tm_wed.tm_sec, 9);    
     // Thu
-    UCUNIT_CheckIsEqual( wake_times.tm_thu.tm_wday, 4);
-    UCUNIT_CheckIsEqual( wake_times.tm_thu.tm_hour, 10);
-    UCUNIT_CheckIsEqual( wake_times.tm_thu.tm_min, 11);
-    UCUNIT_CheckIsEqual( wake_times.tm_thu.tm_sec, 12);     
+    UCUNIT_CheckIsEqual(wake_times.tm_thu.tm_wday, 4);
+    UCUNIT_CheckIsEqual(wake_times.tm_thu.tm_hour, 10);
+    UCUNIT_CheckIsEqual(wake_times.tm_thu.tm_min, 11);
+    UCUNIT_CheckIsEqual(wake_times.tm_thu.tm_sec, 12);     
     // Fri
-    UCUNIT_CheckIsEqual( wake_times.tm_fri.tm_wday, 5);
-    UCUNIT_CheckIsEqual( wake_times.tm_fri.tm_hour, 13);
-    UCUNIT_CheckIsEqual( wake_times.tm_fri.tm_min, 14);
-    UCUNIT_CheckIsEqual( wake_times.tm_fri.tm_sec, 15);     
+    UCUNIT_CheckIsEqual(wake_times.tm_fri.tm_wday, 5);
+    UCUNIT_CheckIsEqual(wake_times.tm_fri.tm_hour, 13);
+    UCUNIT_CheckIsEqual(wake_times.tm_fri.tm_min, 14);
+    UCUNIT_CheckIsEqual(wake_times.tm_fri.tm_sec, 15);     
     // Sat
-    UCUNIT_CheckIsEqual( wake_times.tm_sat.tm_wday, 6);
-    UCUNIT_CheckIsEqual( wake_times.tm_sat.tm_hour, 16);
-    UCUNIT_CheckIsEqual( wake_times.tm_sat.tm_min, 17);
-    UCUNIT_CheckIsEqual( wake_times.tm_sat.tm_sec, 18);     
+    UCUNIT_CheckIsEqual(wake_times.tm_sat.tm_wday, 6);
+    UCUNIT_CheckIsEqual(wake_times.tm_sat.tm_hour, 16);
+    UCUNIT_CheckIsEqual(wake_times.tm_sat.tm_min, 17);
+    UCUNIT_CheckIsEqual(wake_times.tm_sat.tm_sec, 18);     
     // Sun
     // Also check upper bounds
-    UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_wday, 0);
-    UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_hour, 23);
-    UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_min, 59);
-    UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_sec, 59);
-
-    // For easier checking
-    //char formatted_times[128] = {0};
-    //UCUNIT_CheckIsEqual( write_wake_times_message(formatted_times, 128), 0 );
-    //printf("Wake times print:\n%s \n", formatted_times);
+    UCUNIT_CheckIsEqual(wake_times.tm_sun.tm_wday, 0);
+    UCUNIT_CheckIsEqual(wake_times.tm_sun.tm_hour, 23);
+    UCUNIT_CheckIsEqual(wake_times.tm_sun.tm_min, 59);
+    UCUNIT_CheckIsEqual(wake_times.tm_sun.tm_sec, 59);
     
     // Reset
     setup_time_keeper();   
+    
+    UCUNIT_TestcaseEnd();
 }
 
 static void Test_set_wake_invalid()
@@ -374,29 +394,31 @@ static void Test_set_wake_invalid()
     setup_time_keeper();
     
     // Invalid day
-    UCUNIT_CheckIsInRange( set_wake(0, 1, 2, 3), 1, UINT32_MAX);
-    UCUNIT_CheckIsInRange( set_wake(0x0080, 1, 2, 3), 1, UINT32_MAX);
+    UCUNIT_CheckIsInRange(set_wake(0, 1, 2, 3), 1, UINT32_MAX);
+    UCUNIT_CheckIsInRange(set_wake(0x0080, 1, 2, 3), 1, UINT32_MAX);
     
     // Invalid hour
-    UCUNIT_CheckIsInRange( set_wake(MON_T, 24, 2, 3), 1, UINT32_MAX);
-    UCUNIT_CheckIsInRange( set_wake(MON_T, -1, 2, 3), 1, UINT32_MAX);
+    UCUNIT_CheckIsInRange(set_wake(MON_T, 24, 2, 3), 1, UINT32_MAX);
+    UCUNIT_CheckIsInRange(set_wake(MON_T, -1, 2, 3), 1, UINT32_MAX);
     
     // Invalid minute
-    UCUNIT_CheckIsInRange( set_wake(MON_T, 1, 60, 3), 1, UINT32_MAX);
-    UCUNIT_CheckIsInRange( set_wake(MON_T, 1, -1, 3), 1, UINT32_MAX);
+    UCUNIT_CheckIsInRange(set_wake(MON_T, 1, 60, 3), 1, UINT32_MAX);
+    UCUNIT_CheckIsInRange(set_wake(MON_T, 1, -1, 3), 1, UINT32_MAX);
     
     // Invalid second
-    UCUNIT_CheckIsInRange( set_wake(MON_T, 1, 2, 60), 1, UINT32_MAX);
-    UCUNIT_CheckIsInRange( set_wake(MON_T, 1, 2, -1), 1, UINT32_MAX);
+    UCUNIT_CheckIsInRange(set_wake(MON_T, 1, 2, 60), 1, UINT32_MAX);
+    UCUNIT_CheckIsInRange(set_wake(MON_T, 1, 2, -1), 1, UINT32_MAX);
     
     // Check that monday times have not been changed due to invalid input.
-    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_wday, 1);
-    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_hour, DEFAULT_WEEK_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_min, 0);
-    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_sec, 0);
+    UCUNIT_CheckIsEqual(wake_times.tm_mon.tm_wday, 1);
+    UCUNIT_CheckIsEqual(wake_times.tm_mon.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_mon.tm_min, 0);
+    UCUNIT_CheckIsEqual(wake_times.tm_mon.tm_sec, 0);
     
     // Reset
-    setup_time_keeper();     
+    setup_time_keeper();    
+
+    UCUNIT_TestcaseEnd(); 
 }
 
 static void Test_set_wake_multiple_days()
@@ -407,16 +429,18 @@ static void Test_set_wake_multiple_days()
     
     set_wake(MON_T | TUE_T | SAT_T, 11, 2, 3);
     
-    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_hour, 11);
-    UCUNIT_CheckIsEqual( wake_times.tm_tue.tm_hour, 11);
-    UCUNIT_CheckIsEqual( wake_times.tm_wed.tm_hour, DEFAULT_WEEK_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_thu.tm_hour, DEFAULT_WEEK_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_fri.tm_hour, DEFAULT_WEEK_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_sat.tm_hour, 11);
-    UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_hour, DEFAULT_WEEKEND_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_mon.tm_hour, 11);
+    UCUNIT_CheckIsEqual(wake_times.tm_tue.tm_hour, 11);
+    UCUNIT_CheckIsEqual(wake_times.tm_wed.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_thu.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_fri.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_sat.tm_hour, 11);
+    UCUNIT_CheckIsEqual(wake_times.tm_sun.tm_hour, DEFAULT_WEEKEND_WAKE);
     
     // Reset
-    setup_time_keeper();    
+    setup_time_keeper();
+
+    UCUNIT_TestcaseEnd();  
 }
 
 static void Test_set_sleep_single_day()
@@ -427,18 +451,18 @@ static void Test_set_sleep_single_day()
      */
     setup_time_keeper();
     
-    UCUNIT_CheckIsEqual( sleep_times.tm_mon.tm_wday, 1);
-    UCUNIT_CheckIsEqual( sleep_times.tm_mon.tm_hour, DEFAULT_SLEEP);
-    UCUNIT_CheckIsEqual( sleep_times.tm_mon.tm_min, 0);
-    UCUNIT_CheckIsEqual( sleep_times.tm_mon.tm_sec, 0);
-    UCUNIT_CheckIsEqual( sleep_times.tm_sat.tm_wday, 6);
-    UCUNIT_CheckIsEqual( sleep_times.tm_sat.tm_hour, DEFAULT_SLEEP);
-    UCUNIT_CheckIsEqual( sleep_times.tm_sat.tm_min, 0);
-    UCUNIT_CheckIsEqual( sleep_times.tm_sat.tm_sec, 0);
-    UCUNIT_CheckIsEqual( sleep_times.tm_sun.tm_wday, 0);
-    UCUNIT_CheckIsEqual( sleep_times.tm_sun.tm_hour, DEFAULT_SLEEP);
-    UCUNIT_CheckIsEqual( sleep_times.tm_sun.tm_min, 0);
-    UCUNIT_CheckIsEqual( sleep_times.tm_sun.tm_sec, 0);
+    UCUNIT_CheckIsEqual(sleep_times.tm_mon.tm_wday, 1);
+    UCUNIT_CheckIsEqual(sleep_times.tm_mon.tm_hour, DEFAULT_SLEEP);
+    UCUNIT_CheckIsEqual(sleep_times.tm_mon.tm_min, 0);
+    UCUNIT_CheckIsEqual(sleep_times.tm_mon.tm_sec, 0);
+    UCUNIT_CheckIsEqual(sleep_times.tm_sat.tm_wday, 6);
+    UCUNIT_CheckIsEqual(sleep_times.tm_sat.tm_hour, DEFAULT_SLEEP);
+    UCUNIT_CheckIsEqual(sleep_times.tm_sat.tm_min, 0);
+    UCUNIT_CheckIsEqual(sleep_times.tm_sat.tm_sec, 0);
+    UCUNIT_CheckIsEqual(sleep_times.tm_sun.tm_wday, 0);
+    UCUNIT_CheckIsEqual(sleep_times.tm_sun.tm_hour, DEFAULT_SLEEP);
+    UCUNIT_CheckIsEqual(sleep_times.tm_sun.tm_min, 0);
+    UCUNIT_CheckIsEqual(sleep_times.tm_sun.tm_sec, 0);
     
     
     /*
@@ -448,13 +472,15 @@ static void Test_set_sleep_single_day()
     
     // Check whether times are set correctly
     // Mon
-    UCUNIT_CheckIsEqual( sleep_times.tm_mon.tm_wday, 1);
-    UCUNIT_CheckIsEqual( sleep_times.tm_mon.tm_hour, 11);
-    UCUNIT_CheckIsEqual( sleep_times.tm_mon.tm_min, 22);
-    UCUNIT_CheckIsEqual( sleep_times.tm_mon.tm_sec, 33);
+    UCUNIT_CheckIsEqual(sleep_times.tm_mon.tm_wday, 1);
+    UCUNIT_CheckIsEqual(sleep_times.tm_mon.tm_hour, 11);
+    UCUNIT_CheckIsEqual(sleep_times.tm_mon.tm_min, 22);
+    UCUNIT_CheckIsEqual(sleep_times.tm_mon.tm_sec, 33);
     
     // Reset
     setup_time_keeper();
+    
+    UCUNIT_TestcaseEnd();
 }
 
 static void Test_time_until_wake_today()
@@ -480,7 +506,7 @@ static void Test_time_until_wake_today()
                             NEW_MIN,
                             get_current_s());
         time_till_wake = time_until_wake();
-        UCUNIT_CheckIsInRange( time_till_wake, -TARGET_DIFF_SECS - 1, 
+        UCUNIT_CheckIsInRange(time_till_wake, -TARGET_DIFF_SECS - 1, 
                                                 -TARGET_DIFF_SECS + 1);
     }
     else
@@ -490,7 +516,7 @@ static void Test_time_until_wake_today()
                             NEW_MIN,
                             get_current_s());
         time_till_wake = time_until_wake();
-        UCUNIT_CheckIsInRange( time_till_wake, TARGET_DIFF_SECS - 1, 
+        UCUNIT_CheckIsInRange(time_till_wake, TARGET_DIFF_SECS - 1, 
                                                 TARGET_DIFF_SECS + 1);     
     }
     
@@ -498,6 +524,8 @@ static void Test_time_until_wake_today()
     
     // Reset
     setup_time_keeper();
+    
+    UCUNIT_TestcaseEnd();
 }
 
 static void Test_store_time()
@@ -513,14 +541,14 @@ static void Test_store_time()
     
     save_times();
     
-    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_hour, 7);
-    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_min, 7);
-    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_sec, 7);
+    UCUNIT_CheckIsEqual(wake_times.tm_mon.tm_hour, 7);
+    UCUNIT_CheckIsEqual(wake_times.tm_mon.tm_min, 7);
+    UCUNIT_CheckIsEqual(wake_times.tm_mon.tm_sec, 7);
     
     set_wake(MON_T | TUE_T | WED_T |THU_T | FRI_T | SAT_T | SUN_T, 3, 3, 3);
     set_sleep(MON_T | TUE_T | WED_T |THU_T | FRI_T | SAT_T | SUN_T, 4, 4, 4);
     
-    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_min, 3);
+    UCUNIT_CheckIsEqual(wake_times.tm_mon.tm_min, 3);
 
     // Check what has been set
     load_times();
@@ -532,20 +560,22 @@ static void Test_store_time()
     printf("sleep times %s \n\r", message_buf);
     */
 
-    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_hour, 7);
-    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_min, 7);
-    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_sec, 7);
+    UCUNIT_CheckIsEqual(wake_times.tm_mon.tm_hour, 7);
+    UCUNIT_CheckIsEqual(wake_times.tm_mon.tm_min, 7);
+    UCUNIT_CheckIsEqual(wake_times.tm_mon.tm_sec, 7);
     
-    UCUNIT_CheckIsEqual( wake_times.tm_fri.tm_hour, 9);
-    UCUNIT_CheckIsEqual( wake_times.tm_fri.tm_min, 9);
-    UCUNIT_CheckIsEqual( wake_times.tm_fri.tm_sec, 9);
+    UCUNIT_CheckIsEqual(wake_times.tm_fri.tm_hour, 9);
+    UCUNIT_CheckIsEqual(wake_times.tm_fri.tm_min, 9);
+    UCUNIT_CheckIsEqual(wake_times.tm_fri.tm_sec, 9);
 
-    UCUNIT_CheckIsEqual( sleep_times.tm_mon.tm_hour, 14);
-    UCUNIT_CheckIsEqual( sleep_times.tm_mon.tm_min, 15);
-    UCUNIT_CheckIsEqual( sleep_times.tm_mon.tm_sec, 16);
+    UCUNIT_CheckIsEqual(sleep_times.tm_mon.tm_hour, 14);
+    UCUNIT_CheckIsEqual(sleep_times.tm_mon.tm_min, 15);
+    UCUNIT_CheckIsEqual(sleep_times.tm_mon.tm_sec, 16);
 
     // Reset
     setup_time_keeper();
+    
+    UCUNIT_TestcaseEnd();
 }
 
 static void Test_write_times_message()
@@ -557,57 +587,59 @@ static void Test_write_times_message()
     char message[10] = {0};
     
     int status = format_time_to_str(message, 10, 1, 2, 3);
-    UCUNIT_CheckIsEqual( status, 0);
-    UCUNIT_CheckIsEqual( strcmp(message, "01:02:03"), 0);
+    UCUNIT_CheckIsEqual(status, 0);
+    UCUNIT_CheckIsEqual(strcmp(message, "01:02:03"), 0);
     
     memset(message, 0, 10);
     status = format_time_to_str(message, 10, 11, 22, 33);
-    UCUNIT_CheckIsEqual( status, 0);
-    UCUNIT_CheckIsEqual( strcmp(message, "11:22:33"), 0);
+    UCUNIT_CheckIsEqual(status, 0);
+    UCUNIT_CheckIsEqual(strcmp(message, "11:22:33"), 0);
     
     // Invalid stuff
     memset(message, 0, 10);
     status = format_time_to_str(message, 10, 110, 22, 33);
-    UCUNIT_CheckIsEqual( status, 1);
-    UCUNIT_CheckIsEqual( strcmp(message, "-1:-1:-1"), 0);
+    UCUNIT_CheckIsEqual(status, 1);
+    UCUNIT_CheckIsEqual(strcmp(message, "-1:-1:-1"), 0);
     memset(message, 0, 10);
     status = format_time_to_str(message, 10, 11, 220, 33);
-    UCUNIT_CheckIsEqual( status, 1);
-    UCUNIT_CheckIsEqual( strcmp(message, "-1:-1:-1"), 0);
+    UCUNIT_CheckIsEqual(status, 1);
+    UCUNIT_CheckIsEqual(strcmp(message, "-1:-1:-1"), 0);
     memset(message, 0, 10);
     status = format_time_to_str(message, 10, 11, 22, 330);
-    UCUNIT_CheckIsEqual( status, 1);
-    UCUNIT_CheckIsEqual( strcmp(message, "-1:-1:-1"), 0);
+    UCUNIT_CheckIsEqual(status, 1);
+    UCUNIT_CheckIsEqual(strcmp(message, "-1:-1:-1"), 0);
     memset(message, 0, 10);
     status = format_time_to_str(message, 10, -1, 22, 33);
-    UCUNIT_CheckIsEqual( status, 1);
-    UCUNIT_CheckIsEqual( strcmp(message, "-1:-1:-1"), 0);
+    UCUNIT_CheckIsEqual(status, 1);
+    UCUNIT_CheckIsEqual(strcmp(message, "-1:-1:-1"), 0);
     memset(message, 0, 10);
     status = format_time_to_str(message, 10, 11, -1, 33);
-    UCUNIT_CheckIsEqual( status, 1);
-    UCUNIT_CheckIsEqual( strcmp(message, "-1:-1:-1"), 0);
+    UCUNIT_CheckIsEqual(status, 1);
+    UCUNIT_CheckIsEqual(strcmp(message, "-1:-1:-1"), 0);
     memset(message, 0, 10);
     status = format_time_to_str(message, 10, 11, 22, -1);
-    UCUNIT_CheckIsEqual( status, 1);
-    UCUNIT_CheckIsEqual( strcmp(message, "-1:-1:-1"), 0);
+    UCUNIT_CheckIsEqual(status, 1);
+    UCUNIT_CheckIsEqual(strcmp(message, "-1:-1:-1"), 0);
     // No space
     memset(message, 0, 10);
     status = format_time_to_str(message, 3, 110, 22, 33);
-    UCUNIT_CheckIsEqual( status, 1);
-    UCUNIT_CheckIsEqual( strcmp(message, ""), 0);
+    UCUNIT_CheckIsEqual(status, 1);
+    UCUNIT_CheckIsEqual(strcmp(message, ""), 0);
     
     
     // Just visualize the actual formatted message in the console.
     // Check for success.
     char formatted_times[128] = {0};
-    UCUNIT_CheckIsEqual( write_wake_times_message(formatted_times, 128), 0 );
+    UCUNIT_CheckIsEqual(write_wake_times_message(formatted_times, 128), 0 );
     printf("Wake times print:\n%s \n", formatted_times);
     memset(formatted_times, 0, 128);
-    UCUNIT_CheckIsEqual( write_sleep_times_message(formatted_times, 128), 0);
+    UCUNIT_CheckIsEqual(write_sleep_times_message(formatted_times, 128), 0);
     printf("Sleep times print:\n%s \n", formatted_times);
     
     // Reset
     setup_time_keeper();
+    
+    UCUNIT_TestcaseEnd();
 }
 
 #ifdef RUN_TIME_INTENSIVE_TESTS
@@ -643,20 +675,22 @@ static void Test_ignore_wake_when_wake_before_sleep()
     // Check whether wake is ignored as expected.
     // Before wake
     set_ignore();
-    UCUNIT_CheckIsEqual( get_ignore(), 1 );
+    UCUNIT_CheckIsEqual(get_ignore(), 1 );
     update_ignore();
-    UCUNIT_CheckIsEqual( get_ignore(), 1 );
+    UCUNIT_CheckIsEqual(get_ignore(), 1 );
     // After wake
     sleep(3);
     update_ignore();
-    UCUNIT_CheckIsEqual( get_ignore(), 1 );
+    UCUNIT_CheckIsEqual(get_ignore(), 1 );
     // After sleep
     sleep(3);
     update_ignore();
-    UCUNIT_CheckIsEqual( get_ignore(), 0 );
+    UCUNIT_CheckIsEqual(get_ignore(), 0 );
     
     // Reset
-    setup_time_keeper();    
+    setup_time_keeper();
+    
+    UCUNIT_TestcaseEnd();
 }
 
 /*
@@ -692,23 +726,25 @@ static void Test_ignore_wake_when_wake_before_sleep_reset()
     // Check whether wake is ignored as expected.
     // Before wake
     set_ignore();
-    UCUNIT_CheckIsEqual( get_ignore(), 1 );
+    UCUNIT_CheckIsEqual(get_ignore(), 1 );
     update_ignore();
-    UCUNIT_CheckIsEqual( get_ignore(), 1 );
+    UCUNIT_CheckIsEqual(get_ignore(), 1 );
     // After wake
     sleep(3);
     update_ignore();
-    UCUNIT_CheckIsEqual( get_ignore(), 1 );
+    UCUNIT_CheckIsEqual(get_ignore(), 1 );
     unset_ignore();
     update_ignore();
-    UCUNIT_CheckIsEqual( get_ignore(), 0 );
+    UCUNIT_CheckIsEqual(get_ignore(), 0 );
     // After sleep
     sleep(3);
     update_ignore();
-    UCUNIT_CheckIsEqual( get_ignore(), 0 );
+    UCUNIT_CheckIsEqual(get_ignore(), 0 );
     
     // Reset
-    setup_time_keeper();    
+    setup_time_keeper();
+    
+    UCUNIT_TestcaseEnd();
 }
 
 /*
@@ -743,20 +779,22 @@ static void Test_ignore_wake_when_sleep_before_wake()
     // Check whether wake is ignored as expected.
     // Before sleep
     set_ignore();
-    UCUNIT_CheckIsEqual( get_ignore(), 1 );
+    UCUNIT_CheckIsEqual(get_ignore(), 1 );
     update_ignore();
-    UCUNIT_CheckIsEqual( get_ignore(), 1 );
+    UCUNIT_CheckIsEqual(get_ignore(), 1 );
     // After sleep
     sleep(3);
     update_ignore();
-    UCUNIT_CheckIsEqual( get_ignore(), 1 );
+    UCUNIT_CheckIsEqual(get_ignore(), 1 );
     // After wake
     sleep(3);
     update_ignore();
-    UCUNIT_CheckIsEqual( get_ignore(), 1 );
+    UCUNIT_CheckIsEqual(get_ignore(), 1 );
     
     // Reset
-    setup_time_keeper();    
+    setup_time_keeper();
+    
+    UCUNIT_TestcaseEnd();
 }
 #endif // RUN_TIME_INTENSIVE_TESTS
 #endif // TESTABLE_TK_CODE
@@ -778,14 +816,16 @@ static void Test_basic_open_close()
     target_steps = STEPS_TO_MAKE;
     
     // Check for successful init
-    UCUNIT_CheckIsEqual( 0, status );
+    UCUNIT_CheckIsEqual(status, 0);
     
     while(open_nonblocking());
-    UCUNIT_CheckIsEqual( target_steps, current_steps );
-    UCUNIT_CheckIsEqual( CURTAIN_OPEN_T, get_curtain_state() );
+    UCUNIT_CheckIsEqual(current_steps, target_steps);
+    UCUNIT_CheckIsEqual(get_curtain_state(), CURTAIN_OPEN_T);
     while(close_nonblocking());
-    UCUNIT_CheckIsEqual( 0, current_steps );
-    UCUNIT_CheckIsEqual( CURTAIN_CLOSED_T, get_curtain_state() );
+    UCUNIT_CheckIsEqual(current_steps, 0);
+    UCUNIT_CheckIsEqual(get_curtain_state(), CURTAIN_CLOSED_T);
+    
+    UCUNIT_TestcaseEnd();
 }
 
 static void Test_current_state()
@@ -793,17 +833,19 @@ static void Test_current_state()
     current_steps = 0;
     target_steps = 10;
     
-    UCUNIT_CheckIsEqual( CURTAIN_CLOSED_T, get_curtain_state() );
+    UCUNIT_CheckIsEqual(get_curtain_state(), CURTAIN_CLOSED_T);
     
     current_steps = 10;
-    UCUNIT_CheckIsEqual( CURTAIN_OPEN_T, get_curtain_state() );
+    UCUNIT_CheckIsEqual(get_curtain_state(), CURTAIN_OPEN_T);
     
     current_steps = 5;
-    UCUNIT_CheckIsEqual( CURTAIN_UNDEFINED_T, get_curtain_state() );
+    UCUNIT_CheckIsEqual(get_curtain_state(), CURTAIN_UNDEFINED_T);
     current_steps = -5;
-    UCUNIT_CheckIsEqual( CURTAIN_UNDEFINED_T, get_curtain_state() );
+    UCUNIT_CheckIsEqual(get_curtain_state(), CURTAIN_UNDEFINED_T);
     current_steps = 15;
-    UCUNIT_CheckIsEqual( CURTAIN_UNDEFINED_T, get_curtain_state() );
+    UCUNIT_CheckIsEqual(get_curtain_state(), CURTAIN_UNDEFINED_T);
+    
+    UCUNIT_TestcaseEnd();
 }
 
 // TODO Should the calibrate also be tested? requires hardware...
@@ -836,19 +878,21 @@ static void Test_basic_curtain_control_actions()
     target_steps = STEPS_TO_MAKE;
     
     // Check for successful init
-    UCUNIT_CheckIsEqual( 0, status );
+    UCUNIT_CheckIsEqual(status, 0);
     printf("Actual current %i \n", current_steps);
     
     while(execute_action_non_blocking(&open_act,
                                         message,
                                         MESSAGE_LEN));
-    UCUNIT_CheckIsEqual( target_steps, current_steps );
+    UCUNIT_CheckIsEqual(current_steps, target_steps);
     printf("Actual current %i \n", current_steps);
     while(execute_action_non_blocking(&close_act,
                                         message,
                                         MESSAGE_LEN));
-    UCUNIT_CheckIsEqual( 0, current_steps );
+    UCUNIT_CheckIsEqual(current_steps, 0);
     printf("Actual current %i \n", current_steps);
+    
+    UCUNIT_TestcaseEnd();
 }
 
 static void Test_basic_wake_actions()
@@ -874,16 +918,18 @@ static void Test_basic_wake_actions()
                                 
     printf("Message %s \n", message);
     
-    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_hour, 11);
-    UCUNIT_CheckIsEqual( wake_times.tm_tue.tm_hour, 11);
-    UCUNIT_CheckIsEqual( wake_times.tm_wed.tm_hour, DEFAULT_WEEK_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_thu.tm_hour, DEFAULT_WEEK_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_fri.tm_hour, DEFAULT_WEEK_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_sat.tm_hour, 11);
-    UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_hour, DEFAULT_WEEKEND_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_mon.tm_hour, 11);
+    UCUNIT_CheckIsEqual(wake_times.tm_tue.tm_hour, 11);
+    UCUNIT_CheckIsEqual(wake_times.tm_wed.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_thu.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_fri.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_sat.tm_hour, 11);
+    UCUNIT_CheckIsEqual(wake_times.tm_sun.tm_hour, DEFAULT_WEEKEND_WAKE);
     
     // Reset
     setup_time_keeper();
+    
+    UCUNIT_TestcaseEnd();
 }
 
 static void Test_invalid_time_in_wake_actions()
@@ -910,16 +956,18 @@ static void Test_invalid_time_in_wake_actions()
                                 
     printf("Message invalid wake: \n%s \n", message);
     
-    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_hour, DEFAULT_WEEK_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_tue.tm_hour, DEFAULT_WEEK_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_wed.tm_hour, DEFAULT_WEEK_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_thu.tm_hour, DEFAULT_WEEK_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_fri.tm_hour, DEFAULT_WEEK_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_sat.tm_hour, DEFAULT_WEEKEND_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_hour, DEFAULT_WEEKEND_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_mon.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_tue.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_wed.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_thu.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_fri.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_sat.tm_hour, DEFAULT_WEEKEND_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_sun.tm_hour, DEFAULT_WEEKEND_WAKE);
     
     // Reset
     setup_time_keeper();
+    
+    UCUNIT_TestcaseEnd();
 }
 
 static void Test_invalid_command_in_wake_actions()
@@ -947,16 +995,18 @@ static void Test_invalid_command_in_wake_actions()
                                 
     printf("Message invalid wake: \n%s \n", message);
     
-    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_hour, DEFAULT_WEEK_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_tue.tm_hour, DEFAULT_WEEK_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_wed.tm_hour, DEFAULT_WEEK_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_thu.tm_hour, DEFAULT_WEEK_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_fri.tm_hour, DEFAULT_WEEK_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_sat.tm_hour, DEFAULT_WEEKEND_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_hour, DEFAULT_WEEKEND_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_mon.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_tue.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_wed.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_thu.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_fri.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_sat.tm_hour, DEFAULT_WEEKEND_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_sun.tm_hour, DEFAULT_WEEKEND_WAKE);
     
     // Reset
     setup_time_keeper();
+    
+    UCUNIT_TestcaseEnd();
 }
 
 static void Test_parser_errors_in_wake_actions()
@@ -984,16 +1034,18 @@ static void Test_parser_errors_in_wake_actions()
                                 
     printf("Message invalid wake: \n%s \n", message);
     
-    UCUNIT_CheckIsEqual( wake_times.tm_mon.tm_hour, DEFAULT_WEEK_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_tue.tm_hour, DEFAULT_WEEK_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_wed.tm_hour, DEFAULT_WEEK_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_thu.tm_hour, DEFAULT_WEEK_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_fri.tm_hour, DEFAULT_WEEK_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_sat.tm_hour, DEFAULT_WEEKEND_WAKE);
-    UCUNIT_CheckIsEqual( wake_times.tm_sun.tm_hour, DEFAULT_WEEKEND_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_mon.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_tue.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_wed.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_thu.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_fri.tm_hour, DEFAULT_WEEK_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_sat.tm_hour, DEFAULT_WEEKEND_WAKE);
+    UCUNIT_CheckIsEqual(wake_times.tm_sun.tm_hour, DEFAULT_WEEKEND_WAKE);
     
     // Reset
     setup_time_keeper();
+    
+    UCUNIT_TestcaseEnd();
 }
 
 // TODO Maybe vary these checks a litte, make them harder.
@@ -1020,16 +1072,18 @@ static void Test_basic_sleep_actions()
                                 
     printf("Message %s \n", message);
     
-    UCUNIT_CheckIsEqual( sleep_times.tm_mon.tm_hour, DEFAULT_SLEEP);
-    UCUNIT_CheckIsEqual( sleep_times.tm_tue.tm_hour, DEFAULT_SLEEP);
-    UCUNIT_CheckIsEqual( sleep_times.tm_wed.tm_hour, 18);
-    UCUNIT_CheckIsEqual( sleep_times.tm_thu.tm_hour, 18);
-    UCUNIT_CheckIsEqual( sleep_times.tm_fri.tm_hour, 18);
-    UCUNIT_CheckIsEqual( sleep_times.tm_sat.tm_hour, DEFAULT_SLEEP);
-    UCUNIT_CheckIsEqual( sleep_times.tm_sun.tm_hour, 18);
+    UCUNIT_CheckIsEqual(sleep_times.tm_mon.tm_hour, DEFAULT_SLEEP);
+    UCUNIT_CheckIsEqual(sleep_times.tm_tue.tm_hour, DEFAULT_SLEEP);
+    UCUNIT_CheckIsEqual(sleep_times.tm_wed.tm_hour, 18);
+    UCUNIT_CheckIsEqual(sleep_times.tm_thu.tm_hour, 18);
+    UCUNIT_CheckIsEqual(sleep_times.tm_fri.tm_hour, 18);
+    UCUNIT_CheckIsEqual(sleep_times.tm_sat.tm_hour, DEFAULT_SLEEP);
+    UCUNIT_CheckIsEqual(sleep_times.tm_sun.tm_hour, 18);
     
     // Reset
     setup_time_keeper();
+    
+    UCUNIT_TestcaseEnd();
 }
 
 static void Test_other_actions()
@@ -1067,6 +1121,7 @@ static void Test_other_actions()
                                 
     printf("Curtime string: \n%s", message);
     
+    UCUNIT_TestcaseEnd();
 }
 #endif // TESTABLE_ACTION_EXEC
 
@@ -1086,18 +1141,20 @@ static void Test_new_state_ttw_tts_today()
      */
     
     // now |wake| ... |sleep| ...
-    UCUNIT_CheckIsEqual( CURTAIN_UNDEFINED_T, new_state_ttw_tts_today(5, 10));
+    UCUNIT_CheckIsEqual(new_state_ttw_tts_today(5, 10), CURTAIN_UNDEFINED_T);
     // ... |wake| now |sleep| ...
-    UCUNIT_CheckIsEqual( CURTAIN_OPEN_T, new_state_ttw_tts_today(-5, 5));
+    UCUNIT_CheckIsEqual(new_state_ttw_tts_today(-5, 5), CURTAIN_OPEN_T);
     // ... |wake| ... |sleep| now
-    UCUNIT_CheckIsEqual( CURTAIN_CLOSED_T, new_state_ttw_tts_today(-10, -5));
+    UCUNIT_CheckIsEqual(new_state_ttw_tts_today(-10, -5), CURTAIN_CLOSED_T);
     
     // now |sleep| ... |wake| ...
-    UCUNIT_CheckIsEqual( CURTAIN_UNDEFINED_T, new_state_ttw_tts_today(10, 5));
+    UCUNIT_CheckIsEqual(new_state_ttw_tts_today(10, 5), CURTAIN_UNDEFINED_T);
     // ... |sleep| now |wake| ...
-    UCUNIT_CheckIsEqual( CURTAIN_CLOSED_T, new_state_ttw_tts_today(5, -5));
+    UCUNIT_CheckIsEqual(new_state_ttw_tts_today(5, -5), CURTAIN_CLOSED_T);
     // ... |sleep| ... |wake| now
-    UCUNIT_CheckIsEqual( CURTAIN_OPEN_T, new_state_ttw_tts_today(-5, -10));
+    UCUNIT_CheckIsEqual(new_state_ttw_tts_today(-5, -10), CURTAIN_OPEN_T);
+    
+    UCUNIT_TestcaseEnd();
 }
 #endif // TESTABLE_ALARMCHECKER_CODE
 
@@ -1112,20 +1169,22 @@ static void Test_time_storage()
     
     uint8_t d, h, m, s;
     load_time(0, &d, &h, &m, &s );
-    UCUNIT_CheckIsEqual( 1, d );
-    UCUNIT_CheckIsEqual( 2, h );
-    UCUNIT_CheckIsEqual( 3, m );
-    UCUNIT_CheckIsEqual( 4, s );
+    UCUNIT_CheckIsEqual(d, 1);
+    UCUNIT_CheckIsEqual(h, 2);
+    UCUNIT_CheckIsEqual(m, 3);
+    UCUNIT_CheckIsEqual(s, 4);
     load_time(1, &d, &h, &m, &s );
-    UCUNIT_CheckIsEqual( 0, d );
-    UCUNIT_CheckIsEqual( 0, h );
-    UCUNIT_CheckIsEqual( 0, m );
-    UCUNIT_CheckIsEqual( 0, s );
+    UCUNIT_CheckIsEqual(d, 0);
+    UCUNIT_CheckIsEqual(h, 0);
+    UCUNIT_CheckIsEqual(m, 0);
+    UCUNIT_CheckIsEqual(s, 0);
     load_time(2, &d, &h, &m, &s );
-    UCUNIT_CheckIsEqual( 9, d );
-    UCUNIT_CheckIsEqual( 23, h );
-    UCUNIT_CheckIsEqual( 59, m );
-    UCUNIT_CheckIsEqual( 59, s );
+    UCUNIT_CheckIsEqual(d, 9);
+    UCUNIT_CheckIsEqual(h, 23);
+    UCUNIT_CheckIsEqual(m, 59);
+    UCUNIT_CheckIsEqual(s, 59);
+    
+    UCUNIT_TestcaseEnd();
 }
 
 static void Test_ssid_storage()
@@ -1138,8 +1197,10 @@ static void Test_ssid_storage()
     
     store_ssid(ssid1, strlen(ssid1));
     load_ssid(ssid2, 33, &test_len);
-    UCUNIT_CheckIsEqual( 0, strcmp(ssid1, ssid2) );
-    UCUNIT_CheckIsEqual( strlen(ssid1), test_len );
+    UCUNIT_CheckIsEqual(strcmp(ssid1, ssid2), 0);
+    UCUNIT_CheckIsEqual(strlen(ssid1), test_len);
+    
+    UCUNIT_TestcaseEnd();
 }
 
 static void Test_pw_storage()
@@ -1152,8 +1213,10 @@ static void Test_pw_storage()
     
     store_ssid(pw1, strlen(pw1));
     load_ssid(pw2, 33, &test_len);
-    UCUNIT_CheckIsEqual( 0, strcmp(pw1, pw2) );
-    UCUNIT_CheckIsEqual( strlen(pw1), test_len );
+    UCUNIT_CheckIsEqual(strcmp(pw1, pw2), 0);
+    UCUNIT_CheckIsEqual(strlen(pw1), test_len);
+    
+    UCUNIT_TestcaseEnd();
 }
 #endif // TESTABLE_STORAGE_CODE
 

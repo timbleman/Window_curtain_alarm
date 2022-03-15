@@ -1,7 +1,5 @@
-#include "time_keeper.h"
-
-
 /********************************** Includes **********************************/
+#include "time_keeper.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -333,7 +331,6 @@ int set_tm_per_wd(one_tm_per_wd *tmpwd, int wd, int h, int m, int s)
             
     // Set the time of the selected weekday
     struct tm *tm_to_set = get_wdtm(tmpwd, wd);
-    // TODO May uncomment.
     tm_to_set->tm_wday = wd;
     tm_to_set->tm_hour = h;
     tm_to_set->tm_min = m;

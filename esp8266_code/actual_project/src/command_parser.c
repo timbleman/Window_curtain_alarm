@@ -275,8 +275,7 @@ char *parse_arbitrary_arg(char **split_command, int command_num, char option)
 int parse_days(char **split_command, int command_num)
 {
     // TODO Replace by calloc and free, make size variable.
-    char *dvalue = "                                                     ";
-    //int errors = 0;
+    char *dvalue = NULL;
     
     dvalue = parse_arbitrary_arg(split_command, command_num, 'd');
     if (dvalue == NULL)
@@ -321,7 +320,7 @@ int parse_days(char **split_command, int command_num)
  */
 int parse_hour(char **split_command, int command_num)
 {
-    char *hvalue = "     ";
+    char *hvalue = NULL;
     //int index;
     //int c;
     
@@ -421,7 +420,7 @@ int parse_hour(char **split_command, int command_num)
  */
 int parse_min(char **split_command, int command_num)
 {
-    char *mvalue = "-\n";
+    char *mvalue = NULL;
     //int index;
     
     int errors = 0;
@@ -449,7 +448,7 @@ int parse_min(char **split_command, int command_num)
  */
 int parse_sec(char **split_command, int command_num)
 {
-    char *svalue = "-\n";
+    char *svalue = NULL;
     //int index;
     
     int errors = 0;

@@ -4,13 +4,12 @@
 #include "data_storage.h"
 #include "configuration.h"
 
+
 /********************************* Constants **********************************/
 #define STEPPER_ENABLE_PIN D1
 #define STEPPER_DIR_PIN D2
 #define PERFORM_STEP_PIN D5
 #define END_STOP_PIN D6
-
-#define CHECK_MICROS_OVERFLOW
 
 // Time in ms between steps. Controls the motor speed.
 // TODO In mm/s
@@ -163,7 +162,6 @@ int close_nonblocking()
         {
             rollback_necessary = false;
             disable_stepper();
-            // TODO Does this make sense?
             current_steps = 0;
         }
     }
@@ -295,7 +293,7 @@ int calibrate_nonblocking_rollback()
 /*
  * Returns the current state of the curtain.
  * Can be open, closed or undefined.
- * TODO Maybe add some sort of range?
+ * TODO Maybe add some sort of range in between?
  * 
  * @return: enum CURTAIN_STATE open, closed or undefined.
  */
@@ -383,13 +381,13 @@ void make_step_delay(int close)
  */
 int make_step_no_del(int close, int deltime)
 {
-    static unsigned long next_step_micros = 0;
+    static unsigned long last_step_micros = 0;
     static bool high_step = false; 
 
     int step_performed = 0;
 
     // Only act if the delay time has been reached
-    if (micros() >= next_step_micros)
+    if (micros() - last_step_micros >= (uint32_t)deltime)
     {
         // Write the direction pin
         if (close)
@@ -418,15 +416,7 @@ int make_step_no_del(int close, int deltime)
             step_performed = 1;
         }
 
-        // Calculate the next time step to act upon.
-        // TODO This can be solved in a smarter way...
-#ifdef CHECK_MICROS_OVERFLOW
-        // Leave approximately 1ms buffer in case of an overflow
-        next_step_micros = (micros() < 0xFFFFFFFFFFFFFFD0) ? 
-                            (micros() + deltime) : 0;
-#else
-        next_step_micros = micros() + DEL_TIME;
-#endif // CHECK_MICROS_OVERFLOW
+        last_step_micros = micros();
     }
 
     return step_performed;

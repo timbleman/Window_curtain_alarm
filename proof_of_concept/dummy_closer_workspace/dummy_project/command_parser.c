@@ -82,7 +82,7 @@ user_action_t get_action(char *user_str)
                             break;
         case SLEEP_SET_T:   new_act = get_time_action(argv, argc);
                             break;
-        case CURTAIN_CONTROL_T: new_act.data[0] = parse_open_close(user_str);
+        case CURTAIN_CONTROL_T: new_act.data[0] = parse_open_close(str_lower);
                                 break;
         default: break;
     }
@@ -274,8 +274,7 @@ char *parse_arbitrary_arg(char **split_command, int command_num, char option)
  */
 int parse_days(char **split_command, int command_num)
 {
-    // TODO Replace by calloc and free, make size variable.
-    char *dvalue = "                                                     ";
+    char *dvalue = NULL;
     //int errors = 0;
     
     dvalue = parse_arbitrary_arg(split_command, command_num, 'd');
@@ -308,6 +307,8 @@ int parse_days(char **split_command, int command_num)
         days = days | SAT_T | SUN_T;
         
     // TODO Find writing errors!
+    if (days == 0)
+        days |= INVALID_DAY_ERR;
         
     return days;
 }
@@ -321,7 +322,7 @@ int parse_days(char **split_command, int command_num)
  */
 int parse_hour(char **split_command, int command_num)
 {
-    char *hvalue = "     ";
+    char *hvalue = NULL;
     //int index;
     //int c;
     
@@ -421,8 +422,7 @@ int parse_hour(char **split_command, int command_num)
  */
 int parse_min(char **split_command, int command_num)
 {
-    char *mvalue = "-\n";
-    //int index;
+    char *mvalue = NULL;
     
     int errors = 0;
 
@@ -450,7 +450,6 @@ int parse_min(char **split_command, int command_num)
 int parse_sec(char **split_command, int command_num)
 {
     char *svalue = "-\n";
-    //int index;
     
     int errors = 0;
 

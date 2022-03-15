@@ -13,6 +13,9 @@
 int curtain_control_from_act(user_action_t *act,
                                 char *message,
                                 int message_max_len);
+int append_line_break(char *buf, int message_max_len);
+
+
 /**************************** Variable definitions ****************************/
 /**************************** Function definitions ****************************/
 /*
@@ -69,7 +72,7 @@ int execute_action_non_blocking(user_action_t *act,
                                 get_message_from_errors(internal_status, 
                                         &message[strlen(wake_err_str)], 
                                         (message_max_len - strlen(message)));
-                                // TODO append line break
+                                append_line_break(message, message_max_len);
                             }
                             else
                             {
@@ -102,7 +105,7 @@ int execute_action_non_blocking(user_action_t *act,
                                 get_message_from_errors(internal_status, 
                                         &message[strlen(wake_err_str)], 
                                         (message_max_len - strlen(message)));
-                                // TODO append line break
+                                append_line_break(message, message_max_len);
                             }
                             else
                             {
@@ -164,7 +167,9 @@ int curtain_control_from_act(user_action_t *act,
 {
     if (act->act_type != CURTAIN_CONTROL_T)
         return 1;
-    // TODO String bounds checking.
+    
+    if (message_max_len < 32)
+        return 1;
         
     int status = 0;
     // Check which curtain control should be performed.
@@ -205,4 +210,25 @@ int curtain_control_from_act(user_action_t *act,
     }
     
     return status;
+}
+
+/* 
+ * Adds a line break to a string if it fits.
+ * 
+ * @param buf: String location to copy into.
+ * @param message_max_len: Max string length.
+ * @return: Success status.
+ */
+int append_line_break(char *buf, int message_max_len)
+{
+    if (strlen(buf) < message_max_len - 3)
+    {
+        int str_pos = strlen(buf);
+        strcpy(&buf[str_pos], "\n\r");
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
 }

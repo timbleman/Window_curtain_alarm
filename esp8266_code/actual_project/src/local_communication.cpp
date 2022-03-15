@@ -4,7 +4,6 @@
 
 
 /********************************* Constants **********************************/
-// TODO Find a fitting pin
 #define BUTTON1_PIN D3
 #define LED_PIN D0
 
@@ -59,7 +58,6 @@ int get_local_input()
     static unsigned long rising_edge_millis = 0;
     static bool display_finished = false;
 
-    // TODO Verify if internal pullup is sufficient
     if (digitalRead(BUTTON1_PIN) == LOW)
     {
         if (rising_edge_millis == 0)
@@ -101,8 +99,6 @@ int get_local_input()
     {
         display_finished = !(bool)display_long_press();
     }
-
-    // TODO Check for millis() overflow?
 
     // Check if an input is available, only return success if display finished.
     if ((button1_long_press || button1_short_press) && display_finished)
@@ -158,9 +154,8 @@ void reset_button_state()
 }
 
 /*
- * Visualize, that a short press has been detected.
+ * Visualize that a short press has been detected.
  * TODO This can be pressed into a loop when using bit math:
- * TODO Should there be a check for millis() overflow?
  * 
  * @return: Success status.
  */ 
@@ -178,19 +173,19 @@ int display_short_press()
         state = 1;
     }
 
-    if (state == 1 && (millis() > (first_millis + SHORT_HOLD_MILLIS)))
+    if (state == 1 && (millis() - first_millis > (SHORT_HOLD_MILLIS)))
     {
         digitalWrite(LED_PIN, LOW);
         state = 2;
     }
 
-    if (state == 2 && (millis() > (first_millis + 2 * SHORT_HOLD_MILLIS)))
+    if (state == 2 && (millis() - first_millis > (2 * (SHORT_HOLD_MILLIS))))
     {
         digitalWrite(LED_PIN, HIGH);
         state = 3;
     }  
 
-    if (state == 3 && (millis() > (first_millis + 3 * SHORT_HOLD_MILLIS)))
+    if (state == 3 && (millis() - first_millis > (3 * (SHORT_HOLD_MILLIS))))
     {
         digitalWrite(LED_PIN, LOW);
         state = 0;
@@ -203,8 +198,7 @@ int display_short_press()
 }
 
 /*
- * Visualize, that a long press has been detected.
- * TODO Should there be a check for millis() overflow?
+ * Visualize that a long press has been detected.
  * 
  * @return: Success status.
  */
@@ -220,7 +214,7 @@ int display_long_press()
         status = 1;
     }
 
-    if (millis() > first_millis + LONG_HOLD_MILLIS)
+    if (millis() - first_millis > LONG_HOLD_MILLIS)
     {
         first_millis = 0;
         digitalWrite(LED_PIN, LOW);

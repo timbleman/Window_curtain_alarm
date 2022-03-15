@@ -3,8 +3,10 @@
 extern "C" {
 #endif
 
+// TODO Unit tests are not yet available for ESP as they do not fit in memory.
 #undef UNITTESTS_INSTEAD_OF_MAIN
 
+#ifdef UNITTESTS_INSTEAD_OF_MAIN
 #undef TESTABLE_TK_CODE
 #define TESTABLE_PARSER_CODE
 #undef TESTABLE_MOTOR_CODE
@@ -16,11 +18,12 @@ extern "C" {
 
 #define TESTABLE_ALARMCHECKER_CODE
 
-#ifndef UNITTESTS_INSTEAD_OF_MAIN
-#define PRINT_HEAP_STATS_EVERY_MILLIS 240000
 #endif // UNITTESTS_INSTEAD_OF_MAIN
 
-// Enable this if the system should continue without calibration after a reboot
+// Print heap fragmentation stats.
+#define PRINT_HEAP_STATS_EVERY_MILLIS 240000
+
+// Enable this if the system should continue without calibration after a reboot.
 #define RECOVER_AFTER_RESTART
 
 #ifdef __cplusplus
