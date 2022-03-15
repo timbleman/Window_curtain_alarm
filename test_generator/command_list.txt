@@ -1,0 +1,11 @@
+Paste these lines into a telnet client of your choice
+set_wake -d week,sat,sun -h 12 -m 1 
+set_sleep -d week,sat,sun -h 12 -m 2 
+set_wake -d week,sat,sun -h 12 -m 3 
+set_sleep -d week,sat,sun -h 12 -m 4 
+set_wake -d week,sat,sun -h 12 -m 5 
+set_sleep -d week,sat,sun -h 12 -m 6 
+set_wake -d week,sat,sun -h 12 -m 7 
+set_sleep -d week,sat,sun -h 12 -m 8 
+set_wake -d week,sat,sun -h 12 -m 9 
+set_sleep -d week,sat,sun -h 12 -m 10 
