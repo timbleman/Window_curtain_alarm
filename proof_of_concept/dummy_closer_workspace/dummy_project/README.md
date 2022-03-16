@@ -5,7 +5,8 @@
 This project serves as a quick prototype for a window curtain alarm.
 Basic functions are implemented and tested without the actual hardware:
 Parsing strings, setting, and keeping track of time will be fully implemented.
-The motor control and socket interaction will only be implemented as a dummy, as this is highly platform-dependent.
+New code should be tested at first in this project before being ported to a MCU.
+The motor control and socket interaction will only be implemented as a dummy, as these are highly platform-dependent.
 Extensive unit testing using the uCUnit framework should reduce the amount of debugging on the embedded platform.
 
 ## Files and contents

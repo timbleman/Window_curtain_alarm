@@ -2,7 +2,8 @@
 
 ## Basics
 This project aims at creating an alarm that opens and closes a window curtain at certain times each weekday. The system is connected to the local network and is configured using socket communication. The alarm operates independently, it does not require a hub or external control, wake and sleep times can be set for each weekday. An internet connection is required.
-![Rendering of the physical hardware](./pics/physical_mounting_rendering_1.PNG "Physical mounting")
+![Rendering of the physical hardware](./pics/physical_mounting_rendering_1.PNG "Hardware rendering.")
+![Installed hardware. Window can still be opened.](./pics/curtain_window_closed.jpg "Installed hardware. Window can still be opened.")
 
 ## Features
 ### Implemented features
@@ -18,6 +19,7 @@ This project aims at creating an alarm that opens and closes a window curtain at
 * Locally hosting a website for more comfortable interaction
 * Different end stop locations
 * Using more advanced features of the TMC2209 stepper driver (e.g.: sensorless homing)
+* Sync multiple curtains 
 ### Intentional limitations
 * Only accessible in the local network
 * No secure communication
@@ -27,6 +29,7 @@ This project aims at creating an alarm that opens and closes a window curtain at
 ### Setup
 Install the system according to the readme in /3D_objects/. Adjust the SSID in the code, compile and upload.
 Connect a 5V 2A power supply. Assign a static IP using your router. You will need this IP to configure the system.
+The IP is also printed using VCP with 9600 baud at power-up.
 ### Basic controls
 Currently, this alarm is configured using the telnet protocol. Connect using the IP and port 23 with a client of your choice.
 Sending "help" gets a list of example commands.  
@@ -47,19 +50,19 @@ You can XOR the curtainstate by short pressing the hardware button, long pressin
 Here are some directories that may contain interesting files:
 * /3D_objects/: 3D-printable objects and installation instructions.
 * /course_python_draft/: This quick python prototype aims at visualizing the core concepts and ideas of the project. Untested.
-* /curtain_wiring/: A KiCad project for the wiring diagram. No PCB design yet.
+* /curtain_wiring/: A KiCad project for the wiring diagram and PCB design.
 * /esp8266_code/actual_project/: The unit tested proof of concept code ported to ESP8266.
 * /esp8266_code/test_stuff/: Some quick projects testing basic functionality using the ESP8266.
 	* /esp8266_code/test_stuff/socket_test/: TCP socket server test project for the ESP8266.
 	* /esp8266_code/test_stuff/motor_test/: Homing and moving using the TMC2209 driver.
 * /proof_of_concept/: Unit tested project implementing generic components. This project does not strictly target embedded hardware for ease of building and debugging.
 * /pics/: Some pictures and renderings.
-* /public/: A website that is able to configure the alarm.
+* /public/: A website that is able to configure the alarm. Currently on halt.
 
 
 ## Implementation
 ### Hardware
-Opening and closing the curtain shall be done using a belt driven by a stepper motor. A NEMA17 stepper in combination with a TMC2209 driver is currently used. The target platform is the ESP8266. This microcontroller has been chosen instead of a Raspberry PI due to lower cost and power consumption. 
+Opening and closing the curtain shall be done using a belt-driven by a stepper motor. A NEMA17 stepper in combination with a TMC2209 driver is currently used. The target platform is the ESP8266. This microcontroller has been chosen instead of a Raspberry PI due to lower cost and power consumption. 
 ### Mounting
 The hardware, including especially the motor, belt, and end stop, will be mounted using 3D printed objects. Currently, the project is not intended as a 'one design fits all' solution, but will need to be adapted to the used curtain and window.
 ### Programming language and environment
