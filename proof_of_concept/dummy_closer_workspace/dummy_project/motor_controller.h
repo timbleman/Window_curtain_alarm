@@ -1,9 +1,15 @@
+/*
+ * The motor controller is responsible for openening and closing the curtain.
+ * The implementation is highly hardware specific and needs to be adjusted.
+ */
+
 #ifndef _MOTOR_CONTROLLER_H_
 #define _MOTOR_CONTROLLER_H_
 
 /********************************** Includes **********************************/
 #include <stdint.h>
 #include "configuration.h"
+
 
 /********************************* Constants **********************************/
 enum CURTAIN_STATE

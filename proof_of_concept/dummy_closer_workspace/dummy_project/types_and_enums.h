@@ -1,3 +1,7 @@
+/*
+ * Project wide used types and enums are defined in this file.
+ */
+
 #ifndef _TYPES_AND_ENUMS_H_
 #define _TYPES_AND_ENUMS_H_
 

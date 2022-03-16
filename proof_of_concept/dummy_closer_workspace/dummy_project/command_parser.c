@@ -12,10 +12,15 @@
 
 
 /********************************* Constants *********************************/
-#define MAX_DAYS_PATTERNS 12
+/*
+ * Remember to adjust these if you decide to add more patterns.
+ * These constants are used to reserve enough memory, as I try hard to avoid
+ * dynamic allocation on embedded platforms.
+ */
+#define MAX_DAYS_PATTERNS 10
 #define DAY_PATTERN_MAX_LEN 8
 
-#define MAX_ACTS_PATTERNS 16
+#define MAX_ACTS_PATTERNS 14
 #define ACT_PATTERN_MAX_LEN 16
 
 
@@ -69,14 +74,23 @@ uint16_t acts_to_match_num = 0;
 
 
 /**************************** Function definitions ****************************/
+/*
+ * Setup the command parser.
+ * Some patterns are initialized at runtime.
+ * Memory is reset upon initializing.
+ * 
+ * @return: Success status.
+ */
 int setup_command_parser()
 {
     int status = 0;
     
     memset(days_to_match, 0, (MAX_DAYS_PATTERNS) * sizeof(day_match_t));
+    days_to_match_num = 0;
     setup_days_to_match();
     
     memset(acts_to_match, 0, (MAX_ACTS_PATTERNS) * sizeof(act_match_t));
+    acts_to_match_num = 0;
     setup_acts_to_match();
     
     return status;
@@ -356,6 +370,7 @@ int add_pattern(const char *match, enum DAY_TYPE dayt)
 void setup_days_to_match()
 {
     days_to_match_num = 0;
+    
     add_pattern("mon,", MON_T);
     add_pattern("tue", TUE_T);
     add_pattern("wed", WED_T);
@@ -537,7 +552,7 @@ uint32_t check_mins_secs_validity(int m_s_int, char *m_s_str)
             ((strcmp(m_s_str, "0") != 0) && (strcmp(m_s_str, "00") != 0)))
     {
 #ifdef PARSE_TIME_DEBUG_PRINTS
-        printf("Invalid, lol \n");
+        printf("Invalid m/s \n");
 #endif // PARSE_TIME_DEBUG_PRINTS
         errors |= INVALID_TIME_ERR;
     }
@@ -545,7 +560,7 @@ uint32_t check_mins_secs_validity(int m_s_int, char *m_s_str)
     if ((m_s_int < 0) || (m_s_int > 59))
     {
 #ifdef PARSE_TIME_DEBUG_PRINTS
-        printf("Out of range, lol \n");
+        printf("Out of range m/s \n");
 #endif // PARSE_TIME_DEBUG_PRINTS
         errors |= INVALID_TIME_ERR;
     }

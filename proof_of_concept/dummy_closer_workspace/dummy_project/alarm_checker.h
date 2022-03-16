@@ -1,3 +1,9 @@
+/*
+ * The alarm checker needs to called in a loop.
+ * It checks, whether the curtain should be open and closed based on the
+ * wake/sleep times saved by the time keeper.
+ */
+
 #ifndef _ALARM_CHECKER_H_
 #define _ALARM_CHECKER_H_
 
