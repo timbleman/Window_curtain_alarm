@@ -27,12 +27,20 @@ extern "C" {
 
 #define BASIC_DEBUG_PRINTS
 #undef PARSE_TIME_DEBUG_PRINTS
-#define PARSE_ACTION_DEBUG_PRINTS
+#undef PARSE_ACTION_DEBUG_PRINTS
 
 
 /***************************** Struct definitions *****************************/
 /**************************** Variable definitions ****************************/
 /**************************** Prototype functions *****************************/
+/*
+ * Setup the command parser.
+ * Some patterns are initialized at runtime.
+ * 
+ * @return: Success status.
+ */
+int setup_command_parser();
+
 /*
  * This function returns a user_action_t. 
  * Pass by value with copying is used, should not be a problem for this small

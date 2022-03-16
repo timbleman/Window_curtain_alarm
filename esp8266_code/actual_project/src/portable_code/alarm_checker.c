@@ -33,19 +33,12 @@ int check_and_alarm_non_blocking()
     enum CURTAIN_STATE new_state = new_state_ttw_tts_today(time_until_wake(), 
                                                         time_until_sleep());
 
-    /*
-     * FIXME This switch case is probably wrong...
-     * Should one be checking for the current state? 
-     */
     int status = 0;
     if (new_state != old_state)
     {
         switch(new_state)
         {
-            case CURTAIN_OPEN_T:    // FIXME If ignore, 1 is returned. This means 
-                                    // still working.
-                                    // If ignore is unset, the curtain should open.
-                                    if (!get_ignore())
+            case CURTAIN_OPEN_T:    if (!get_ignore())
                                         status =  open_nonblocking();
                                     else
                                         status =  1;
@@ -55,7 +48,6 @@ int check_and_alarm_non_blocking()
             case CURTAIN_UNDEFINED_T:   break;
             default:    break;
         }
-        //printf("old vs new state: %i vs %i\n\r", old_state, new_state);
     }
 
     if (status == 0)

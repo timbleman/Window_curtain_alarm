@@ -23,10 +23,11 @@
 /********************************* Constants **********************************/
 // Adjust these
 // TODO This should be done using WPS.
-const char* def_ssid = "It hurts when IP";
-const char* def_password =  "SagIchDirNicht!";
+const char* def_ssid = "YourSSID";
+const char* def_password =  "************";
 #define SSID_MAX_LEN 33
  
+
 /***************************** Struct definitions *****************************/
 /**************************** Prototype functions *****************************/
 /**************************** Variable definitions ****************************/
@@ -72,6 +73,8 @@ void setup() {
     printf("Loaded SSID and password from the EEPROM.\n\r");
   }
   printf("Using ssid '%s'\n\r", ssid);
+
+  setup_command_parser();
 
   setup_motor_control();
 
