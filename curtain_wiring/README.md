@@ -6,7 +6,7 @@ This directory contains a wiring diagram and a PCB design. Created using KiCad.
 This wiring diagram is also present as a PDF. Please refer to the document for needed components. 
 Low noise power supplies are expected, if the input voltage is noisy you may need to add some components.
 
-<img src="../pics/wiring_screenshot.png" width="400" />
+<img src="../pics/wiring_screenshot_upscaled.png" width="400" />
 
 
 ## PCB
