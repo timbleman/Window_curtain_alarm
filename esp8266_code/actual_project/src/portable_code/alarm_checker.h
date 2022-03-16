@@ -1,3 +1,9 @@
+/*
+ * The alarm checker needs to called in a loop.
+ * It checks, whether the curtain should be open and closed based on the
+ * wake/sleep times saved by the time keeper.
+ */
+
 #ifndef _ALARM_CHECKER_H_
 #define _ALARM_CHECKER_H_
 
@@ -10,7 +16,7 @@ extern "C" {
 #include "hardware_specific_code/motor_controller.h"
 #include "configuration.h"
 #include "types_and_enums.h"
-//#include "time_keeper.h"
+
 
 /********************************* Constants **********************************/
 /***************************** Struct definitions *****************************/

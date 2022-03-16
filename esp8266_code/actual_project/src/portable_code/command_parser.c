@@ -12,11 +12,7 @@
 
 
 /********************************* Constants *********************************/
-
-
 /***************************** Struct definitions *****************************/
-
-
 /**************************** Prototype functions ****************************/
 char *parse_arbitrary_arg(char **split_command, int command_num, char option);
 void replace_last_return_by_space(char *buf);

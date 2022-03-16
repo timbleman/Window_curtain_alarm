@@ -1,3 +1,13 @@
+/*
+ * The command parser is used to turn a user input string into an executable
+ * user_action_t. 
+ * User readable strings can be created from error code.
+ * Setup has to be run for some matching patterns to be initialized.
+ * 
+ * If you want to add new day or action patters you have to extend the .c file.
+ * Remeber to increase memory parameters if you want to fit more patters.
+ */
+
 #ifndef _COMMAND_PARSER_H_
 #define _COMMAND_PARSER_H_
 
@@ -10,6 +20,7 @@ extern "C" {
 #include "configuration.h"
 #include "types_and_enums.h"
 
+
 /********************************* Constants *********************************/
 #define MAX_USER_INPUT_LEN 64
 #define CONVERT_USER_IN_TO_LOWER
@@ -18,10 +29,10 @@ extern "C" {
 #undef PARSE_TIME_DEBUG_PRINTS
 #define PARSE_ACTION_DEBUG_PRINTS
 
+
 /***************************** Struct definitions *****************************/
 /**************************** Variable definitions ****************************/
 /**************************** Prototype functions *****************************/
-
 /*
  * This function returns a user_action_t. 
  * Pass by value with copying is used, should not be a problem for this small

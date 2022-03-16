@@ -1,3 +1,8 @@
+/*
+ * The action executer runs a user_action_t. It interacts with the time keeper
+ * and the motor controller.
+ */
+
 #ifndef _ACTION_EXECUTER_H_
 #define _ACTION_EXECUTER_H_
 
@@ -9,6 +14,7 @@ extern "C" {
 #include <stdint.h>
 #include "types_and_enums.h"
 #include "configuration.h"
+
 
 /********************************* Constants **********************************/
 /***************************** Struct definitions *****************************/

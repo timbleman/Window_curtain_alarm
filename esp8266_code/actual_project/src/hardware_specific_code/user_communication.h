@@ -1,3 +1,8 @@
+/* 
+ * Receive user input strings.
+ * Respond to a user.
+ */
+
 #ifndef _USER_COMMUNICATION_H_
 #define _USER_COMMUNICATION_H_
 

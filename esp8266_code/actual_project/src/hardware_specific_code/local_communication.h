@@ -1,3 +1,7 @@
+/* 
+ * Local communication using a button and an LED.
+ */
+
 #ifndef _USER_COMM_H_
 #define _USER_COMM_H_
 

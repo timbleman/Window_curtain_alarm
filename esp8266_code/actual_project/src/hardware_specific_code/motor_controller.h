@@ -1,3 +1,8 @@
+/*
+ * The motor controller is responsible for openening and closing the curtain.
+ * The implementation is highly hardware specific and needs to be adjusted.
+ */
+
 #ifndef _MOTOR_CONTROLLER_H_
 #define _MOTOR_CONTROLLER_H_
 
@@ -10,7 +15,6 @@ extern "C" {
 // Debugging prints to activate/deactivate
 #define MOTOR_PRINTS
 #undef PRINTS_AT_EACH_STEP
-
 
 /*
  * TODO Configure these.

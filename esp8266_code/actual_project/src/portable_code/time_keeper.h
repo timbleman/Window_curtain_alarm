@@ -1,3 +1,9 @@
+/*
+ * The time keeper keeps track of the current time and sleep and wake times.
+ * To be able to achieve multiple sleep/wake times a day, a major refactoring
+ * would be required.
+ */
+
 #ifndef _TIME_KEEPER_H_
 #define _TIME_KEEPER_H_
 
@@ -39,6 +45,7 @@ typedef struct {
 one_tm_per_wd wake_times;
 one_tm_per_wd sleep_times;
 #endif // TESTABLE_TK_CODE
+
 
 /**************************** Prototype functions ****************************/
 /*

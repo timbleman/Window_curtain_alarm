@@ -1,9 +1,13 @@
+/*
+ * This file is used to configure the project build.
+ */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 // TODO Unit tests are not yet available for ESP as they do not fit in memory.
+// Run the proof_of_concept if you want to check if new code passes tests.
 #undef UNITTESTS_INSTEAD_OF_MAIN
 
 #ifdef UNITTESTS_INSTEAD_OF_MAIN

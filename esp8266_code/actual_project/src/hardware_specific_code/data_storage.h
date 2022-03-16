@@ -1,3 +1,8 @@
+/*
+ * Data storage saves data that needs to be persistent.
+ * The implementation is highly hardware specific and needs to be adjusted.
+ */
+
 #ifndef _DATA_STORAGE_H_
 #define _DATA_STORAGE_H_
 
@@ -12,8 +17,6 @@ extern "C" {
 /********************************* Constants **********************************/
 /***************************** Struct definitions *****************************/
 /**************************** Variable definitions ****************************/
-
-
 /**************************** Prototype functions *****************************/
 /*
  * Sets up the eeprom.
