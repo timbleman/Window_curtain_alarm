@@ -371,7 +371,7 @@ void setup_days_to_match()
 {
     days_to_match_num = 0;
     
-    add_pattern("mon,", MON_T);
+    add_pattern("mon", MON_T);
     add_pattern("tue", TUE_T);
     add_pattern("wed", WED_T);
     add_pattern("thu", THU_T);

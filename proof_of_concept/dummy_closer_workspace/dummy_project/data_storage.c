@@ -12,9 +12,8 @@
 #define TIMES_EEPROM_OFFSET 96
 #define TIMES_EL_SIZE (sizeof(uint8_t) * 4)
 
+
 /***************************** Struct definitions *****************************/
-
-
 /**************************** Prototype functions *****************************/
 void dummy_eeprom_put(int const address, uint8_t const val);
 uint8_t dummy_eeprom_read(int const address);
