@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name = "viewport" content = "width = device-width, initial-scale = 1.0, maximum-scale = 1.0, user-scalable=0">
+<title>Window curtain alarm</title>
+<style>
+"body { background-color: #808080; font-family: Arial, Helvetica, Sans-Serif; Color: #000000; }"
+</style>
+
+<script>
+var websock;
+var recv_str;
+
+function start() {
+  /*
+	websock = new WebSocket('ws://' + window.location.hostname + ':81/');
+	websock.onopen = function(evt) { console.log('websock open'); };
+	websock.onclose = function(evt) { console.log('websock close'); };
+	websock.onerror = function(evt) { console.log(evt); };
+	websock.onmessage = function(evt) {
+		console.log(evt);
+		recv_str = evt;
+	};
+  */
+  
+  update_wake();
+}
+
+function dummy_websock(wstr) {
+  console.log(wstr);
+}
+
+function set_new_time() {
+	set_time_str = document.getElementById('set_field').textContent;
+	
+	set_time_str += ' -d ';
+	set_time_str += get_day_str();
+	
+	set_time_str += ' -h ';
+	set_time_str += document.getElementById('hours').value;
+	
+	set_time_str += ' -m ';
+	set_time_str += document.getElementById('mins').value;
+	
+	set_time_str += ' -s ';
+	set_time_str += document.getElementById('secs').value;
+	
+	dummy_websock(set_time_str);
+}
+
+function get_day_str() {
+	// Maybe you can get these from the fieldset
+	day_labels = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+	
+	day_str = "";
+	
+	// forEach is not recommended?
+	for (var i = 0; i < day_labels.length; i++) {
+		if (document.getElementById(day_labels[i]).checked == true) {
+			day_str += day_labels[i] + ',';
+		}
+	}
+	
+	console.log(day_str);
+	return day_str;
+}
+
+function update_wake() {
+	document.getElementById('set_wake_button').style.background = 'red';
+	document.getElementById('set_sleep_button').style.background = '#D0D0D0';
+	
+	document.getElementById('set_field').textContent = "set_wake";
+	
+	// Here you have to fetch current data
+	document.getElementById('wake_sleep_text').textContent = "waketimes \n\rdummy text";
+}
+
+function update_sleep() {
+	document.getElementById('set_wake_button').style.background = '#D0D0D0';
+	document.getElementById('set_sleep_button').style.background = 'red';
+	
+	document.getElementById('set_field').textContent = "set_sleep";
+	
+	// Here you have to fetch current data
+	text_field = document.getElementById('wake_sleep_text');
+	text_field.textContent = "sleeptimes \n\rdummy text";
+}
+
+function buttonclick(e) {
+	//websock.send(e.id);
+	if (e.id === 'set_wake_button') {
+		update_wake();
+	} else if (e.id === 'set_sleep_button') {
+		update_sleep();
+	} else if (e.id === 'set_time_button') {
+		set_new_time();
+	} else {
+		// Else send the id back
+		dummy_websock(e.id);
+	}
+}
+</script>
+
+</head>
+<body onload="javascript:start();">
+<h1 style="text-align: center;">Window curtain alarm</h1>
+
+<table style="margin: 0px auto;">
+	<tbody>
+		<tr>
+			<td>&nbsp;</td>
+			<td><button id="ignore"  type="button" onclick="buttonclick(this);">Ignore</button> </td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td><button id="open"  type="button" onclick="buttonclick(this);">Open</button> </td>
+			<td><button id="curtainxor"  type="button" onclick="buttonclick(this);">Xor</button> </td>
+			<td><button id="close"  type="button" onclick="buttonclick(this);">Close</button> </td>
+		</tr>
+		<tr>		
+			<td>&nbsp;</td>
+			<td><button id="calibrate"  type="button" onclick="buttonclick(this);">Calibrate</button> </td>
+			<td>&nbsp;</td>
+		</tr>
+	</tbody>
+</table>
+
+<!-- TODO Make responsive using containers? -->
+<!-- border: 1px: create line, border-collapse: collapse: Inner lines are not doubled -->
+<!-- margin: 0px auto: centering the whole table, width:60%: Not full width of the screen -->
+<table style="border: 1px solid black; border-collapse: collapse; margin: 0px auto; width:60%;">
+	<tbody>
+		<tr style="border: 1px solid black; border-collapse: collapse;">
+			<td>
+				<button id="set_wake_button" type="button" onclick="buttonclick(this);">set_wake</button>
+				<button id="set_sleep_button"  type="button" onclick="buttonclick(this);">set_sleep</button>
+			</td>
+		</tr>
+		<tr style="border: 1px solid black; border-collapse: collapse;">
+			<td>
+				<p id="wake_sleep_text" style="margin: 0px auto; white-space: pre;"></p>
+			</td>
+		</tr>
+		<tr style="border: 1px solid black; border-collapse: collapse;">
+			<td>
+				<div style="display: flex; justify-content: space-between;">
+					<p id = "set_field">s</p>
+					<p>-d</p>
+					<fieldset>
+						<div>
+							<input type="checkbox" id="mon" name="mon" value="mon">
+							<label for="mon">mon</label>
+						</div>
+						<div>
+							<input type="checkbox" id="tue" name="tue" value="tue">
+							<label for="tue">tue</label>
+						</div>
+						<div>
+							<input type="checkbox" id="wed" name="wed" value="wed">
+							<label for="wed">wed</label>
+						</div>
+						<div>
+							<input type="checkbox" id="thu" name="thu" value="thu">
+							<label for="thu">thu</label>
+						</div>
+						<div>
+							<input type="checkbox" id="fri" name="fri" value="fri">
+							<label for="fri">fri</label>
+						</div>
+						<div>
+							<input type="checkbox" id="sat" name="sat" value="sat">
+							<label for="sat">sat</label>
+						</div>
+						<div>
+							<input type="checkbox" id="sun" name="sun" value="sun">
+							<label for="music">sun</label>
+						</div>
+					</fieldset>
+					<p>-h</p>
+					<input max="23" min="0" id="hours" name="hours" step="1" type="number" value="18" />
+					<p>-m</p>
+					<input max="59" min="0" id="mins" name="mins" step="1" type="number" value="18" />
+					<p>-s</p>
+					<input max="59" min="0" id="secs" name="secs" step="1" type="number" value="0" />
+					<button id="set_time_button"  type="button" onclick="buttonclick(this);">Set!</button>
+				</div>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+</body>
+</html>
