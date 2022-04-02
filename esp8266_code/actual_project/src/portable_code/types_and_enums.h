@@ -10,6 +10,13 @@ extern "C" {
 #endif
 
 /********************************** Includes **********************************/
+#include <stdint.h>
+
+
+/********************************** Defines ***********************************/
+#define TAG_LEN 16
+
+
 /********************************* Constants **********************************/
 enum TIME_ERRORS
 {
@@ -61,6 +68,16 @@ typedef struct
     enum ACTION_TYPE act_type;
     uint32_t data[5];
 } user_action_t;
+
+typedef struct
+{
+    char tag[TAG_LEN];
+    int (*setup)();
+    int (*input_available)();
+    user_action_t (*fetch_action)();
+    int (*respond_to_user)(char *buf, int buf_max_len);
+} input_handler_t;
+
 
 #ifdef __cplusplus
 }

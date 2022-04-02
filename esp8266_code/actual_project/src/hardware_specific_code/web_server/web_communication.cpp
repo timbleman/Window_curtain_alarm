@@ -88,6 +88,23 @@ bool data_available = false;
 
 
 /**************************** Function definitions ***************************/
+/* 
+ * Setup an input_handler_t. Better way to handle multiple input sources.
+ * 
+ * @param inh: An input_handler_t to initialize.
+ * @retval: Success status.
+ */
+int setup_web_input_handler_t(input_handler_t *inh)
+{
+    inh->setup = setup_web_comm;
+    inh->input_available = get_web_in;
+    inh->fetch_action = fetch_web_action;
+    inh->respond_to_user = respond_to_web_user;
+    strncpy(inh->tag, "web", TAG_LEN);
+
+    return inh->setup();
+}
+
 void handleRoot()
 {
   server.send_P(200, "text/html", INDEX_HTML);
@@ -108,56 +125,6 @@ void handleNotFound()
   }
   server.send(404, "text/plain", message);
 }
-
-/*
-void webSocketEvent1(uint8_t num, WStype_t type, uint8_t * payload, size_t length)
-{
-  Serial.printf("webSocketEvent(%d, %d, ...)\r\n", num, type);
-  switch(type) {
-    case WStype_DISCONNECTED:
-      Serial.printf("[%u] Disconnected!\r\n", num);
-      break;
-    case WStype_CONNECTED:
-      {
-        IPAddress ip = webSocket.remoteIP(num);
-        Serial.printf("[%u] Connected from %d.%d.%d.%d url: %s\r\n", num, ip[0], ip[1], ip[2], ip[3], payload);
-        // Send the current LED status
-        if (LEDStatus) {
-          webSocket.sendTXT(num, LEDON, strlen(LEDON));
-        }
-        else {
-          webSocket.sendTXT(num, LEDOFF, strlen(LEDOFF));
-        }
-      }
-      break;
-    case WStype_TEXT:
-      Serial.printf("[%u] get Text: %s\r\n", num, payload);
-
-      if (strcmp(LEDON, (const char *)payload) == 0) {
-        writeLED(true);
-      }
-      else if (strcmp(LEDOFF, (const char *)payload) == 0) {
-        writeLED(false);
-      }
-      else {
-        Serial.println("Unknown command");
-      }
-      // send data to all connected clients
-      webSocket.broadcastTXT(payload, length);
-      break;
-    case WStype_BIN:
-      Serial.printf("[%u] get binary length: %u\r\n", num, length);
-      hexdump(payload, length);
-
-      // echo data back to browser
-      webSocket.sendBIN(num, payload, length);
-      break;
-    default:
-      Serial.printf("Invalid WStype [%d]\r\n", type);
-      break;
-  }
-}
-*/
 
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length)
 {

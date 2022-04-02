@@ -11,6 +11,7 @@
 #include "portable_code/command_parser.h"
 #include "hardware_specific_code/data_storage.h"
 #include "hardware_specific_code/local_communication.h"
+#include "hardware_specific_code/web_server/web_communication.h"
 #include "hardware_specific_code/motor_controller.h"
 #include "portable_code/time_keeper.h"
 #include "portable_code/types_and_enums.h"
@@ -21,11 +22,18 @@
 
 
 /********************************* Constants **********************************/
+#define RESPOND_BUF_SIZE 256
+#define SSID_MAX_LEN 33
+#define NUM_INPUTS 3
+
+
+/********************************* Constants **********************************/
 // Adjust these
 // TODO This should be done using WPS.
-const char* def_ssid = "YourSSID";
-const char* def_password =  "************";
-#define SSID_MAX_LEN 33
+const char* def_ssid = "FRITZ!Box 7430 FC";
+const char* def_password =  "94044782303556147675";
+//const char* def_ssid = "YourSSID";
+//const char* def_password =  "************";
  
 
 /***************************** Struct definitions *****************************/
@@ -45,6 +53,9 @@ int pw_len = 0;
 #ifdef PRINT_HEAP_STATS_EVERY_MILLIS
 unsigned long last_heap_print = 0;
 #endif // PRINT_HEAP_STATS_EVERY_MILLIS
+
+// Manage multiple inputs: input_handler_t 
+input_handler_t inputs[NUM_INPUTS] = {0};
 
 
 /**************************** Function definitions ****************************/
@@ -78,7 +89,7 @@ void setup() {
 
   setup_motor_control();
 
-  setup_local_comm();
+  //setup_local_comm();
 
   /*
    * This allows the correct timeoffset to be used for localtime().
@@ -100,40 +111,50 @@ void setup() {
   setup_time_keeper();
   printf("cur time %i %i %i \n", get_current_h(), get_current_m(), get_current_s());
 
-  setup_user_comm();
+  //setup_user_comm();
+
+  //setup_web_comm();
+
+  // Setup input_handler_t
+  setup_user_input_handler_t(&inputs[0]);
+  setup_local_input_handler_t(&inputs[1]);
+  setup_web_input_handler_t(&inputs[2]);
 #endif // UNITTESTS_INSTEAD_OF_MAIN
 }
 
 void loop() {
 #ifndef UNITTESTS_INSTEAD_OF_MAIN
-  static char buf[256] = {0};
-  static size_t max_size = 256;
+  static char buf[RESPOND_BUF_SIZE] = {0};
   static bool busy = false;
   static user_action_t usr_act;
 
   // Check for new input if no action is currently executed.
-  if (!busy)
+  for (int i = 0; i < NUM_INPUTS; i++)
   {
-    if (get_user_in(buf, max_size) == 0)
+    input_handler_t *current_input = &inputs[i];
+    if (!busy)
     {
-      usr_act = get_action(buf);
-      busy = true;
-    } 
-    else if (get_local_input() == 0)
-    {
-      usr_act = fetch_local_action();
-      busy = true;
+      if (current_input->input_available() == 0)
+      {
+        usr_act = current_input->fetch_action();
+        busy = true;
+      }
     }
   }
   
+  // Execute an action and respond back to all users when done
   if (busy)
   {
     // Execute an action.
-    busy = execute_action_non_blocking(&usr_act, buf, max_size);
-    if (!busy)
+    busy = execute_action_non_blocking(&usr_act, buf, RESPOND_BUF_SIZE);
+    if ((!busy) && (strlen(buf) > 0))
     {
-      respond_to_user(buf, max_size);
-      memset(buf, 0, max_size);
+      for (int i = 0; i < NUM_INPUTS; i++)
+      {
+        input_handler_t *current_input = &inputs[i];
+        current_input->respond_to_user(buf, strlen(buf));
+      }
+      memset(buf, 0, RESPOND_BUF_SIZE);
     }
   }
   else

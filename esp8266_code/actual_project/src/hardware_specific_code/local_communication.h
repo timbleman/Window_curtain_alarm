@@ -14,12 +14,20 @@
 /**************************** Variable definitions ****************************/
 /**************************** Prototype functions *****************************/
 /* 
+ * Setup an input_handler_t. Better way to handle multiple input sources.
+ * 
+ * @param inh: An input_handler_t to initialize.
+ * @retval: Success status.
+ */
+int setup_local_input_handler_t(input_handler_t *inh);
+
+/* 
  * Setup local inputs and display.
  * Will consist of buttons and an LED at first.
  * 
- * @return: None.
+ * @return: Success status.
  */
-void setup_local_comm();
+int setup_local_comm();
 
 /* 
  * Update and check for local inputs.

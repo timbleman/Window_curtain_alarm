@@ -11,6 +11,14 @@
 /**************************** Variable definitions ****************************/
 /**************************** Prototype functions *****************************/
 /* 
+ * Setup an input_handler_t. Better way to handle multiple input sources.
+ * 
+ * @param inh: An input_handler_t to initialize.
+ * @retval: Success status.
+ */
+int setup_web_input_handler_t(input_handler_t *inh);
+
+/* 
  * Setup the web server.
  * 
  * return:  Success status.
