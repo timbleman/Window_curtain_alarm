@@ -1,3 +1,4 @@
+= R"rawliteral(
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,26 +13,41 @@ var websock;
 var recv_str;
 
 function start() {
-  /*
 	websock = new WebSocket('ws://' + window.location.hostname + ':81/');
 	websock.onopen = function(evt) { console.log('websock open'); };
 	websock.onclose = function(evt) { console.log('websock close'); };
 	websock.onerror = function(evt) { console.log(evt); };
 	websock.onmessage = function(evt) {
 		console.log(evt);
-		recv_str = evt;
+		recv_str = evt.data;
+		update_time_field(evt.data)
 	};
-  */
   
-  update_wake();
+	websock.onopen = () => update_wake();
 }
 
 function dummy_websock(wstr) {
   console.log(wstr);
+  websock.send(wstr);
+}
+
+function update_time_field(evt_str)
+{
+	const time_patterns = ['wake times', 'sleep times'];
+	console.log('received str, check for times' + evt_str.substr(0,9));
+	for (var i = 0; i < time_patterns.length; i++)
+	{
+		var pat = time_patterns[i];
+		if (evt_str.substr(0, pat.length) === pat) {
+			recv_str = recv_str.replace(/[^\x06-\x7F]/g,'');
+			document.getElementById('wake_sleep_text').textContent = recv_str;
+		}
+	}
 }
 
 function set_new_time() {
-	set_time_str = document.getElementById('set_field').textContent;
+	set_command = document.getElementById('set_field').textContent;
+	set_time_str = '' + set_command;
 	
 	set_time_str += ' -d ';
 	set_time_str += get_day_str();
@@ -44,8 +60,15 @@ function set_new_time() {
 	
 	set_time_str += ' -s ';
 	set_time_str += document.getElementById('secs').value;
+
+	set_time_str += ' \n\r\0';
 	
 	dummy_websock(set_time_str);
+
+	if (set_command === 'set_wake')
+		update_wake();
+	else
+		update_sleep();
 }
 
 function get_day_str() {
@@ -72,7 +95,9 @@ function update_wake() {
 	document.getElementById('set_field').textContent = "set_wake";
 	
 	// Here you have to fetch current data
-	document.getElementById('wake_sleep_text').textContent = "waketimes \n\rdummy text";
+	recv_str = '';
+	websock.send("waketimes \n");
+	//document.getElementById('wake_sleep_text').textContent = "waketimes \n\rdummy text";
 }
 
 function update_sleep() {
@@ -82,8 +107,10 @@ function update_sleep() {
 	document.getElementById('set_field').textContent = "set_sleep";
 	
 	// Here you have to fetch current data
-	text_field = document.getElementById('wake_sleep_text');
-	text_field.textContent = "sleeptimes \n\rdummy text";
+	recv_str = '';
+	websock.send("sleeptimes \n");
+	//text_field = document.getElementById('wake_sleep_text');
+	//text_field.textContent = "sleeptimes \n\rdummy text";
 }
 
 function buttonclick(e) {
@@ -191,3 +218,4 @@ function buttonclick(e) {
 
 </body>
 </html>
+)rawliteral"
