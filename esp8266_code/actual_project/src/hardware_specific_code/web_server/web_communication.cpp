@@ -73,6 +73,11 @@ void handleRoot();
 void handleNotFound();
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length);
 int fetch_web_data(char *buf, int buf_max_len);
+int setup_web_comm();
+int get_web_in();
+user_action_t fetch_web_action();
+int get_web_in(char *buf, int buf_max_len);
+int respond_to_web_user(char *buf, int buf_max_len);
 
 
 /**************************** Variable definitions ****************************/

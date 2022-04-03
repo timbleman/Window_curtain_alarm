@@ -13,6 +13,13 @@
 /********************************* Constants **********************************/
 /***************************** Struct definitions *****************************/
 /**************************** Prototype functions *****************************/
+int setup_user_comm();
+int get_user_in1();
+user_action_t fetch_user_action();
+int get_user_in(char *buf, int buf_max_len);
+int respond_to_user(char *buf, int buf_max_len);
+
+
 /**************************** Variable definitions ****************************/
 WiFiServer wifiServer(23);
 WiFiClient client;

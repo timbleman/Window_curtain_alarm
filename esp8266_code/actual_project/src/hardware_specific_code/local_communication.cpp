@@ -24,6 +24,9 @@ void reset_button_state();
 int display_short_press();
 int display_long_press();
 int respond_to_local_input(char *buf, int buf_max_len);
+int setup_local_comm();
+int get_local_input();
+user_action_t fetch_local_action();
 
 
 /**************************** Variable definitions ****************************/
