@@ -30,8 +30,8 @@
 /********************************* Constants **********************************/
 // Adjust these
 // TODO This should be done using WPS.
-const char* def_ssid = "FRITZ!Box 7430 FC";
-const char* def_password =  "94044782303556147675";
+const char* def_ssid = "YourSSID";
+const char* def_password =  "*********";
 //const char* def_ssid = "YourSSID";
 //const char* def_password =  "************";
  

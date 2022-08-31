@@ -5,7 +5,53 @@
 <meta name = "viewport" content = "width = device-width, initial-scale = 1.0, maximum-scale = 1.0, user-scalable=0">
 <title>Window curtain alarm</title>
 <style>
-"body { background-color: #808080; font-family: Arial, Helvetica, Sans-Serif; Color: #000000; }"
+body { background-color: #f6f1ef; font-family: Arial, Helvetica, Sans-Serif; Color: #000000; }
+.dpad_buttons{
+	width: 100%;
+	background-color: #3E362F;
+	color: white;
+	border: none;
+	padding: 4px 16px;
+}
+
+.set_button{
+	background-color: #3E362F;
+	color: white;
+	border: none;
+}
+
+.ws_button{
+	background-color: #3E362F;
+	color: white;
+	border: none;
+	padding: 4px 16px;	
+}
+
+button:active{
+	background-color: #A39E92;
+	color: white;
+	border: none;
+}
+
+input{
+	background-color: #fefbfa;
+}
+
+.control_table{
+	width:60%;
+}
+
+@media only screen and (max-width: 500px) {
+	/* For mobile phones: */
+	input{
+		width: 25px;
+	}
+	
+	.control_table{
+		width:94%;
+	}
+}
+
 </style>
 
 <script>
@@ -58,8 +104,8 @@ function set_new_time() {
 	set_time_str += ' -m ';
 	set_time_str += document.getElementById('mins').value;
 	
-	set_time_str += ' -s ';
-	set_time_str += document.getElementById('secs').value;
+	//set_time_str += ' -s ';
+	//set_time_str += document.getElementById('secs').value;
 
 	set_time_str += ' \n\r\0';
 	
@@ -89,8 +135,8 @@ function get_day_str() {
 }
 
 function update_wake() {
-	document.getElementById('set_wake_button').style.background = 'red';
-	document.getElementById('set_sleep_button').style.background = '#D0D0D0';
+	document.getElementById('set_wake_button').style.background = '#A39E92';
+	document.getElementById('set_sleep_button').style.background = '#3E362F';
 	
 	document.getElementById('set_field').textContent = "set_wake";
 	
@@ -101,8 +147,8 @@ function update_wake() {
 }
 
 function update_sleep() {
-	document.getElementById('set_wake_button').style.background = '#D0D0D0';
-	document.getElementById('set_sleep_button').style.background = 'red';
+	document.getElementById('set_wake_button').style.background = '#3E362F';
+	document.getElementById('set_sleep_button').style.background = '#A39E92';
 	
 	document.getElementById('set_field').textContent = "set_sleep";
 	
@@ -129,38 +175,43 @@ function buttonclick(e) {
 </script>
 
 </head>
+
+<header>
+<h1 style="text-align: center; padding: 20px; background: #E7DBD6; color: 56514F;">Window curtain alarm</h1>
+</header>
+
 <body onload="javascript:start();">
-<h1 style="text-align: center;">Window curtain alarm</h1>
 
 <table style="margin: 0px auto;">
 	<tbody>
 		<tr>
 			<td>&nbsp;</td>
-			<td><button id="ignore "  type="button" onclick="buttonclick(this);">Ignore</button> </td>
+			<td><button id="ignore " class="dpad_buttons" type="button" onclick="buttonclick(this);">Ignore</button> </td>
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
-			<td><button id="open "  type="button" onclick="buttonclick(this);">Open</button> </td>
-			<td><button id="curtainxor "  type="button" onclick="buttonclick(this);">Xor</button> </td>
-			<td><button id="close "  type="button" onclick="buttonclick(this);">Close</button> </td>
+			<td><button id="open " class="dpad_buttons" type="button" onclick="buttonclick(this);">Open</button> </td>
+			<td><button id="curtainxor " class="dpad_buttons" style="width:100%"  type="button" onclick="buttonclick(this);">Xor</button> </td>
+			<td><button id="close " class="dpad_buttons" type="button" onclick="buttonclick(this);">Close</button> </td>
 		</tr>
 		<tr>		
 			<td>&nbsp;</td>
-			<td><button id="calibrate "  type="button" onclick="buttonclick(this);">Calibrate</button> </td>
+			<td><button id="calibrate " class="dpad_buttons" type="button" onclick="buttonclick(this);">Calibrate</button> </td>
 			<td>&nbsp;</td>
 		</tr>
 	</tbody>
 </table>
+<br>
 
 <!-- TODO Make responsive using containers? -->
 <!-- border: 1px: create line, border-collapse: collapse: Inner lines are not doubled -->
 <!-- margin: 0px auto: centering the whole table, width:60%: Not full width of the screen -->
-<table style="border: 1px solid black; border-collapse: collapse; margin: 0px auto; width:60%;">
+<table class="control_table" style="border: 1px solid black; border-collapse: collapse; margin: 0px auto;">
 	<tbody>
 		<tr style="border: 1px solid black; border-collapse: collapse;">
 			<td>
-				<button id="set_wake_button" type="button" onclick="buttonclick(this);">set_wake</button>
-				<button id="set_sleep_button"  type="button" onclick="buttonclick(this);">set_sleep</button>
+				<button id="set_wake_button" class="ws_button" style="width:49%" type="button" onclick="buttonclick(this);">set_wake</button>
+				<button id="set_sleep_button" class="ws_button" style="width:49%" type="button" onclick="buttonclick(this);">set_sleep</button>
 			</td>
 		</tr>
 		<tr style="border: 1px solid black; border-collapse: collapse;">
@@ -207,9 +258,11 @@ function buttonclick(e) {
 					<input max="23" min="0" id="hours" name="hours" step="1" type="number" value="18" />
 					<p>-m</p>
 					<input max="59" min="0" id="mins" name="mins" step="1" type="number" value="18" />
+					<!--
 					<p>-s</p>
 					<input max="59" min="0" id="secs" name="secs" step="1" type="number" value="0" />
-					<button id="set_time_button"  type="button" onclick="buttonclick(this);">Set!</button>
+					-->
+					<button id="set_time_button" class="set_button" type="button" onclick="buttonclick(this);">Set!</button>
 				</div>
 			</td>
 		</tr>
