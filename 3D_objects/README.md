@@ -1,7 +1,7 @@
 # 3D objects and mounting
 
 This subfolder stores 3D objects used to mount and build the curtain closer alarm.
-The objects have been designed using Fusion360 and saved as STLs. Step files can be provided if desired.
+The objects have been designed using Fusion360 and saved as STLs. Step files are also included.
 
 ## Project structure
 These directories contain the 3D models:

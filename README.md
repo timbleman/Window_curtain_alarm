@@ -5,6 +5,10 @@ This project aims at creating an alarm that opens and closes a window curtain at
 ![Rendering of the physical hardware](./pics/physical_mounting_rendering_1.PNG "Hardware rendering.")
 ![Installed hardware. Window can still be opened.](./pics/curtain_window_closed.jpg "Installed hardware. Window can still be opened.")
 
+## Changelog
+* V1.1: Added a locally acessible, basic webpage. Improved 3D files slightly. Minor bug fixes.
+* V1.0: Initial release. Controls using button and TCP socket.
+
 ## Features
 ### Implemented features
 * Automatically keeping track of time
@@ -30,20 +34,35 @@ This project aims at creating an alarm that opens and closes a window curtain at
 Install the system according to the readme in /3D_objects/. Adjust the SSID in the code, compile and upload.
 Connect a 5V 2A power supply. Assign a static IP using your router. You will need this IP to configure the system.
 The IP is also printed using VCP with 9600 baud at power-up.
-### Basic controls
-Currently, this alarm is configured using the telnet protocol. Connect using the IP and port 23 with a client of your choice.
+### Basic controls using TCP sockets
+This alarm can be configured using the telnet protocol. Connect using the IP and port 23 with a client of your choice.
 Sending "help" gets a list of example commands.  
 Upon powering up, the curtain position has to be calibrated. Open the curtain to the desired position by hand and 
 send "calibrate". Make sure the motor moves in the right direction and hits the endstop. 
 Now everything should be ready to go. Use "set_wake" and "set_sleep" to set the alarm. Check if the times have been correctly 
 set using "waketimes" and "sleeptimes". Check if the right timezone is selected using "curtime".
 You can manually move the curtain using "open", "close" or "curtainxor".  
-You can XOR the curtainstate by short pressing the hardware button, long pressing ignores the next wake.
 
 <p float="left">
   <img src="/pics/screenshots/Screenshot_help_curtime_JuiceSSH.jpg" width="400" />
   <img src="/pics/screenshots/Screenshot_set_sleep_sleeptimes_JuiceSSH.jpg" width="400" /> 
 </p>
+
+### Controls using the webpage
+With version 1.1, a crude webpage is now availabe. Please don't judge the interface too harshly. :)  
+The webpage is hosted locally and has the same functionality, as the command line style TCP interface. 
+Dpad-like buttons allow to move the curtain, ignore the next wake or calibrate.
+Below, the current wake or sleep times are shown and can be changed.
+The webpage should work on desktop and mobile. Some of the code has been taken from this [great post](https://gist.github.com/bbx10/667e3d4f5f2c0831d00b).
+<p float="left">
+  <img src="/pics/screenshots/Screenshot_webpage_1_1_desktop.jpg" width="700" />
+  <img src="/pics/screenshots/Screenshot_webpage_1_1_mobile.jpg" width="161" /> 
+</p>
+
+
+### Controls using only the hardware
+You can XOR the curtainstate by short pressing the hardware button, long pressing ignores the next wake.
+An LED indicates if a short or a long press has been detected.
 
 
 ## Project structure

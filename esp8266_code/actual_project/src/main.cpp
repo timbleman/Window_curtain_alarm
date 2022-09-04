@@ -23,18 +23,15 @@
 
 /********************************* Constants **********************************/
 #define RESPOND_BUF_SIZE 256
-#define SSID_MAX_LEN 33
 #define NUM_INPUTS 3
 
 
 /********************************* Constants **********************************/
 // Adjust these
 // TODO This should be done using WPS.
-const char* def_ssid = "YourSSID";
-const char* def_password =  "*********";
-//const char* def_ssid = "YourSSID";
-//const char* def_password =  "************";
- 
+const char* def_ssid = YOUR_SSID;
+const char* def_password =  YOUR_PW;
+
 
 /***************************** Struct definitions *****************************/
 /**************************** Prototype functions *****************************/
@@ -89,8 +86,6 @@ void setup() {
 
   setup_motor_control();
 
-  //setup_local_comm();
-
   /*
    * This allows the correct timeoffset to be used for localtime().
    * Do not worry about the IDE warning, the function is defined in a macro.
@@ -110,10 +105,6 @@ void setup() {
 
   setup_time_keeper();
   printf("cur time %i %i %i \n", get_current_h(), get_current_m(), get_current_s());
-
-  //setup_user_comm();
-
-  //setup_web_comm();
 
   // Setup input_handler_t
   setup_user_input_handler_t(&inputs[0]);
