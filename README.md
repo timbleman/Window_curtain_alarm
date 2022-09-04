@@ -55,8 +55,8 @@ Dpad-like buttons allow to move the curtain, ignore the next wake or calibrate.
 Below, the current wake or sleep times are shown and can be changed.
 The webpage should work on desktop and mobile. Some of the code has been taken from this [great post](https://gist.github.com/bbx10/667e3d4f5f2c0831d00b).
 <p float="left">
-  <img src="/pics/screenshots/Screenshot_webpage_1_1_desktop.png" width="700" />
-  <img src="/pics/screenshots/Screenshot_webpage_1_1_mobile.jpg" width="161" /> 
+  <img src="/pics/screenshots/Screenshot_webpage_1_1_desktop.png" width="650" />
+  <img src="/pics/screenshots/Screenshot_webpage_1_1_mobile.jpg" width="149" /> 
 </p>
 
 
