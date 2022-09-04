@@ -27,7 +27,6 @@
 
 
 /********************************* Constants **********************************/
-// Adjust these
 // TODO This should be done using WPS.
 const char* def_ssid = YOUR_SSID;
 const char* def_password =  YOUR_PW;

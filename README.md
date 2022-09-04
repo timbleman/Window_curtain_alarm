@@ -6,22 +6,23 @@ This project aims at creating an alarm that opens and closes a window curtain at
 ![Installed hardware. Window can still be opened.](./pics/curtain_window_closed.jpg "Installed hardware. Window can still be opened.")
 
 ## Changelog
-* V1.1: Added a locally acessible, basic webpage. Improved 3D files slightly. Minor bug fixes.
-* V1.0: Initial release. Controls using button and TCP socket.
+* V1.1: Added a locally accessible, basic webpage. Improved 3D files slightly. Minor bug fixes.
+* V1.0: Initial release. Controls using a hardware button and a TCP socket.
 
 ## Features
 ### Implemented features
 * Automatically keeping track of time
 * One wake and sleep time for each weekday
-* Belt driven opening and closing of curtains
-* Socket based user communication
+* Belt-driven opening and closing of curtains
+* Socket-based user communication
+* Local webpage for communication
 * Button for snoozing one day and manually opening and closing the curtain
 * PCB design
+* STL files for assembling the project
 ### Possible future work
 * Multiple wake and sleep times for each weekday
 * WPS button for easy WIFI connection
-* Locally hosting a website for more comfortable interaction
-* Different end stop locations
+* Different endstop locations
 * Using more advanced features of the TMC2209 stepper driver (e.g.: sensorless homing)
 * Sync multiple curtains 
 ### Intentional limitations
@@ -49,9 +50,9 @@ You can manually move the curtain using "open", "close" or "curtainxor".
 </p>
 
 ### Controls using the webpage
-With version 1.1, a crude webpage is now availabe. Please don't judge the interface too harshly. :)  
+With version 1.1, a crude webpage is now available. Please don't judge the interface too harshly. :)  
 The webpage is hosted locally and has the same functionality, as the command line style TCP interface. 
-Dpad-like buttons allow to move the curtain, ignore the next wake or calibrate.
+D-pad-like buttons allow you to move the curtain, ignore the next wake or calibrate.
 Below, the current wake or sleep times are shown and can be changed.
 The webpage should work on desktop and mobile. Some of the code has been taken from this [great post](https://gist.github.com/bbx10/667e3d4f5f2c0831d00b).
 <p float="left">
@@ -72,8 +73,8 @@ Here are some directories that may contain interesting files:
 * /curtain_wiring/: A KiCad project for the wiring diagram and PCB design.
 * /esp8266_code/actual_project/: The unit tested proof of concept code ported to ESP8266.
 * /esp8266_code/test_stuff/: Some quick projects testing basic functionality using the ESP8266.
-	* /esp8266_code/test_stuff/socket_test/: TCP socket server test project for the ESP8266.
-	* /esp8266_code/test_stuff/motor_test/: Homing and moving using the TMC2209 driver.
+  * /esp8266_code/test_stuff/socket_test/: TCP socket server test project for the ESP8266.
+  * /esp8266_code/test_stuff/motor_test/: Homing and moving using the TMC2209 driver.
 * /proof_of_concept/: Unit tested project implementing generic components. This project does not strictly target embedded hardware for ease of building and debugging.
 * /pics/: Some pictures and renderings.
 * /public/: A website that is able to configure the alarm. Currently on halt.
@@ -81,9 +82,9 @@ Here are some directories that may contain interesting files:
 
 ## Implementation
 ### Hardware
-Opening and closing the curtain shall be done using a belt-driven by a stepper motor. A NEMA17 stepper in combination with a TMC2209 driver is currently used. The target platform is the ESP8266. This microcontroller has been chosen instead of a Raspberry PI due to lower cost and power consumption. 
+Opening and closing the curtain shall be done using a belt driven by a stepper motor. A NEMA17 stepper in combination with a TMC2209 driver is currently used. The target platform is the ESP8266. This microcontroller has been chosen instead of a Raspberry PI due to its lower cost and power consumption. 
 ### Mounting
-The hardware, including especially the motor, belt, and end stop, will be mounted using 3D printed objects. Currently, the project is not intended as a 'one design fits all' solution, but will need to be adapted to the used curtain and window.
+The hardware, including especially the motor, belt, and endstop, will be mounted using 3D printed objects. Currently, the project is not intended as a 'one design fits all' solution, but will need to be adapted to the used curtain and window.
 ### Programming language and environment
 Due to its dominance in embedded systems and easier debugging, C, instead of C++, is used for most of the more generic project components. These components include user input parsing, keeping track of time, and controlling the IO.
 As Arduino and most of its libraries are based on C++, the main function and socket server use this more high-level approach. The PlatformIO IDE and toolchain is used for the ESP8266 code. The proof of concept has been developed using CodeLite.
