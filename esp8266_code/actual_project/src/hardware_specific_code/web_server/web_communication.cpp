@@ -1,5 +1,6 @@
 /********************************** Includes **********************************/
 #include "web_communication.h"
+#ifdef ENABLE_LOCAL_WEB_SITE
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
 #include "arduinoWebSockets/src/WebSocketsServer.h"
@@ -266,3 +267,5 @@ int respond_to_web_user(char *buf, int buf_max_len)
 
     return (int)!status;
 }
+
+#endif // ENABLE_LOCAL_WEB_SITE

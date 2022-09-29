@@ -6,6 +6,7 @@
 extern "C" {
 #endif
 
+/********************************** Defines **********************************/
 // TODO Unit tests are not yet available for ESP as they do not fit in memory.
 // Run the proof_of_concept if you want to check if new code passes tests.
 #undef UNITTESTS_INSTEAD_OF_MAIN
@@ -23,6 +24,15 @@ extern "C" {
 #define TESTABLE_ALARMCHECKER_CODE
 
 #endif // UNITTESTS_INSTEAD_OF_MAIN
+
+// Adjust these
+#define YOUR_SSID "FRITZ!Box 7430 FC"
+#define YOUR_PASSWORD "94044782303556147675"
+//"YourSSID";
+//"************";
+
+// Enable a local webserver and websockets. Uses heap.
+#undef ENABLE_LOCAL_WEB_SITE
 
 // Print heap fragmentation stats.
 #define PRINT_HEAP_STATS_EVERY_MILLIS 240000
