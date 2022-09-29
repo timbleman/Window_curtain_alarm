@@ -20,7 +20,7 @@ To get a quick overview, I will list which files do what. To keep it compact, on
 
 ## Configuration
 There are some configuration parameters.
-SSID and your WIFI password need to be set in main.c using *def_ssid* and *def_password*.  
-The UTC time offset will need to be set in main.c using the *setenv()* function.  
-The speed of the stepper motor can be adjusted in motor_controller.c using *FAST_STEP_TIME* and *SLOW_STEP_TIME*.  
+SSID and your WIFI password need to be set in *configuration.h*.  
+The UTC time offset will need to be set in main.c using the `setenv()` function.  
+The speed of the stepper motor can be adjusted in motor_controller.c using `FAST_STEP_TIME` and `SLOW_STEP_TIME`.  
 Most prints can be disabled using define statements.  
