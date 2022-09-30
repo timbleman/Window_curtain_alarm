@@ -8,7 +8,7 @@
 /********************************* Constants **********************************/
 // 1 Kb for now
 // IMPORTANT: MAKE SURE THESE VALUES ARE MULTIPLES OF 4!!!
-#define EEPROM_MAX_SIZE 0x400
+#define EEPROM_MAX_SIZE 0x100
 #define SSID_MAX_SIZE 32
 #define SSID_EEPROM_OFFSET 0
 #define PW_EEPROM_OFFSET ((SSID_MAX_SIZE) + 4)
@@ -45,7 +45,7 @@ int load_generic_string(char *buf1, int buf_max_len, int *str_len,
  */
 void storage_setup()
 {
-    EEPROM.begin(256);
+    EEPROM.begin(EEPROM_MAX_SIZE);
 }
 
 /*

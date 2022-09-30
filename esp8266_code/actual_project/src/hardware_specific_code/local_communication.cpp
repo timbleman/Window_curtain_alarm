@@ -23,6 +23,10 @@
 void reset_button_state();
 int display_short_press();
 int display_long_press();
+int respond_to_local_input(char *buf, int buf_max_len);
+int setup_local_comm();
+int get_local_input();
+user_action_t fetch_local_action();
 
 
 /**************************** Variable definitions ****************************/
@@ -32,17 +36,36 @@ static bool button1_long_press = false;
 
 /**************************** Function definitions ****************************/
 /* 
+ * Setup an input_handler_t. Better way to handle multiple input sources.
+ * 
+ * @param inh: An input_handler_t to initialize.
+ * @retval: Success status.
+ */
+int setup_local_input_handler_t(input_handler_t *inh)
+{
+    inh->setup = setup_local_comm;
+    inh->input_available = get_local_input;
+    inh->fetch_action = fetch_local_action;
+    inh->respond_to_user = respond_to_local_input;
+    strncpy(inh->tag, "local", TAG_LEN);
+
+    return inh->setup();
+}
+
+/* 
  * Setup local inputs and display.
  * Will consist of buttons and an LED at first.
  * 
- * @return: None.
+ * @return: Success status.
  */
-void setup_local_comm()
+int setup_local_comm()
 {
     pinMode(BUTTON1_PIN, INPUT);
     pinMode(LED_PIN, OUTPUT);
 
     reset_button_state();
+
+    return 0;
 }
 
 /* 
@@ -222,4 +245,10 @@ int display_long_press()
     }
     
     return status;
+}
+
+int respond_to_local_input(__attribute__((unused))char *buf, 
+                            __attribute__((unused)) int buf_max_len)
+{
+    return 0;
 }

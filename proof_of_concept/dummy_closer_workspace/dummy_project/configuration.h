@@ -1,3 +1,6 @@
+/*
+ * This file is used to configure the project build.
+ */
 
 #ifdef __cplusplus
 extern "C" {

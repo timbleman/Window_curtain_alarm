@@ -7,6 +7,9 @@
 #define _USER_COMMUNICATION_H_
 
 /********************************** Includes **********************************/
+#include "../portable_code/types_and_enums.h"
+
+
 /********************************* Constants **********************************/
 #define RECV_DEBUG
 
@@ -14,31 +17,12 @@
 /***************************** Struct definitions *****************************/
 /**************************** Variable definitions ****************************/
 /**************************** Prototype functions *****************************/
-/*
- * Setup the user communication.
- * 
- * @return: Success status.
- */
-int setup_user_comm();
-
-/*
- * Check for user input.
- * Stores the input in the buffer and returns 0 if successful.
- * 
- * @param buf: Buffer to store the input into.
- * @param buf_max_len: The size of the buffer.
- * @return: 0 if success and new input, else 1.
- */
-int get_user_in(char *buf, int buf_max_len);
-
 /* 
- * Send text back to the user. 
- * Does not send if the user is no longer connected.
- *
- * @param buf: The string to send back.
- * @param buf_max_len: The maximum number of chars to send.
- * @return: Success status.
+ * Setup an input_handler_t. Better way to handle multiple input sources.
+ * 
+ * @param inh: An input_handler_t to initialize.
+ * @retval: Success status.
  */
-int respond_to_user(char *buf, int buf_max_len);
+int setup_user_input_handler_t(input_handler_t *inh);
 
 #endif // _USER_COMMUNICATION_H_
