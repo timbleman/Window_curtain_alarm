@@ -23,26 +23,19 @@
 
 /********************************** Defines **********************************/
 #define RESPOND_BUF_SIZE 256
-<<<<<<< HEAD
-#define SSID_MAX_LEN 33
 #ifndef ENABLE_LOCAL_WEB_SITE
 #define NUM_INPUTS 2
 #else
-=======
->>>>>>> 5425baef8fbb8d38dccce4b948896e6017766c44
 #define NUM_INPUTS 3
 #endif // ENABLE_LOCAL_WEB_SITE
 
 
 /********************************* Constants **********************************/
-<<<<<<< HEAD
-=======
 // TODO This should be done using WPS.
 const char* def_ssid = YOUR_SSID;
 const char* def_password =  YOUR_PW;
 
 
->>>>>>> 5425baef8fbb8d38dccce4b948896e6017766c44
 /***************************** Struct definitions *****************************/
 /**************************** Prototype functions *****************************/
 /**************************** Variable definitions ****************************/
@@ -74,7 +67,7 @@ void setup() {
   storage_setup();
   // Uncomment these as needed
   store_ssid(YOUR_SSID, strlen(YOUR_SSID));
-  store_pw(YOUR_PASSWORD, strlen(YOUR_PASSWORD));
+  store_pw(YOUR_PW, strlen(YOUR_PW));
   //dummy_eeprom_print();
   // Try to load ssid and pw froom eeprom, if it does not work choose default.
   printf("EEPROM is data available: %i\n\r", storage_data_available());
@@ -84,7 +77,7 @@ void setup() {
     printf("Failed to load valid ssid and password from the EEPROM. "
             "Using the default.\n\r");
     strcpy(ssid, YOUR_SSID);
-    strcpy(password, YOUR_PASSWORD);
+    strcpy(password, YOUR_PW);
   }
   else
   {
@@ -116,10 +109,7 @@ void setup() {
   setup_time_keeper();
   printf("cur time %i %i %i \n", get_current_h(), get_current_m(), get_current_s());
 
-<<<<<<< HEAD
-=======
   // Setup input_handler_t
->>>>>>> 5425baef8fbb8d38dccce4b948896e6017766c44
   setup_user_input_handler_t(&inputs[0]);
   setup_local_input_handler_t(&inputs[1]);
 #ifdef ENABLE_LOCAL_WEB_SITE
