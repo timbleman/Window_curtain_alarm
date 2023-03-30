@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include "ESP8266WiFi.h"
 #include "configuration.h"
+#include "hardware_specific_code/web_server/ota/ota.h"
 #include "hardware_specific_code/user_communication.h"
 #include "configuration.h"
 #ifndef UNITTESTS_INSTEAD_OF_MAIN
@@ -114,6 +115,8 @@ void setup() {
   setup_local_input_handler_t(&inputs[1]);
 #ifdef ENABLE_LOCAL_WEB_SITE
   setup_web_input_handler_t(&inputs[2]);
+
+  setup_ota();
 #endif // ENABLE_LOCAL_WEB_SITE
 #endif // UNITTESTS_INSTEAD_OF_MAIN
 }

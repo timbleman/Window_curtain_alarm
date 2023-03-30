@@ -11,6 +11,7 @@ extern "C" {
 #define YOUR_SSID "YourSSID"
 #define YOUR_PW "*********"
 #define SSID_MAX_LEN 33
+#define ENABLE_LOCAL_WEB_SITE true
 
 // Print heap fragmentation stats.
 #define PRINT_HEAP_STATS_EVERY_MILLIS 240000
