@@ -16,6 +16,7 @@ This project aims at creating an alarm that opens and closes a window curtain at
 * Belt-driven opening and closing of curtains
 * Socket-based user communication
 * Local webpage for communication
+* Over the air updating
 * Button for snoozing one day and manually opening and closing the curtain
 * PCB design
 * STL files for assembling the project
@@ -54,7 +55,8 @@ With version 1.1, a crude webpage is now available. Please don't judge the inter
 The webpage is hosted locally and has the same functionality, as the command line style TCP interface. 
 D-pad-like buttons allow you to move the curtain, ignore the next wake or calibrate.
 Below, the current wake or sleep times are shown and can be changed.
-The webpage should work on desktop and mobile. Some of the code has been taken from this [great post](https://gist.github.com/bbx10/667e3d4f5f2c0831d00b).
+The webpage should work on desktop and mobile. Some of the code has been taken from this [great post](https://gist.github.com/bbx10/667e3d4f5f2c0831d00b).  
+You can update code when visiting IP:8000/update!
 <p float="left">
   <img src="/pics/screenshots/Screenshot_webpage_1_1_desktop.png" width="650" />
   <img src="/pics/screenshots/Screenshot_webpage_1_1_mobile.jpg" width="149" /> 
