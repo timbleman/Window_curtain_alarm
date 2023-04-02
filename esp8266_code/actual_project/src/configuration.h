@@ -9,9 +9,11 @@ extern "C" {
 // Adjust these
 // TODO This should be done using WPS.
 #define YOUR_SSID "YourSSID"
-#define YOUR_PW "*********"
+#define YOUR_PW "********"
 #define SSID_MAX_LEN 33
-#define ENABLE_LOCAL_WEB_SITE true
+
+// Enable a local webserver and websockets. Uses heap.
+#define ENABLE_LOCAL_WEB_SITE
 
 // Print heap fragmentation stats.
 #define PRINT_HEAP_STATS_EVERY_MILLIS 240000

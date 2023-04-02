@@ -14,6 +14,7 @@
 #include "hardware_specific_code/local_communication.h"
 #include "hardware_specific_code/web_server/web_communication.h"
 #include "hardware_specific_code/motor_controller.h"
+#include "hardware_specific_code/wifi_connector.h"
 #include "portable_code/time_keeper.h"
 #include "portable_code/types_and_enums.h"
 #else
@@ -46,10 +47,10 @@ WiFiClient client1;
 bool connected1 = false;
 
 // Buffers to store the ssid or password
-char ssid[SSID_MAX_LEN];
-char password[SSID_MAX_LEN];
-int ssid_len = 0;
-int pw_len = 0;
+//char ssid[SSID_MAX_LEN];
+//char password[SSID_MAX_LEN];
+//int ssid_len = 0;
+//int pw_len = 0;
 
 #ifdef PRINT_HEAP_STATS_EVERY_MILLIS
 unsigned long last_heap_print = 0;
@@ -66,25 +67,6 @@ void setup() {
 
 #ifndef UNITTESTS_INSTEAD_OF_MAIN
   storage_setup();
-  // Uncomment these as needed
-  store_ssid(YOUR_SSID, strlen(YOUR_SSID));
-  store_pw(YOUR_PW, strlen(YOUR_PW));
-  //dummy_eeprom_print();
-  // Try to load ssid and pw froom eeprom, if it does not work choose default.
-  printf("EEPROM is data available: %i\n\r", storage_data_available());
-  if ((load_ssid(ssid, SSID_MAX_LEN, &ssid_len) != EXIT_SUCCESS)
-      || (load_pw(password, SSID_MAX_LEN, &pw_len) != EXIT_SUCCESS))
-  {
-    printf("Failed to load valid ssid and password from the EEPROM. "
-            "Using the default.\n\r");
-    strcpy(ssid, YOUR_SSID);
-    strcpy(password, YOUR_PW);
-  }
-  else
-  {
-    printf("Loaded SSID and password from the EEPROM.\n\r");
-  }
-  printf("Using ssid '%s'\n\r", ssid);
 
   setup_command_parser();
 
@@ -96,16 +78,7 @@ void setup() {
    */
   setenv("TZ", "CET-1CEST,M3.5.0,M10.5.0/3", 3);
  
-  WiFi.begin(ssid, password);
- 
-  // TODO WPS button
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.println("Connecting..");
-  }
- 
-  Serial.print("Connected to WiFi. IP:");
-  Serial.println(WiFi.localIP());
+  wifi_connect();
 
   setup_time_keeper();
   printf("cur time %i %i %i \n", get_current_h(), get_current_m(), get_current_s());
