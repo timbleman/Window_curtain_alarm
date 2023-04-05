@@ -1,0 +1,26 @@
+sequenceDiagram
+    main->>+wifi_connector: wifi_connect()
+    wifi_connector->>-main: int: 0
+
+    main->>+local_input: setup_local_input()
+    local_input-->>-main: int: 0
+    main->>+tcp_input: setup_tcp_input()
+    tcp_input-->>-main: int: 0
+    main->>+web_input: setup_web_input()
+    web_input-->>-main: int: 0
+        
+
+    loop main_loop
+        main->>+local_input: input_available()
+        local_input-->>-main: bool: true
+        main->>+local_input: fetch_action()
+        local_input-->>-main: user_action_t: new_action
+        main->>+action_executer: execute_action(new_action)
+        action_executer->>-main: string: user_response
+        main->>+local_input: responsd_to_user(user_response)
+        local_input-->>-main: int: 0
+        main->>+tcp_input: responsd_to_user(user_response)
+        tcp_input-->>-main: int: 0
+        main->>+web_input: responsd_to_user(user_response)
+        web_input-->>-main: int: 0
+    end

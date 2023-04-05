@@ -13,7 +13,7 @@
  * Try to connect to WiFi using several different means.
  * This function blocks until success.
  *
- * @return  Succes status, 0 for success.
+ * @return  Success status, 0 for success.
  */
 int wifi_connect();
 

@@ -33,25 +33,9 @@
 
 
 /********************************* Constants **********************************/
-// TODO This should be done using WPS.
-const char* def_ssid = YOUR_SSID;
-const char* def_password =  YOUR_PW;
-
-
 /***************************** Struct definitions *****************************/
 /**************************** Prototype functions *****************************/
 /**************************** Variable definitions ****************************/
-WiFiServer wifiServer1(23);
-WiFiClient client1;
-
-bool connected1 = false;
-
-// Buffers to store the ssid or password
-//char ssid[SSID_MAX_LEN];
-//char password[SSID_MAX_LEN];
-//int ssid_len = 0;
-//int pw_len = 0;
-
 #ifdef PRINT_HEAP_STATS_EVERY_MILLIS
 unsigned long last_heap_print = 0;
 #endif // PRINT_HEAP_STATS_EVERY_MILLIS

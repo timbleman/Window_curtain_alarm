@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include "ESP8266WiFi.h"
 #include "data_storage.h"
+#include "local_communication.h"
 #include "../configuration.h"
 
 
@@ -24,6 +25,7 @@ int ssid_pw_from_serial();
 int read_string_until_noblocking(char *buf, size_t buflen, char terminator1, 
                                     char terminator2);
 void clear_serial_rx_buf();
+int start_WPS();
 
 
 /**************************** Variable definitions ****************************/
@@ -36,52 +38,134 @@ static int pw_len = 0;
 
 /**************************** Function definitions ****************************/
 /*
+ * Start connection using WPS. After a successful connection, the ESP has to
+ * be restarted. Does not work with every router.
+ * 
+ * @return  Success status, 0 for success.
+ */
+int start_WPS() {
+    int success = 1;
+    Serial.println("WPS Konfiguration gestartet");
+    bool wpsSuccess = WiFi.beginWPSConfig();
+    if(wpsSuccess) {
+        // Muss nicht immer erfolgreich heißen! Nach einem Timeout bist die SSID leer
+        String newSSID = WiFi.SSID();
+        if(newSSID.length() > 0)
+        {
+            // Nur wenn eine SSID gefunden wurde waren wir erfolgreich 
+            Serial.printf("WPS fertig. Erfolgreich angemeldet an SSID '%s'\n", newSSID.c_str());
+            success = 0;
+        }
+    }
+    return success; 
+}
+
+/*
  * Try to connect to WiFi using several different means.
  * This function blocks until success.
  *
- * @return  Succes status, 0 for success.
+ * @return  Success status, 0 for success.
  */
-int wifi_connect()
-{
-    int status = 1;
-        
-    /*
-     * Try to load ssid and pw from eeprom, if it does not work choose default.
-     */
-    printf("EEPROM is data available: %i\n\r", storage_data_available());
-    if ((load_ssid(ssid, SSID_MAX_LEN, &ssid_len) != EXIT_SUCCESS)
-        || (load_pw(password, SSID_MAX_LEN, &pw_len) != EXIT_SUCCESS))
+int wifi_connect() {
+    // Uncomment these if you want to erase EEPROM or WPS stored SSID
+    store_ssid("DUMMY_SSID", strlen("DUMMY_SSID"));
+    WiFi.disconnect(true);
+    ESP.eraseConfig();
+
+    // Needs to be STA for WPS
+    WiFi.mode(WIFI_STA);
+
+    // Try to connect via WPS saved SSID
+    bool wifi_from_wps_available = strlen(WiFi.SSID().c_str()) > 0;
+    if (wifi_from_wps_available)
     {
-        printf("Failed to load valid ssid and password from the EEPROM. "
-                "Using the default %s.\n\r", YOUR_SSID);
-        strcpy(ssid, YOUR_SSID);
-        strcpy(password, YOUR_PW);
-        store_ssid(YOUR_SSID, strlen(YOUR_SSID));
-        store_pw(YOUR_PW, strlen(YOUR_PW));
+        Serial.printf("WPS saved SSID %s available\r\n", WiFi.SSID().c_str());
+        if (wifi_connect_address(WiFi.SSID().c_str(),WiFi.psk().c_str(), 
+                                NUM_CONNECTION_TRIES) == 0)
+        {
+            Serial.printf("Successful connection using WPS saved SSID\r\n");
+            return 0;
+        }
     }
     else
     {
-        printf("Loaded SSID %s and password of len %u from the EEPROM.\r\n", 
-                ssid, strlen(password));
+    Serial.printf("No WPS saved data available\r\n");
     }
-    
+
+    // Try to connect via EEPROM saved SSID
+    bool eeprom_avail = (load_ssid(ssid, SSID_MAX_LEN, &ssid_len) == EXIT_SUCCESS)
+        && (load_pw(password, SSID_MAX_LEN, &pw_len) == EXIT_SUCCESS); 
+    if (eeprom_avail)
+    {
+        Serial.printf("Loaded SSID %s and password of len %u from the EEPROM.\r\n", 
+                    ssid, strlen(password));
+        if (wifi_connect_address(ssid, password, NUM_CONNECTION_TRIES) == 0)
+        {
+            Serial.printf("Successful connection using EEPROM saved SSID\r\n");
+            return 0;
+        }
+    }
+    else
+    {
+        Serial.printf("No EEPROM data available\r\n");
+    }
+
+    // Try to connect using YOUR_SSID in configuration.h
+    if (strstr(YOUR_SSID, "YourSSID") == NULL)
+    {
+        Serial.printf("Now trying SSID %s from configuration.h\r\n", YOUR_SSID);
+        if (wifi_connect_address(YOUR_SSID, YOUR_PW, NUM_CONNECTION_TRIES) == 0)
+        {
+            Serial.printf("Successful using SSID from configuration.h\r\n");
+            return 0;
+        }
+    }
+    else
+    {
+        Serial.printf("No SSID and pw supplied in configuration.h\r\n");
+    }
+
     /*
      * Get SSID and password using the Serial console and try to connect.
      */ 
-    while (wifi_connect_address((const char*) ssid, (const char*) password, 
-            NUM_CONNECTION_TRIES) != 0)
+    Serial.printf("Could not connect using any stored SSID. "
+                    "You can either input your SSID and password using the "
+                    "following command prompt, or by first pressing the WPS "
+                    "button on your router, than the button of your "
+                    "window_curtain_alarm. You have to restart your ESP "
+                    "after WPS connection!\r\n");
+    while (WiFi.status() != WL_CONNECTED)
     {
+        input_handler_t local_input_handler = {0};
+        if (setup_local_input_handler_t(&local_input_handler))
+        {
+            printf("Error creating local input handler in wifi_connector!\r\n");
+            exit(0);
+        }
+
+        // Repeat until Serial input is complete
         while (ssid_pw_from_serial() != 0)
         {
+            // Check if WPS button is pressed
+            if(local_input_handler.input_available() == 0)
+            {
+                printf("Button pressed, start WPS connection!\r\n");
+                // Discard action
+                local_input_handler.fetch_action();
+                if (start_WPS() == 0)
+                {
+                    printf("Connected via WPS, please restart\r\n");
+                    return 0;
+                }
+            }
             yield();
         }
-        Serial.print("Trying ssid ");
-        Serial.print(ssid);
-        Serial.print(" and pw of length ");
-        Serial.println(strlen(password));
+        Serial.printf("Trying ssid %s and pw of length %u\r\n", ssid, 
+                        strlen(password));
+        wifi_connect_address(ssid, password, NUM_CONNECTION_TRIES);
     }
 
-    return status;
+    return 1;
 }
 
 /*

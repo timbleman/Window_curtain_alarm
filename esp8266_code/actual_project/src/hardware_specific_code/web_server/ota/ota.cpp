@@ -6,11 +6,19 @@
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 
+
 /***************************** Struct definitions *****************************/
 /**************************** Prototype functions *****************************/
+void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type,
+             void *arg, uint8_t *data, size_t len);
+void initWebSocket();
+void setup_ota();
+
+
 /**************************** Variable definitions ****************************/
 AsyncWebServer asyncServer(8000);
 AsyncWebSocket ws("/ws");
+
 
 /********************************* Constants **********************************/
 const char index_html[] PROGMEM = R"rawliteral(
@@ -141,13 +149,12 @@ const char index_html[] PROGMEM = R"rawliteral(
 /**
  * @brief Reacts to an event
  *
- * @param server the websocketServer
- * @param client the websocketClient
- * @param type the eventType
- * @param arg
- * @param data
- * @param len
- *
+ * @param server  The websocketServer
+ * @param client  The websocketClient
+ * @param type    The eventType
+ * @param arg     Passend argument
+ * @param data    Byte data
+ * @param len     Data length
  * @return none
  */
 void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type,
@@ -172,7 +179,7 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
 /**
  * @brief Initializes Websocketserver
  *
- * @return none
+ * @return  None
  */
 void initWebSocket()
 {
@@ -183,7 +190,7 @@ void initWebSocket()
 /**
  * @brief Basic Setup for Over the air flashing
  *
- * @return none
+ * @return  None
  */
 void setup_ota()
 {
