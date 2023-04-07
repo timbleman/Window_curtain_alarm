@@ -3,7 +3,7 @@
 #include <string.h>
 #include "action_executer.h"
 #include "command_parser.h"
-#include "hardware_specific_code/motor_controller.h"
+#include "hardware_specific_code/local_hardware/motor_controller.h"
 #include "time_keeper.h"
 
 

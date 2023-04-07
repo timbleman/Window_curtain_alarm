@@ -7,7 +7,7 @@
 #define _USER_COMMUNICATION_H_
 
 /********************************** Includes **********************************/
-#include "../portable_code/types_and_enums.h"
+#include "../../portable_code/types_and_enums.h"
 
 
 /********************************* Constants **********************************/

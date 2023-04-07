@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include "ESP8266WiFi.h"
-#include "../portable_code/command_parser.h"
+#include "../../portable_code/command_parser.h"
 
 
 /********************************** Defines **********************************/

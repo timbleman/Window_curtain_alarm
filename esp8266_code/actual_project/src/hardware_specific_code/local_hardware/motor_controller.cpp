@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include "motor_controller.h"
 #include "data_storage.h"
-#include "configuration.h"
+#include "../../configuration.h"
 
 
 /********************************* Constants **********************************/

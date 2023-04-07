@@ -13,7 +13,7 @@ extern "C" {
 
 /********************************** Includes **********************************/
 #include <stdint.h>
-#include "hardware_specific_code/motor_controller.h"
+#include "hardware_specific_code/local_hardware/motor_controller.h"
 #include "configuration.h"
 #include "types_and_enums.h"
 

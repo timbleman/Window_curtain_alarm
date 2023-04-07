@@ -3,8 +3,8 @@
 
 /********************************** Includes **********************************/
 #include <stdint.h>
-#include "../../configuration.h"
-#include "../../portable_code/command_parser.h"
+#include "../../../configuration.h"
+#include "../../../portable_code/command_parser.h"
 
 #ifdef ENABLE_LOCAL_WEB_SITE
 

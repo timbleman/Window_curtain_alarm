@@ -2,9 +2,9 @@
 #include "wifi_connector.h"
 #include <Arduino.h>
 #include "ESP8266WiFi.h"
-#include "data_storage.h"
-#include "local_communication.h"
-#include "../configuration.h"
+#include "../local_hardware/data_storage.h"
+#include "../local_hardware/local_communication.h"
+#include "../../configuration.h"
 
 
 /********************************* Constants **********************************/
@@ -68,9 +68,9 @@ int start_WPS() {
  */
 int wifi_connect() {
     // Uncomment these if you want to erase EEPROM or WPS stored SSID
-    store_ssid("DUMMY_SSID", strlen("DUMMY_SSID"));
-    WiFi.disconnect(true);
-    ESP.eraseConfig();
+    //store_ssid("DUMMY_SSID", strlen("DUMMY_SSID"));
+    //WiFi.disconnect(true);
+    //ESP.eraseConfig();
 
     // Needs to be STA for WPS
     WiFi.mode(WIFI_STA);
@@ -313,11 +313,13 @@ int wifi_connect_address(const char* ssid, const char* pw, size_t num_tries)
     WiFi.begin(ssid, pw);
 
     size_t tries = 0;
+    Serial.print("Connecting");
     while (WiFi.status() != WL_CONNECTED && tries < num_tries) {
         delay(1000);
-        Serial.println("Connecting..");
+        Serial.print("..");
         tries++;
     }
+    Serial.print("\r\n");
     
     if (WiFi.status() == WL_CONNECTED)
     {
