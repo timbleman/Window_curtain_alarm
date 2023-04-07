@@ -14,6 +14,7 @@ extern "C" {
 /********************************** Includes **********************************/
 #include "time_keeper.h"
 #include "motor_controller.h"
+#include "types_and_enums.h"
 #include "configuration.h"
 
 
@@ -22,13 +23,15 @@ extern "C" {
 /**************************** Variable definitions ****************************/
 /**************************** Prototype functions ****************************/
 /*
+ * Setup an input_handler_t. Better way to handle multiple input sources.
  * Checks if an alarm should be triggered.
  * Factors in curtain state, the wake, sleep and current time.
  * In this current iteration only today's wake and sleep times are used.
  * 
- * @return: Success status or something?
+ * @param inh: An input_handler_t to initialize.
+ * @return: Success status.
  */
-int check_and_alarm_non_blocking();
+int setup_alarm_checker_input_handler(input_handler_t *inh);
 
 #ifdef TESTABLE_ALARMCHECKER_CODE
 enum CURTAIN_STATE new_state_ttw_tts_today(long tuw_today, long tus_today);

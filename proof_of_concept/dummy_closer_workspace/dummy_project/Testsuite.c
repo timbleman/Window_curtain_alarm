@@ -37,6 +37,7 @@
 #include <unistd.h> // sleep()
 #include <string.h>
 #include <stdio.h>  // printf()
+#include <stdlib.h>
 #include <stdbool.h>
 #include "System.h"
 #include "uCUnit-v1.0.h"
@@ -50,9 +51,14 @@
 #include "configuration.h"
 
 
-/********************************* Constants **********************************/
+/********************************** Defines ***********************************/
 #define MESSAGE_LEN 512
-#undef RUN_TIME_INTENSIVE_TESTS
+#define RUN_TIME_INTENSIVE_TESTS
+
+
+/********************************* Constants **********************************/
+const uint32_t ALL_DAYS = MON_T | TUE_T | WED_T | THU_T | FRI_T 
+                                | SAT_T | SUN_T;
 
 
 /**************************** Prototype functions *****************************/
@@ -506,8 +512,6 @@ static void Test_time_until_wake_today()
     
     bool min_prev = get_current_m() > 30;
     
-    const uint32_t ALL_DAYS = MON_T | TUE_T | WED_T | THU_T | FRI_T 
-                                | SAT_T | SUN_T;
     const int MIN_OFFSET = 25;
     const int TARGET_DIFF_SECS = MIN_OFFSET * 60;
     
@@ -1174,6 +1178,99 @@ static void Test_new_state_ttw_tts_today()
     
     UCUNIT_TestcaseEnd();
 }
+
+#ifdef RUN_TIME_INTENSIVE_TESTS
+// This is the closest to an end-to-end test
+static void Test_alarm_checker_as_input()
+{
+    UCUNIT_TestcaseBegin("Checking getting open and close actions from the "
+                            "alarm checker.");
+    
+    char message[MESSAGE_LEN] = {0};
+    
+    input_handler_t alarm_checker_inh = {0};
+    setup_alarm_checker_input_handler(&alarm_checker_inh);
+    user_action_t ackc_action = {0};
+    
+    // Setup
+    UCUNIT_CheckIsEqual(setup_files(), 0);
+    
+    // TODO Do you have to calibrate first?
+    // close curtain
+    user_action_t close_act = {0};
+    close_act.act_type = CLOSE_T;
+    while(execute_action_non_blocking(&close_act, message, MESSAGE_LEN));
+    UCUNIT_CheckIsEqual(get_curtain_state(), CURTAIN_CLOSED_T);
+    
+    // check if enough time available, otherwise abort
+    int testh = get_current_h();
+    int testm = get_current_m();
+    int tests = get_current_s();
+    // Do not run test if its to late, avoid stupid overflows.
+    System_WriteString("Checking if there is enough time to run checks today:\n");
+    UCUNIT_CheckIsEqual((testh >= 23 && testm > 55), 0);
+    
+    // set wake 5 seconds in the future
+    time_plus_secs(5, &testh, &testm, &tests);
+    set_wake(ALL_DAYS, testh, testm, tests);
+    
+    // set sleep 60 seconds in the future
+    testh = get_current_h();
+    testm = get_current_m();
+    tests = get_current_s();
+    time_plus_secs(60, &testh, &testm, &tests);
+    set_sleep(ALL_DAYS, testh, testm, tests);
+    
+    // check if available, get action: should do nothing
+    UCUNIT_CheckIsEqual(alarm_checker_inh.input_available(), EXIT_FAILURE);
+    ackc_action = alarm_checker_inh.fetch_action();
+    UCUNIT_CheckIsEqual(ackc_action.act_type, NONE_T);
+
+    // wait 6 second
+    sleep(6);
+
+    // check if available, get action, should be open
+    UCUNIT_CheckIsEqual(alarm_checker_inh.input_available(), EXIT_SUCCESS);
+    ackc_action = alarm_checker_inh.fetch_action();
+    UCUNIT_CheckIsEqual(ackc_action.act_type, CURTAIN_CONTROL_T);
+    UCUNIT_CheckIsEqual(ackc_action.data[0], OPEN_T);
+    
+    // execute action
+    while(execute_action_non_blocking(&ackc_action, message, MESSAGE_LEN));
+    
+    // check if available, get action: should do nothing
+    ackc_action = alarm_checker_inh.fetch_action();
+    UCUNIT_CheckIsEqual(ackc_action.act_type, NONE_T);
+    
+    // set sleep 3 seconds in future
+    testh = get_current_h();
+    testm = get_current_m();
+    tests = get_current_s();
+    time_plus_secs(3, &testh, &testm, &tests);
+    set_sleep(ALL_DAYS, testh, testm, tests);
+
+    // sleep 5 seconds
+    sleep(5);
+    
+    // check if available, get action: should be close
+    UCUNIT_CheckIsEqual(alarm_checker_inh.input_available(), EXIT_SUCCESS);
+    ackc_action = alarm_checker_inh.fetch_action();
+    UCUNIT_CheckIsEqual(ackc_action.act_type, CURTAIN_CONTROL_T);
+    UCUNIT_CheckIsEqual(ackc_action.data[0], CLOSE_T);
+    
+    // execute action
+    while(execute_action_non_blocking(&ackc_action, message, MESSAGE_LEN));
+    
+    // check if available, get action: should be nothing
+    ackc_action = alarm_checker_inh.fetch_action();
+    UCUNIT_CheckIsEqual(ackc_action.act_type, NONE_T);
+    
+    // Reset
+    setup_files();
+    
+    UCUNIT_TestcaseEnd();
+}
+#endif // RUN_TIME_INTENSIVE_TESTS
 #endif // TESTABLE_ALARMCHECKER_CODE
 
 #ifdef TESTABLE_STORAGE_CODE
@@ -1466,6 +1563,9 @@ void Testsuite_RunTests(void)
 
 #ifdef TESTABLE_ALARMCHECKER_CODE
     Test_new_state_ttw_tts_today();
+#ifdef RUN_TIME_INTENSIVE_TESTS
+    Test_alarm_checker_as_input();
+#endif // RUN_TIME_INTENSIVE_TESTS
 #endif // TESTABLE_ALARMCHECKER_CODE
 
 #ifdef TESTABLE_STORAGE_CODE
