@@ -7,11 +7,8 @@ extern "C" {
 #endif
 
 // Adjust these
-// TODO This should be done using WPS.
-//const char* def_ssid = "YourSSID";
-//const char* def_password =  "94044782303556147675";
 #define YOUR_SSID "YourSSID"
-#define YOUR_PW "94044782303556147675"
+#define YOUR_PW "********"
 #define SSID_MAX_LEN 33
 
 // Enable a local webserver and websockets. Uses heap.

@@ -6,6 +6,7 @@ This project aims at creating an alarm that opens and closes a window curtain at
 ![Installed hardware. Window can still be opened.](./pics/curtain_window_closed.jpg "Installed hardware. Window can still be opened.")
 
 ## Changelog
+* V1.2: Added OTA updating, WiFi connection using WPS and Serial, refactorings, a BOM and some UML diagrams.
 * V1.1: Added a locally accessible, basic webpage. Improved 3D files slightly. Minor bug fixes.
 * V1.0: Initial release. Controls using a hardware button and a TCP socket.
 
@@ -14,6 +15,7 @@ This project aims at creating an alarm that opens and closes a window curtain at
 * Automatically keeping track of time
 * One wake and sleep time for each weekday
 * Belt-driven opening and closing of curtains
+* WiFi configuration using WPS, Serial interface or source code
 * Socket-based user communication
 * Local webpage for communication
 * Over the air updating
@@ -22,7 +24,6 @@ This project aims at creating an alarm that opens and closes a window curtain at
 * STL files for assembling the project
 ### Possible future work
 * Multiple wake and sleep times for each weekday
-* WPS button for easy WIFI connection
 * Different endstop locations
 * Using more advanced features of the TMC2209 stepper driver (e.g.: sensorless homing)
 * Sync multiple curtains 
@@ -33,9 +34,9 @@ This project aims at creating an alarm that opens and closes a window curtain at
 
 ## Usage
 ### Setup
-Install the system according to the readme in /3D_objects/. Adjust the SSID in the code, compile and upload.
-Connect a 5V 2A power supply. Assign a static IP using your router. You will need this IP to configure the system.
-The IP is also printed using VCP with 9600 baud at power-up.
+Install the system according to the readme in /3D_objects/. In this directory there is also a bill of materials. You can adjust the SSID and password in the code. Compile and upload or just upload the binary.
+Connect a 5V 2A power supply. If you have not provided your SSID in the code, you have two options: Firstly, you connect a Serial terminal with 9600 baud rate and enter your data. Secondly, you can use WPS if your router supports it. Press the WPS button of your router, then the button of the window_curtain_alarm, wait approximately 30 seconds and then restart the ESP.  
+Assign a static IP using your router. You will need this IP to connect to the system. The IP is also printed using VCP at power-up.
 ### Basic controls using TCP sockets
 This alarm can be configured using the telnet protocol. Connect using the IP and port 23 with a client of your choice.
 Sending "help" gets a list of example commands.  
@@ -78,17 +79,19 @@ Here are some directories that may contain interesting files:
   * /esp8266_code/test_stuff/socket_test/: TCP socket server test project for the ESP8266.
   * /esp8266_code/test_stuff/motor_test/: Homing and moving using the TMC2209 driver.
 * /proof_of_concept/: Unit tested project implementing generic components. This project does not strictly target embedded hardware for ease of building and debugging.
-* /pics/: Some pictures and renderings.
-* /public/: A website that is able to configure the alarm. Currently on halt.
+* /pics/: Some pictures, diagrams and renderings.
 
 
 ## Implementation
 ### Hardware
-Opening and closing the curtain shall be done using a belt driven by a stepper motor. A NEMA17 stepper in combination with a TMC2209 driver is currently used. The target platform is the ESP8266. This microcontroller has been chosen instead of a Raspberry PI due to its lower cost and power consumption. 
+Opening and closing the curtain is done using a belt driven by a stepper motor. A NEMA17 stepper in combination with a TMC2209 driver is currently used. The target platform is the ESP8266. This microcontroller has been chosen instead of a Raspberry PI due to its lower cost and power consumption. 
 ### Mounting
 The hardware, including especially the motor, belt, and endstop, will be mounted using 3D printed objects. Currently, the project is not intended as a 'one design fits all' solution, but will need to be adapted to the used curtain and window.
 ### Programming language and environment
 Due to its dominance in embedded systems and easier debugging, C, instead of C++, is used for most of the more generic project components. These components include user input parsing, keeping track of time, and controlling the IO.
-As Arduino and most of its libraries are based on C++, the main function and socket server use this more high-level approach. The PlatformIO IDE and toolchain is used for the ESP8266 code. The proof of concept has been developed using CodeLite.
+As Arduino and most of its libraries are based on C++, the main function and socket server use this more high-level approach. The PlatformIO IDE and toolchain is used for the ESP8266 code. The unit tested proof of concept has been developed using CodeLite.  
+
+The following class diagram should give an overview of the projects components.  As C, the language most used in this project is not class-oriented, I deviated slightly from the UML standard. Instead of modeling classes, I model files, structs, and enums. Enums are often used by multiple files, this is not modeled to increase readability.
+![A class diagram.](./pics/charts/class_diagram.PNG "A class diagram.")
 ### Testing
-The uCunit framework has been used for unit testing. The framework is basic but very portable and requires only a few header files.
+The uCunit framework has been used for unit testing portable code components. The framework is basic but very portable and requires only a few header files.

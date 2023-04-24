@@ -26,9 +26,9 @@
 /********************************** Defines **********************************/
 #define RESPOND_BUF_SIZE 256
 #ifndef ENABLE_LOCAL_WEB_SITE
-#define NUM_INPUTS 2
-#else
 #define NUM_INPUTS 3
+#else
+#define NUM_INPUTS 4
 #endif // ENABLE_LOCAL_WEB_SITE
 
 
@@ -68,10 +68,11 @@ void setup() {
   printf("cur time %i %i %i \n", get_current_h(), get_current_m(), get_current_s());
 
   // Setup input_handler_t
-  setup_user_input_handler_t(&inputs[0]);
-  setup_local_input_handler_t(&inputs[1]);
+  setup_alarm_checker_input_handler(&inputs[0]);
+  setup_user_input_handler_t(&inputs[1]);
+  setup_local_input_handler_t(&inputs[2]);
 #ifdef ENABLE_LOCAL_WEB_SITE
-  setup_web_input_handler_t(&inputs[2]);
+  setup_web_input_handler_t(&inputs[3]);
 
   setup_ota();
 #endif // ENABLE_LOCAL_WEB_SITE
@@ -112,11 +113,6 @@ void loop() {
       }
       memset(buf, 0, RESPOND_BUF_SIZE);
     }
-  }
-  else
-  {
-    // Check for alarms, open or close the curtain.
-    check_and_alarm_non_blocking();
   }
 
 #ifdef PRINT_HEAP_STATS_EVERY_MILLIS
