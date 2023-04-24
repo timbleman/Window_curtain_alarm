@@ -63,13 +63,18 @@ int setup_alarm_checker_comm()
  */
 int alarm_checker_input()
 {
+    static enum CURTAIN_STATE old_state = CURTAIN_UNDEFINED_T;
+    
+    // Try to get teh actual curtain_state if undefined
+    if (old_state == CURTAIN_UNDEFINED_T)
+        old_state = get_curtain_state();
+
     int status = 1;
     
     // Update the ignore one wake.
     update_ignore();
     
     // Actual state may not be needed...
-    enum CURTAIN_STATE old_state = get_curtain_state();
     enum CURTAIN_STATE new_state = new_state_ttw_tts_today(time_until_wake(), 
                                                         time_until_sleep());
 
@@ -93,6 +98,15 @@ int alarm_checker_input()
             default:    break;
         }
     }
+
+    /* 
+     * Update the curtain_state if an OPEN_T or CLOSE_T has been stored.
+     * Using a dedicated variable instead of the actual state, allows
+     * the user to open curtain manually and not closing it immediately
+     * if it is sleeptime. 
+     */
+    if (status == 0)
+        old_state = new_state;
     
     return status;
 }

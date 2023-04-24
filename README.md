@@ -92,6 +92,6 @@ Due to its dominance in embedded systems and easier debugging, C, instead of C++
 As Arduino and most of its libraries are based on C++, the main function and socket server use this more high-level approach. The PlatformIO IDE and toolchain is used for the ESP8266 code. The unit tested proof of concept has been developed using CodeLite.  
 
 The following class diagram should give an overview of the projects components.  As C, the language most used in this project is not class-oriented, I deviated slightly from the UML standard. Instead of modeling classes, I model files, structs, and enums. Enums are often used by multiple files, this is not modeled to increase readability.
-![A class diagram.](./pics/charts/class_diagram.PNG "A class diagram.")
+![A class diagram.](./pics/charts/class_diagram.png "A class diagram.")
 ### Testing
 The uCunit framework has been used for unit testing portable code components. The framework is basic but very portable and requires only a few header files.
