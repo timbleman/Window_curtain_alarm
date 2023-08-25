@@ -65,7 +65,7 @@ int alarm_checker_input()
 {
     static enum CURTAIN_STATE old_state = CURTAIN_UNDEFINED_T;
     
-    // Try to get teh actual curtain_state if undefined
+    // Try to get the actual curtain_state if undefined
     if (old_state == CURTAIN_UNDEFINED_T)
         old_state = get_curtain_state();
 
@@ -74,9 +74,15 @@ int alarm_checker_input()
     // Update the ignore one wake.
     update_ignore();
     
-    // Actual state may not be needed...
-    enum CURTAIN_STATE new_state = new_state_ttw_tts_today(time_until_wake(), 
-                                                        time_until_sleep());
+    enum CURTAIN_STATE new_state = CURTAIN_UNDEFINED_T;
+    /*
+     * Do not check immediately before midnight to prevent fetching
+     * tuw and tus from different days.
+     */
+    if (!(get_current_h() == 23 && get_current_m() == 59 && get_current_s() > 57))
+    {
+        new_state = new_state_ttw_tts_today(time_until_wake(), time_until_sleep());
+    }
 
     // Check whether to open or close. 
     if (new_state != old_state)
